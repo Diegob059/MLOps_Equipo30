@@ -6,6 +6,32 @@
 
 Proyecto con el dataset MiBici aplicando ML para resolver necesidades de negocio
 
+## 🚀 Inicio Rápido (Quickstart)
+
+### 1. Requisitos e Instalación
+Clona el repositorio e instala las dependencias del proyecto:
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Descarga y Estructura de Datos
+Para descargar automáticamente los datos abiertos oficiales de MiBici (2023 y 2024 + Nomenclatura):
+```bash
+python src/data/download_raw_data.py --years 2023 2024
+```
+Los datos se organizan bajo el estándar de Cookiecutter Data Science en `data/raw/`:
+* `data/raw/Nomenclatura/nomenclatura_*.csv`: Catálogo de estaciones y capacidades.
+* `data/raw/Viajes/`: 24 archivos mensuales CSV de viajes (2023 y 2024).
+
+### 3. Ejecución del Notebook (Pregunta 2)
+Abre y corre el notebook modular de predicción de riesgo a 2 horas:
+```bash
+jupyter lab notebooks/1.0-pregunta-2-riesgo-estaciones.ipynb
+```
+El notebook detecta dinámicamente la raíz del proyecto y corre sin importar si se abre desde la raíz (`MLOps_Equipo30`) o desde la carpeta `notebooks/`.
+
+---
+
 ## Project Organization
 
 ```
