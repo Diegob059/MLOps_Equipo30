@@ -1,12 +1,12 @@
 {
   "dataset_name": "MiBici Guadalajara Open Data",
-  "data_version": "mibici-v2025_2026-ddfa3aa49c",
-  "generated_at": "2026-10-18T12:44:56Z",
+  "data_version": "mibici-v2025_2026-f1db9c0782",
+  "generated_at": "2026-10-18T19:22:15Z",
   "target_years": [
     2025,
     2026
   ],
-  "total_files_tracked": 24,
+  "total_files_tracked": 22,
   "files": {
     "raw/Nomenclatura/nomenclatura_2026_09.csv": {
       "sha256": "206e45fe633922b634d858142fa21e6fd9f4c421b6435c02980ef290cc2df90d",
@@ -95,16 +95,6 @@
     "raw/Viajes/datos_abiertos_2026_09.csv": {
       "sha256": "00b5cf64cc31a502d01044d905f6e033f9bc1db962e771119742fd25c6cb58b3",
       "size_bytes": 42566896
-    },
-    "interim/estaciones.parquet": {
-      "sha256": "97e228e6fa9c48036686d3b78dfa1254c74c2912e4011e9c4f6bff36e9ed4061",
-      "size_bytes": 22531,
-      "rows_count": 480
-    },
-    "interim/viajes_agregados_hora.parquet": {
-      "sha256": "dfa210ca2d85532e3f195c534c5f90e8d93f6d6ab8abc73c6e4e853f0d9f0185",
-      "size_bytes": 10980877,
-      "rows_count": 3343731
     }
   }
 }

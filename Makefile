@@ -56,6 +56,12 @@ data:
 	$(PYTHON_INTERPRETER) -m src.data.p2_dataset
 	$(PYTHON_INTERPRETER) -m src.features.p2_features
 
+## Build interim dataset and engineer features (shared: Question 3)
+.PHONY: data_p3
+data_p3:
+	$(PYTHON_INTERPRETER) -m src.data.dataset
+	$(PYTHON_INTERPRETER) -m src.features.features
+
 ## Train all models and log experiments to MLflow (P1, P2 and P3)
 .PHONY: train
 train:
@@ -65,6 +71,11 @@ train:
 .PHONY: train_p2
 train_p2:
 	$(PYTHON_INTERPRETER) -m src.models.p2_train
+
+## Train specifically Question 3 station-clustering model
+.PHONY: train_p3
+train_p3:
+	$(PYTHON_INTERPRETER) -m src.models.p3_train
 
 ## Launch local MLflow Tracking server on port 5005
 .PHONY: mlflow

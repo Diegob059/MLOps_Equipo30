@@ -11,6 +11,7 @@ Ejecución desde CLI:
 import typer
 
 from src.models.p2_train import train_and_evaluate as run_p2
+from src.models.p3_train import entrenar_y_registrar as run_p3
 from src.models.run_all_experiments import main as run_all
 
 app = typer.Typer(help="CLI de Entrenamiento y Registro en MLflow - MiBici Equipo 30")
@@ -26,6 +27,12 @@ def all():
 def p2():
     """Ejecuta y registra en MLflow el pipeline específico de Pregunta 2."""
     run_p2()
+
+
+@app.command()
+def p3():
+    """Ejecuta y registra en MLflow el pipeline específico de Pregunta 3 (clustering)."""
+    run_p3()
 
 
 if __name__ == "__main__":
