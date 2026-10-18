@@ -1,7 +1,7 @@
 {
   "dataset_name": "MiBici Guadalajara Open Data",
-  "data_version": "mibici-v2023_2024-d6201b6995",
-  "generated_at": "2026-10-17T00:48:25Z",
+  "data_version": "mibici-v2023_2024-d404721c4f",
+  "generated_at": "2026-10-18T06:46:21Z",
   "target_years": [
     2023,
     2024
@@ -114,9 +114,9 @@
       "rows_count": 480
     },
     "interim/viajes_agregados_hora.parquet": {
-      "sha256": "a9b39dacb9a6f76a2f7b4ae64bbc46a1569808c3834b2dba35ef61e5558f257f",
-      "size_bytes": 10673444,
-      "rows_count": 3261655
+      "sha256": "fd3810b149d5cdec11b069925f0c0c7647144c19f8e3e007bb23514a8cce8728",
+      "size_bytes": 11038561,
+      "rows_count": 3369108
     }
   }
 }
