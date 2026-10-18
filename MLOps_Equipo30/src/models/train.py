@@ -5,12 +5,13 @@ Permite entrenar y registrar todos los experimentos (P1, P2 y P3) en MLflow
 o ejecutar selectivamente el pipeline deseado.
 
 Ejecución desde CLI:
-    python -m MiBici.modeling.train
+    python -m src.models.train
 """
 
 import typer
-from MiBici.modeling.run_all_experiments import main as run_all
-from MiBici.modeling.p2_train import train_and_evaluate as run_p2
+
+from src.models.p2_train import train_and_evaluate as run_p2
+from src.models.run_all_experiments import main as run_all
 
 app = typer.Typer(help="CLI de Entrenamiento y Registro en MLflow - MiBici Equipo 30")
 

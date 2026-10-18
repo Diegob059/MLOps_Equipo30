@@ -20,20 +20,19 @@ Uso:
     python src/data/download_raw_data.py --years 2026 --output_dir data/raw --force
 """
 
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 import argparse
+from dataclasses import dataclass
 import logging
-import os
+from pathlib import Path
 import re
 import sys
 import time
+from typing import Dict, List, Optional, Tuple
 import urllib.parse
 import zipfile
 
-import requests
 from bs4 import BeautifulSoup
+import requests
 from requests.adapters import HTTPAdapter
 from tqdm import tqdm
 from urllib3.util.retry import Retry
@@ -229,9 +228,7 @@ def scrape_portal_links(
             if key not in found_trips and key in FALLBACK_TRIPS:
                 fallback_url = FALLBACK_TRIPS[key]
                 fallback_name = Path(urllib.parse.urlparse(fallback_url).path).name
-                logger.info(
-                    f"Activando fallback para {y}-{m:02d} -> {fallback_name}"
-                )
+                logger.info(f"Activando fallback para {y}-{m:02d} -> {fallback_name}")
                 item = DownloadItem(
                     filename=fallback_name,
                     url=fallback_url,
@@ -371,22 +368,23 @@ def download_item(
     try:
         with session.get(item.url, stream=True, timeout=timeout) as resp:
             if resp.status_code != 200:
-                logger.error(
-                    f"Código HTTP {resp.status_code} al solicitar {item.filename}."
-                )
+                logger.error(f"Código HTTP {resp.status_code} al solicitar {item.filename}.")
                 return False
 
             total_bytes = int(resp.headers.get("Content-Length", 0))
             chunk_size = 64 * 1024  # 64 KB
 
-            with open(temp_path, "wb") as f, tqdm(
-                total=total_bytes,
-                unit="B",
-                unit_scale=True,
-                unit_divisor=1024,
-                desc=f"↓ {item.filename[:26]}",
-                leave=False,
-            ) as pbar:
+            with (
+                open(temp_path, "wb") as f,
+                tqdm(
+                    total=total_bytes,
+                    unit="B",
+                    unit_scale=True,
+                    unit_divisor=1024,
+                    desc=f"↓ {item.filename[:26]}",
+                    leave=False,
+                ) as pbar,
+            ):
                 for chunk in resp.iter_content(chunk_size=chunk_size):
                     if chunk:
                         f.write(chunk)

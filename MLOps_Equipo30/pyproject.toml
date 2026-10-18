@@ -1,37 +1,35 @@
 [build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
-name = "MiBici"
-version = "0.0.1"
-description = "Proyecto con el dataset MiBici aplicando ML para resolver necesidades de negocio"
+name = "src"
+version = "0.1.0"
+description = "Proyecto MiBici Guadalajara con MLOps - Equipo 30 (CCDS v1)"
 authors = [
   { name = "Equipo 30" },
 ]
 license = { file = "LICENSE" }
 readme = "README.md"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License"
-]
-requires-python = "~=3.13.0"
+requires-python = ">=3.10"
+dependencies = []
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
 
 [tool.ruff]
 line-length = 99
-src = ["MiBici"]
-include = ["pyproject.toml", "MiBici/**/*.py"]
+src = ["src"]
+include = ["pyproject.toml", "src/**/*.py"]
 
 [tool.ruff.lint]
-extend-select = ["I"]  # Add import sorting
+extend-select = ["I"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["MiBici"]
+known-first-party = ["src"]
 force-sort-within-sections = true
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
-
-

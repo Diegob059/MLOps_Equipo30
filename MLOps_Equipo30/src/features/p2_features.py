@@ -11,30 +11,29 @@ Principios de Diseño:
     - Funciones puras, desacopladas y reutilizables tanto en batch como en inferencia.
 
 Ejecución desde terminal:
-    python -m MiBici.p2_features
+    python -m src.features.p2_features
 """
 
-import time
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+import time
+from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
 import typer
 
-from MiBici.p2_config import (
+from src.p2_config import (
     DEMAND_LAGS,
     END_TIMESTAMP,
-    P2_STATIONS_PARQUET,
-    P2_TRIPS_HOURLY_PARQUET,
     OVERFLOW_RATIO_THRESHOLD,
     P2_FEATURES_TARGET_PARQUET,
+    P2_STATIONS_PARQUET,
+    P2_TRIPS_HOURLY_PARQUET,
     ROLLING_WINDOWS,
     START_TIMESTAMP,
     TARGET_HORIZON_HOURS,
     TRAIN_END_DATE,
     UNDERFLOW_RATIO_THRESHOLD,
-    WARMUP_HOURS,
     logger,
 )
 
@@ -106,8 +105,12 @@ def compute_target_variable(
     df = df.copy()
 
     # Desplazamientos hacia adelante por estación
-    fut_llegadas = df.groupby("station_id")["llegadas"].shift(-1) + df.groupby("station_id")["llegadas"].shift(-2)
-    fut_salidas = df.groupby("station_id")["salidas"].shift(-1) + df.groupby("station_id")["salidas"].shift(-2)
+    fut_llegadas = df.groupby("station_id")["llegadas"].shift(-1) + df.groupby("station_id")[
+        "llegadas"
+    ].shift(-2)
+    fut_salidas = df.groupby("station_id")["salidas"].shift(-1) + df.groupby("station_id")[
+        "salidas"
+    ].shift(-2)
 
     df["delta_net"] = (fut_llegadas - fut_salidas).astype("float32")
     df["ratio"] = (df["delta_net"] / df["capacity"]).astype("float32")
@@ -159,9 +162,11 @@ def add_rolling_balance_features(
 
     for w in windows:
         feat_name = f"balance_rolling_{w}h"
-        df[feat_name] = df.groupby("station_id")["balance_neto"].transform(
-            lambda x: x.shift(1).rolling(w, min_periods=1).mean()
-        ).astype("float32")
+        df[feat_name] = (
+            df.groupby("station_id")["balance_neto"]
+            .transform(lambda x: x.shift(1).rolling(w, min_periods=1).mean())
+            .astype("float32")
+        )
         rolling_cols.append(feat_name)
 
     return df, rolling_cols
@@ -195,7 +200,7 @@ def build_full_feature_pipeline(
     if not stations_parquet.exists() or not trips_parquet.exists():
         raise FileNotFoundError(
             f"Faltan artefactos intermedios para P2 ({stations_parquet} o {trips_parquet}). "
-            "Ejecuta primero: python -m MiBici.p2_dataset"
+            "Ejecuta primero: python -m src.data.p2_dataset"
         )
 
     df_stations = pd.read_parquet(stations_parquet)
@@ -249,8 +254,19 @@ def get_train_test_data(
     df_clean = df[valid_mask].copy()
 
     feature_cols = [
-        c for c in df_clean.columns
-        if c not in ["station_id", "timestamp", "salidas", "llegadas", "balance_neto", "delta_net", "ratio", "target"]
+        c
+        for c in df_clean.columns
+        if c
+        not in [
+            "station_id",
+            "timestamp",
+            "salidas",
+            "llegadas",
+            "balance_neto",
+            "delta_net",
+            "ratio",
+            "target",
+        ]
     ]
 
     train_mask = df_clean["timestamp"] < split_date

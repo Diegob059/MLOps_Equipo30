@@ -1,1 +1,1 @@
-"""Módulo de ingesta y procesamiento de datos."""
+"""Submódulo de adquisición, validación y preparación de datos."""

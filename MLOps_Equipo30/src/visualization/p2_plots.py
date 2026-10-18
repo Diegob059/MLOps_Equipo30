@@ -14,10 +14,10 @@ import pandas as pd
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
 
-from MiBici.p2_config import (
+from src.p2_config import (
+    LABEL_MAPPING,
     P2_CONFUSION_MATRIX_PLOT,
     P2_FEATURE_IMPORTANCE_PLOT,
-    LABEL_MAPPING,
     logger,
 )
 

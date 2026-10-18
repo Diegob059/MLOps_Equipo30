@@ -6,27 +6,26 @@ por lotes (Batch Scoring) sobre el conjunto de Test y formatea una tabla legible
 con 5 ejemplos (valor predicho vs esperado con probabilidades de cada clase).
 
 Ejecución desde terminal:
-    python -m MiBici.modeling.p2_predict --sample-size 5
+    python -m src.models.p2_predict --sample-size 5
 """
 
 from pathlib import Path
-from typing import Optional
 
 import joblib
 import numpy as np
 import pandas as pd
 import typer
 
-from MiBici.p2_config import (
-    P2_MODEL_PATH,
-    P2_FEATURES_TARGET_PARQUET,
+from src.features.p2_features import get_train_test_data
+from src.p2_config import (
     LABEL_MAPPING,
+    P2_FEATURES_TARGET_PARQUET,
+    P2_MODEL_PATH,
     P2_STATIONS_PARQUET,
     P2_TEST_PREDICTIONS_PARQUET,
     TRAIN_END_DATE,
     logger,
 )
-from MiBici.p2_features import get_train_test_data
 
 app = typer.Typer(
     help="CLI de Inferencia en Batch y Diagnóstico de Predicciones para P2 (MiBici)."
@@ -47,7 +46,7 @@ def run_batch_inference(
     if not model_path.exists():
         raise FileNotFoundError(
             f"No se encontró el modelo serializado en: {model_path}. "
-            "Ejecuta primero: python -m MiBici.modeling.p2_train"
+            "Ejecuta primero: python -m src.models.p2_train"
         )
 
     logger.info(f"Cargando modelo serializado desde: {model_path}")
@@ -64,7 +63,9 @@ def run_batch_inference(
     y_proba = clf.predict_proba(X_test)
 
     # Construcción de tabla de resultados
-    df_results = df_clean.loc[X_test.index, ["station_id", "timestamp", "capacity", "delta_net", "ratio", "target"]].copy()
+    df_results = df_clean.loc[
+        X_test.index, ["station_id", "timestamp", "capacity", "delta_net", "ratio", "target"]
+    ].copy()
     df_results["pred_target"] = y_pred
     df_results["prob_normal"] = y_proba[:, 0].round(3)
     df_results["prob_desabasto"] = y_proba[:, 1].round(3)
@@ -73,7 +74,9 @@ def run_batch_inference(
     # Cruce con nombres de estaciones
     if stations_parquet.exists():
         df_stations = pd.read_parquet(stations_parquet)
-        df_results = df_results.merge(df_stations[["station_id", "name"]], on="station_id", how="left")
+        df_results = df_results.merge(
+            df_stations[["station_id", "name"]], on="station_id", how="left"
+        )
         df_results.rename(columns={"name": "nombre_estacion"}, inplace=True)
     else:
         df_results["nombre_estacion"] = "Estación " + df_results["station_id"].astype(str)
@@ -82,9 +85,7 @@ def run_batch_inference(
     df_results["etiqueta_esperada"] = df_results["target"].map(LABEL_MAPPING)
     df_results["etiqueta_predicha"] = df_results["pred_target"].map(LABEL_MAPPING)
     df_results["diagnostico"] = np.where(
-        df_results["target"] == df_results["pred_target"],
-        "✓ Acierto",
-        "✗ Discrepancia"
+        df_results["target"] == df_results["pred_target"], "✓ Acierto", "✗ Discrepancia"
     )
 
     output_predictions_parquet.parent.mkdir(parents=True, exist_ok=True)
@@ -93,16 +94,27 @@ def run_batch_inference(
 
     # Selección intencional de 5 ejemplos diversos para inspección visual
     cols_display = [
-        "timestamp", "station_id", "nombre_estacion", "capacity",
-        "delta_net", "ratio", "etiqueta_esperada", "etiqueta_predicha",
-        "prob_normal", "prob_desabasto", "prob_saturacion", "diagnostico"
+        "timestamp",
+        "station_id",
+        "nombre_estacion",
+        "capacity",
+        "delta_net",
+        "ratio",
+        "etiqueta_esperada",
+        "etiqueta_predicha",
+        "prob_normal",
+        "prob_desabasto",
+        "prob_saturacion",
+        "diagnostico",
     ]
 
     sample_normal = df_results[df_results["target"] == 0].head(1)
     sample_desabasto = df_results[df_results["target"] == 1].head(2)
     sample_saturacion = df_results[df_results["target"] == 2].head(2)
 
-    df_sample = pd.concat([sample_normal, sample_desabasto, sample_saturacion]).reset_index(drop=True)
+    df_sample = pd.concat([sample_normal, sample_desabasto, sample_saturacion]).reset_index(
+        drop=True
+    )
     df_sample = df_sample[cols_display]
 
     print("\n" + "=" * 115)
@@ -115,9 +127,7 @@ def run_batch_inference(
 
 
 @app.command()
-def main(
-    sample_size: int = typer.Option(5, help="Número de ejemplos a desplegar en consola.")
-):
+def main(sample_size: int = typer.Option(5, help="Número de ejemplos a desplegar en consola.")):
     """Ejecuta la inferencia en batch para la Pregunta 2."""
     run_batch_inference(sample_size=sample_size)
 

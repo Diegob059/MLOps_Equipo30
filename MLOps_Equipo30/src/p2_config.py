@@ -6,15 +6,17 @@ y configuración de tracking para MLflow, completamente desacoplado para evitar
 colisiones con otras preguntas o módulos del proyecto.
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
 from typing import Dict, List
+
 from dotenv import load_dotenv
 
 try:
     from loguru import logger
 except ImportError:
     import logging
+
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(message)s",
@@ -78,7 +80,7 @@ TRAIN_END_DATE: str = "2026-01-01 00:00:00"
 # Flujo neto en 2 horas hacia adelante: (Llegadas[t+1, t+2] - Salidas[t+1, t+2]) / Capacidad
 TARGET_HORIZON_HOURS: int = 2
 UNDERFLOW_RATIO_THRESHOLD: float = -0.50  # Clase 1: Riesgo Desabasto / Vacío
-OVERFLOW_RATIO_THRESHOLD: float = 0.50   # Clase 2: Riesgo Saturación / Lleno
+OVERFLOW_RATIO_THRESHOLD: float = 0.50  # Clase 2: Riesgo Saturación / Lleno
 
 LABEL_MAPPING: Dict[int, str] = {
     0: "Normal (0)",
@@ -90,8 +92,8 @@ LABEL_MAPPING: Dict[int, str] = {
 # INGENIERÍA DE CARACTERÍSTICAS
 # ==============================================================================
 DEMAND_LAGS: List[int] = [1, 2, 24, 168]  # t-1, t-2, t-24, t-168
-ROLLING_WINDOWS: List[int] = [3, 12]       # Ventanas rodantes de balance neto
-WARMUP_HOURS: int = 168                   # 1 semana de calentamiento para lags
+ROLLING_WINDOWS: List[int] = [3, 12]  # Ventanas rodantes de balance neto
+WARMUP_HOURS: int = 168  # 1 semana de calentamiento para lags
 
 # ==============================================================================
 # SEMILLAS Y MODELADO
@@ -119,9 +121,7 @@ LGBM_PARAMS: Dict = {
 # ==============================================================================
 os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
 os.environ["MLFLOW_DISABLE_AGENT_HINT"] = "1"
-MLFLOW_TRACKING_URI: str = os.getenv(
-    "MLFLOW_TRACKING_URI", f"sqlite:///{PROJ_ROOT / 'mlflow.db'}"
-)
+MLFLOW_TRACKING_URI: str = os.getenv("MLFLOW_TRACKING_URI", f"sqlite:///{PROJ_ROOT / 'mlflow.db'}")
 MLFLOW_EXPERIMENT_NAME: str = "mibici-equipo30"
 
 # Configuración de loguru con tqdm si está disponible

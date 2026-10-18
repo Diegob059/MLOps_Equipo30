@@ -7,14 +7,14 @@ import pytest
 import pandas as pd
 import numpy as np
 
-from MiBici.p2_config import (
+from src.p2_config import (
     P2_DATA_MANIFEST_PATH,
     LABEL_MAPPING,
     OVERFLOW_RATIO_THRESHOLD,
     TARGET_HORIZON_HOURS,
     UNDERFLOW_RATIO_THRESHOLD,
 )
-from MiBici.p2_dataset import compute_sha256, get_current_data_version
+from src.data.p2_dataset import compute_sha256, get_current_data_version
 
 
 def test_p2_config_thresholds_and_targets():

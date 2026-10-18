@@ -29,10 +29,10 @@ Para descargar los datos abiertos de MiBici Guadalajara (años 2025 y 2026) y co
 python -m src.data.p2_download_raw_data
 
 # 2. Agregación temporal horaria y cruce con nomenclatura
-python -m MiBici.p2_dataset
+python -m src.data.p2_dataset
 
 # 3. Construcción de características y target sin fuga temporal
-python -m MiBici.p2_features
+python -m src.features.p2_features
 ```
 
 ---
@@ -43,13 +43,13 @@ El proyecto incluye un orquestador unificado que ejecuta los baselines y modelos
 
 ```bash
 # Ejecutar y registrar todos los experimentos (P1, P2 Baseline, P2 Candidato, P3)
-python -m MiBici.modeling.run_all_experiments
+python -m src.models.run_all_experiments
 ```
 
 También es posible ejecutar únicamente la modelación de la Pregunta 2:
 
 ```bash
-python -m MiBici.modeling.p2_train
+python -m src.models.p2_train
 ```
 
 ### Runs Registrados en `mibici-equipo30`:

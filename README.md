@@ -22,16 +22,16 @@ Desde la carpeta `MLOps_Equipo30/`:
 
 ```bash
 # 1. Ingesta y versionado Parquet + SHA-256 (Datos 2025-2026)
-python -m MiBici.p2_dataset
+python -m src.data.p2_dataset
 
 # 2. Generación del Feature Store sin Data Leakage (7.19M filas)
-python -m MiBici.p2_features
+python -m src.features.p2_features
 
 # 3. Entrenamiento (LightGBM vs Baseline) y Tracking en MLflow
-python -m MiBici.modeling.p2_train
+python -m src.models.p2_train
 
 # 4. Inferencia en batch y diagnóstico de 5 casos
-python -m MiBici.modeling.p2_predict --sample-size 5
+python -m src.models.p2_predict --sample-size 5
 
 # 5. Visualizar Experimentos y Métricas en MLflow Localmente
 mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5000

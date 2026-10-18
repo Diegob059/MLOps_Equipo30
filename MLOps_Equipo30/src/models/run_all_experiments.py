@@ -17,20 +17,18 @@ Cumple rigurosamente con la rúbrica y especificación oficial de MLOps TC5061:
    garantizar visibilidad sin importar cómo se invoque la UI de MLflow.
 
 Ejecución desde CLI:
-    python -m MiBici.modeling.run_all_experiments
+    python -m src.models.run_all_experiments
 """
 
-import os
+from pathlib import Path
 import subprocess
 import time
-from pathlib import Path
 from typing import Dict, List, Tuple
 
 import joblib
-import matplotlib.pyplot as plt
 from lightgbm import LGBMClassifier
+import matplotlib.pyplot as plt
 import mlflow
-import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.dummy import DummyClassifier
@@ -42,18 +40,19 @@ from sklearn.metrics import (
     f1_score,
     mean_absolute_error,
     precision_score,
+    r2_score,
     recall_score,
     root_mean_squared_error,
-    r2_score,
     silhouette_score,
 )
 from sklearn.preprocessing import StandardScaler
 
-from MiBici.p2_config import (
+from src.data.p2_dataset import get_current_data_version
+from src.features.p2_features import get_train_test_data
+from src.p2_config import (
     FIGURES_DIR,
     LGBM_PARAMS,
     MLFLOW_EXPERIMENT_NAME,
-    MODELS_DIR,
     P2_FEATURES_TARGET_PARQUET,
     P2_MODEL_PATH,
     P2_STATIONS_PARQUET,
@@ -64,17 +63,13 @@ from MiBici.p2_config import (
     TRAIN_END_DATE,
     logger,
 )
-from MiBici.p2_dataset import get_current_data_version
-from MiBici.p2_features import get_train_test_data
-from MiBici.p2_plots import plot_confusion_matrix, plot_feature_importance
+from src.visualization.p2_plots import plot_confusion_matrix, plot_feature_importance
 
 
 def get_git_commit() -> str:
     """Obtiene el hash del commit actual de Git."""
     try:
-        return subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], text=True
-        ).strip()
+        return subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
     except Exception:
         return "90b6590"
 
@@ -132,9 +127,7 @@ def run_p1_baseline(data_version: str, git_commit: str):
 
     # Heurística: Promedio histórico por estación, día de semana y hora
     lookup = (
-        train_df.groupby(["station_id", "dow", "hour"])["salidas"]
-        .mean()
-        .rename("pred_salidas")
+        train_df.groupby(["station_id", "dow", "hour"])["salidas"].mean().rename("pred_salidas")
     )
     overall_mean = train_df["salidas"].mean()
 
@@ -154,11 +147,7 @@ def run_p1_baseline(data_version: str, git_commit: str):
     p1_plot_path = FIGURES_DIR / "p1_demanda_prediccion_vs_real.png"
 
     # Agregación temporal por hora para visualización clara
-    agg_eval = (
-        test_df.groupby("timestamp")[["salidas", "pred_salidas"]]
-        .sum()
-        .reset_index()
-    )
+    agg_eval = test_df.groupby("timestamp")[["salidas", "pred_salidas"]].sum().reset_index()
     sample_window = agg_eval.iloc[: 24 * 7]  # 1 semana representativa
 
     plt.figure(figsize=(12, 5), dpi=150)
@@ -402,11 +391,7 @@ def run_p3_clustering(data_version: str, git_commit: str):
     trips = pd.read_parquet(P2_TRIPS_HOURLY_PARQUET)
 
     trips["hour"] = pd.to_datetime(trips["timestamp"]).dt.hour
-    st_hourly = (
-        trips.groupby(["station_id", "hour"])["salidas"]
-        .mean()
-        .unstack(fill_value=0)
-    )
+    st_hourly = trips.groupby(["station_id", "hour"])["salidas"].mean().unstack(fill_value=0)
     st_hourly.columns = [f"hour_{c}" for c in st_hourly.columns]
 
     merged = estaciones.set_index("station_id").join(st_hourly).fillna(0)
@@ -423,7 +408,9 @@ def run_p3_clustering(data_version: str, git_commit: str):
     db = davies_bouldin_score(X, labels)
     ch = calinski_harabasz_score(X, labels)
 
-    logger.info(f"P3 Clustering -> Silhouette: {sil:.4f}, Davies-Bouldin: {db:.4f}, Calinski: {ch:.1f}")
+    logger.info(
+        f"P3 Clustering -> Silhouette: {sil:.4f}, Davies-Bouldin: {db:.4f}, Calinski: {ch:.1f}"
+    )
 
     # Generación de Artefactos Visuales
     p3_map_path = FIGURES_DIR / "p3_clusters_estaciones_mapa.png"
@@ -562,7 +549,7 @@ def main():
     run_p3_clustering(data_version=data_version, git_commit=git_commit)
 
     logger.success(
-        f"✓ Todos los experimentos (P1, P2 y P3) se registraron en MLflow en {time.time()-t_start:.1f}s."
+        f"✓ Todos los experimentos (P1, P2 y P3) se registraron en MLflow en {time.time() - t_start:.1f}s."
     )
 
 

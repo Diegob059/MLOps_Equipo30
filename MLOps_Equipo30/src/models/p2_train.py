@@ -7,18 +7,16 @@ Evalúa sobre el conjunto de Test sin fuga temporal y registra parámetros,
 métricas y artefactos en SQLite MLflow.
 
 Ejecución desde terminal:
-    python -m MiBici.modeling.p2_train
+    python -m src.models.p2_train
 """
 
-import time
 from pathlib import Path
+import time
 from typing import Dict, Optional
 
 import joblib
 from lightgbm import LGBMClassifier
 import mlflow
-import numpy as np
-import pandas as pd
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import (
     balanced_accuracy_score,
@@ -29,24 +27,22 @@ from sklearn.metrics import (
 )
 import typer
 
-from MiBici.p2_config import (
-    P2_MODEL_PATH,
+from src.data.p2_dataset import get_current_data_version
+from src.features.p2_features import get_train_test_data
+from src.p2_config import (
     LGBM_PARAMS,
     MLFLOW_EXPERIMENT_NAME,
     MLFLOW_TRACKING_URI,
     P2_FEATURES_TARGET_PARQUET,
+    P2_MODEL_PATH,
     RANDOM_SEED,
     REPORTS_DIR,
     TRAIN_END_DATE,
     logger,
 )
-from MiBici.p2_dataset import get_current_data_version
-from MiBici.p2_features import get_train_test_data
-from MiBici.p2_plots import plot_confusion_matrix, plot_feature_importance
+from src.visualization.p2_plots import plot_confusion_matrix, plot_feature_importance
 
-app = typer.Typer(
-    help="CLI de Entrenamiento y Evaluación de Modelos para la Pregunta 2 (MiBici)."
-)
+app = typer.Typer(help="CLI de Entrenamiento y Evaluación de Modelos para la Pregunta 2 (MiBici).")
 
 
 def train_and_evaluate(
@@ -96,7 +92,6 @@ def train_and_evaluate(
     # 4. Evaluación en Test
     logger.info("Generando predicciones sobre el conjunto de Test...")
     y_pred = clf.predict(X_test)
-    y_prob = clf.predict_proba(X_test)
 
     macro_f1 = f1_score(y_test, y_pred, average="macro")
     bal_acc = balanced_accuracy_score(y_test, y_pred)
@@ -135,13 +130,12 @@ def train_and_evaluate(
 
     # 7. Tracking y Registro en MLflow (Cumplimiento de Rúbrica TC5061)
     data_version = get_current_data_version()
-    
+
     # Obtener commit de git para ligar la corrida con el código exacto
     import subprocess
+
     try:
-        git_commit = subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], text=True
-        ).strip()
+        git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
     except Exception:
         git_commit = "unknown"
 
@@ -157,23 +151,27 @@ def train_and_evaluate(
         # RUN 1: Baseline Heurístico Estratificado
         # ------------------------------------------------------------------
         with mlflow.start_run(run_name="p2_baseline_dummy_stratified") as run_dummy:
-            mlflow.log_params({
-                "model_class": "DummyClassifier",
-                "strategy": "stratified",
-                "random_seed": RANDOM_SEED,
-                "train_samples": len(X_train),
-                "test_samples": len(X_test),
-                "train_end_date": TRAIN_END_DATE,
-                "date_range": "2025-01-01 to 2026-09-30",
-                "data_version": data_version,
-            })
-            mlflow.log_metrics({
-                "test_macro_f1": float(baseline_macro_f1),
-                "test_balanced_accuracy": float(dummy_bal_acc),
-                "test_recall_normal": float(recalls_dummy[0]),
-                "test_recall_desabasto": float(recalls_dummy[1]),
-                "test_recall_saturacion": float(recalls_dummy[2]),
-            })
+            mlflow.log_params(
+                {
+                    "model_class": "DummyClassifier",
+                    "strategy": "stratified",
+                    "random_seed": RANDOM_SEED,
+                    "train_samples": len(X_train),
+                    "test_samples": len(X_test),
+                    "train_end_date": TRAIN_END_DATE,
+                    "date_range": "2025-01-01 to 2026-09-30",
+                    "data_version": data_version,
+                }
+            )
+            mlflow.log_metrics(
+                {
+                    "test_macro_f1": float(baseline_macro_f1),
+                    "test_balanced_accuracy": float(dummy_bal_acc),
+                    "test_recall_normal": float(recalls_dummy[0]),
+                    "test_recall_desabasto": float(recalls_dummy[1]),
+                    "test_recall_saturacion": float(recalls_dummy[2]),
+                }
+            )
             baseline_summary_path = REPORTS_DIR / "p2_baseline_summary.txt"
             baseline_summary_path.write_text(
                 f"BASELINE HEURÍSTICO ESTRATIFICADO (PREGUNTA 2)\n"
@@ -187,15 +185,17 @@ def train_and_evaluate(
                 encoding="utf-8",
             )
             mlflow.log_artifact(str(baseline_summary_path), artifact_path="reports")
-            mlflow.set_tags({
-                "equipo": "Equipo 30",
-                "pregunta": "P2",
-                "git_commit": git_commit,
-                "model_class": "DummyClassifier",
-                "author": "Ricardo Bahamon (Equipo 30)",
-                "target_horizon": "2_hours",
-                "problem_type": "multiclass_imbalanced",
-            })
+            mlflow.set_tags(
+                {
+                    "equipo": "Equipo 30",
+                    "pregunta": "P2",
+                    "git_commit": git_commit,
+                    "model_class": "DummyClassifier",
+                    "author": "Ricardo Bahamon (Equipo 30)",
+                    "target_horizon": "2_hours",
+                    "problem_type": "multiclass_imbalanced",
+                }
+            )
             logger.info(f"✓ Run de Baseline registrado con ID: {run_dummy.info.run_id}")
 
         # ------------------------------------------------------------------
@@ -204,39 +204,45 @@ def train_and_evaluate(
         with mlflow.start_run(run_name="p2_lgbm_risk_classifier_2025_2026") as run_lgbm:
             # Parámetros del modelo y del pipeline
             mlflow.log_params(lgbm_params)
-            mlflow.log_params({
-                "model_class": "LGBMClassifier",
-                "train_samples": len(X_train),
-                "test_samples": len(X_test),
-                "num_features": len(feature_cols),
-                "train_end_date": TRAIN_END_DATE,
-                "date_range": "2025-01-01 to 2026-09-30",
-                "data_version": data_version,
-            })
+            mlflow.log_params(
+                {
+                    "model_class": "LGBMClassifier",
+                    "train_samples": len(X_train),
+                    "test_samples": len(X_test),
+                    "num_features": len(feature_cols),
+                    "train_end_date": TRAIN_END_DATE,
+                    "date_range": "2025-01-01 to 2026-09-30",
+                    "data_version": data_version,
+                }
+            )
 
             # Etiquetas del run: linaje de código, pregunta y gobernanza
-            mlflow.set_tags({
-                "equipo": "Equipo 30",
-                "pregunta": "P2",
-                "git_commit": git_commit,
-                "model_class": "LGBMClassifier",
-                "author": "Ricardo Bahamon (Equipo 30)",
-                "target_horizon": "2_hours",
-                "problem_type": "multiclass_imbalanced",
-            })
+            mlflow.set_tags(
+                {
+                    "equipo": "Equipo 30",
+                    "pregunta": "P2",
+                    "git_commit": git_commit,
+                    "model_class": "LGBMClassifier",
+                    "author": "Ricardo Bahamon (Equipo 30)",
+                    "target_horizon": "2_hours",
+                    "problem_type": "multiclass_imbalanced",
+                }
+            )
 
             # Métricas del run nombradas indicando el conjunto de datos (test_ / train_)
-            mlflow.log_metrics({
-                "test_macro_f1": float(macro_f1),
-                "test_balanced_accuracy": float(bal_acc),
-                "test_recall_normal": float(recalls[0]),
-                "test_recall_desabasto": float(recalls[1]),
-                "test_recall_saturacion": float(recalls[2]),
-                "test_precision_normal": float(precisions[0]),
-                "test_precision_desabasto": float(precisions[1]),
-                "test_precision_saturacion": float(precisions[2]),
-                "train_fit_duration_seconds": float(fit_duration),
-            })
+            mlflow.log_metrics(
+                {
+                    "test_macro_f1": float(macro_f1),
+                    "test_balanced_accuracy": float(bal_acc),
+                    "test_recall_normal": float(recalls[0]),
+                    "test_recall_desabasto": float(recalls[1]),
+                    "test_recall_saturacion": float(recalls[2]),
+                    "test_precision_normal": float(precisions[0]),
+                    "test_precision_desabasto": float(precisions[1]),
+                    "test_precision_saturacion": float(precisions[2]),
+                    "train_fit_duration_seconds": float(fit_duration),
+                }
+            )
 
             # Artefactos (Figuras diagnósticas, modelo serializado y reporte)
             if cm_path.exists():
@@ -267,7 +273,7 @@ def main():
     """Ejecuta el entrenamiento y evaluación para P2 desde CLI."""
     t0 = time.time()
     train_and_evaluate()
-    logger.info(f"Pipeline de modelado finalizado en {time.time()-t0:.1f}s.")
+    logger.info(f"Pipeline de modelado finalizado en {time.time() - t0:.1f}s.")
 
 
 if __name__ == "__main__":

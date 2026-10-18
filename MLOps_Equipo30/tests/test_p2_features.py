@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from MiBici.p2_features import (
+from src.features.p2_features import (
     add_cyclical_calendar_features,
     add_demand_lags,
     add_rolling_balance_features,
