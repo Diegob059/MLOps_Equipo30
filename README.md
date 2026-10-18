@@ -32,9 +32,13 @@ El proyecto aborda tres preguntas estratégicas:
 ```
 TC5061-Proyecto-Equipo30/
 ├── data/
+│   ├── external/            <- Datos externos complementarios (metadatos de clima o API).
 │   ├── raw/                 <- Datos crudos inmutables (CSVs de Viajes y Nomenclatura 2025-2026).
 │   ├── interim/             <- Datos limpios en Parquet (p2_estaciones.parquet, p2_viajes_agregados_hora.parquet).
 │   └── processed/           <- Datasets finales para modelado (p2_mibici_features_target.parquet).
+├── docs/                    <- Documentación del proyecto, Getting Started y ML Canvas oficial.
+│   ├── getting-started.md   <- Guía de configuración y reproducción paso a paso.
+│   └── Machine Learning Canvas (v1.2).docx <- Canvas oficial del equipo.
 ├── notebooks/
 │   └── 1.0-rb-p2-riesgo-estaciones.ipynb <- Exploración interactiva y blueprint analítico P2 (convención 1.0-iniciales-descripcion).
 ├── src/                     <- Código fuente canónico del paquete Python (CCDS v1).
@@ -69,12 +73,13 @@ TC5061-Proyecto-Equipo30/
 │   ├── p2_ml_canvas.md      <- Machine Learning Canvas detallado para la Pregunta 2.
 │   └── p2_architecture_diagram.md <- Diagramas de arquitectura del flujo end-to-end P2.
 ├── tests/
+│   ├── __init__.py
+│   ├── test_data.py         <- Pruebas unitarias generales.
 │   ├── test_p2_data.py      <- Pruebas unitarias de configuración y manifiesto P2.
 │   └── test_p2_features.py  <- Pruebas unitarias de ingeniería de características P2.
-├── pyproject.toml           <- Configuración de empaquetado del paquete src editable.
 ├── setup.py                 <- Setup clásico de empaquetado pip editable (CCDS v1).
 ├── requirements.txt         <- Dependencias con versiones fijadas para reproducibilidad.
-├── Makefile                 <- Comandos estándar de conveniencia.
+├── Makefile                 <- Comandos estándar de conveniencia y automatización.
 └── README.md                <- Documentación principal del proyecto.
 ```
 
@@ -130,15 +135,19 @@ python -m src.models.p2_predict --sample-size 5
 
 ### Paso 5: Ejecución de Pruebas Unitarias
 ```bash
-PYTHONPATH=. pytest tests/test_p2_*.py
+make test
+# O directamente con pytest:
+pytest tests
 ```
 
 ### Paso 6: Explorador de Experimentos en MLflow UI
 Para inspeccionar gráficamente las métricas, parámetros y artefactos registrados:
 ```bash
-mlflow ui --backend-store-uri sqlite:///mlflow.db
+make mlflow
+# O directamente:
+mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5005
 ```
-Acceder en el navegador a `http://127.0.0.1:5000`.
+Acceder en el navegador a: **`http://127.0.0.1:5005`** (seleccionar la pestaña **"Model training"** para ver las corridas registradas).
 
 ---
 
