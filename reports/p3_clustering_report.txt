@@ -1,9 +1,9 @@
 PREGUNTA 3: CLUSTERING Y PERFILAMIENTO DE ESTACIONES (MIBICI)
 ============================================================
-Algoritmo               : K-Means (k=4)
+Algoritmo               : gmm (k=2)
+Conjunto de features    : hourly
 Escalador               : StandardScaler
-Total Estaciones        : 480
-Silhouette Score        : 0.2735
-Davies-Bouldin Score    : 1.3819
-Calinski-Harabasz Score : 201.2
-Distribución Estaciones : {2: np.int64(271), 0: np.int64(139), 1: np.int64(62), 3: np.int64(8)}
+Total Estaciones        : 352
+Silhouette Score        : 0.2918
+Davies-Bouldin Score    : 1.9792
+Distribución Estaciones : {0: 329, 1: 23}
