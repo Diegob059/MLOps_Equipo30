@@ -25,9 +25,9 @@ Anticipar con 2 horas de ventana operativa el riesgo crítico de **Desabasto** (
   * **Clase 0 (Operación Normal):** $-0.50 < \text{Ratio} < 0.50$.
 
 ## 4. Fuentes de Datos e Ingesta (Data Sources)
-* **Datos Abiertos MiBici (2023 - 2024):** 24 archivos CSV mensuales con más de 8.9 millones de transacciones de viajes (`Viaje_Id`, `Inicio_del_viaje`, `Fin_del_viaje`, `Origen_Id`, `Destino_Id`).
+* **Datos Abiertos MiBici (2025 - 2026):** 21 archivos CSV mensuales (12 meses de 2025 y 9 meses de 2026 hasta septiembre) con millones de transacciones de viajes (`Viaje_Id`, `Inicio_del_viaje`, `Fin_del_viaje`, `Origen_Id`, `Destino_Id`).
 * **Catálogo de Nomenclatura:** Catálogo geoespacial y físico de estaciones (`id`, `name`, `latitude`, `longitude`, `dpcapacity`).
-* **Rejilla Cartesiana Espacio-Temporal:** Rejilla completa de 370 estaciones $\times$ 17,544 horas con **Zero-Filling** (la inactividad es un cero físico real).
+* **Rejilla Cartesiana Espacio-Temporal:** Rejilla completa de estaciones activas $\times$ 15,312 horas continuas con **Zero-Filling** (la inactividad es un cero físico real).
 
 ## 5. Ingeniería de Características (Features - Estrictamente $t \le 0$)
 1. **Lags de Demanda y Oferta:** Salidas y llegadas en $t-1$, $t-2$, $t-24$ (día anterior) y $t-168$ (semana anterior).

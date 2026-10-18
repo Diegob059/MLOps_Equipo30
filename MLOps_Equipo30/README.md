@@ -20,9 +20,8 @@ El proyecto aborda tres preguntas estratégicas:
 
 ## 📊 2. Datos Utilizados
 
-* **Fuente Oficial:** Portal de Datos Abiertos de MiBici ([https://www.mibici.net/es/datos-abiertos/](https://www.mibici.net/es/datos-abiertos/)).
-* **Periodo Histórico:** Años completos 2023 y 2024 (24 archivos mensuales de viajes).
-* **Volumen:** Más de **8.93 millones de viajes** registrados y agregados en series de tiempo horarias para 370 estaciones activas.
+* **Periodo Histórico:** Años 2025 y 2026 (21 archivos mensuales de viajes: 2025 completo y 2026 hasta septiembre).
+* **Volumen:** Más de **7.89 millones de viajes** registrados y agregados en series de tiempo horarias para 470 estaciones activas.
 * **Catálogo de Nomenclatura:** Catálogo oficial con ID de estación, nombre, geolocalización (latitud, longitud) y capacidad física de anclajes instalados (`capacity`).
 * **Formato Intermedio:** **Apache Parquet** comprimido para alta velocidad de I/O y bajo consumo de disco.
 
@@ -33,28 +32,31 @@ El proyecto aborda tres preguntas estratégicas:
 ```
 MLOps_Equipo30/
 ├── data/
-│   ├── raw/                 <- Datos crudos inmutables (CSVs de Viajes y Nomenclatura).
-│   ├── interim/             <- Datos limpios en Parquet (estaciones.parquet, viajes_agregados_hora.parquet).
-│   └── processed/           <- Datasets finales para modelado (mibici_features_target.parquet).
+│   ├── raw/                 <- Datos crudos inmutables (CSVs de Viajes y Nomenclatura 2025-2026).
+│   ├── interim/             <- Datos limpios en Parquet (p2_estaciones.parquet, p2_viajes_agregados_hora.parquet).
+│   └── processed/           <- Datasets finales para modelado (p2_mibici_features_target.parquet).
 ├── notebooks/
-│   └── 1.0-pregunta-2-riesgo-estaciones.ipynb <- Exploración interactiva y blueprint analítico.
+│   └── 1.0-pregunta-2-riesgo-estaciones.ipynb <- Exploración interactiva y blueprint analítico P2.
+├── src/data/
+│   └── p2_download_raw_data.py <- Descargador automatizado de datos abiertos 2025-2026.
 ├── MiBici/                  <- Código fuente modular del paquete Python del proyecto.
-│   ├── __init__.py
-│   ├── config.py            <- Centralización de rutas, fechas, hiperparámetros y MLflow.
-│   ├── dataset.py           <- Ingesta desatendida, normalización Parquet y versionado con hashes.
-│   ├── features.py          <- Feature store: rejilla espacio-temporal, zero-filling, lags y rollings.
-│   ├── plots.py             <- Generación de diagnósticos visuales (matriz de confusión e importancias).
+│   ├── p2_config.py         <- Centralización de rutas, fechas (2025-2026), hiperparámetros y MLflow P2.
+│   ├── p2_dataset.py        <- Ingesta desatendida, normalización Parquet y versionado SHA-256 P2.
+│   ├── p2_features.py       <- Feature store: rejilla continua (7.19M filas), zero-filling, lags y target P2.
+│   ├── p2_plots.py          <- Generación de diagnósticos visuales P2 (matriz de confusión e importancias).
 │   └── modeling/
-│       ├── __init__.py
-│       ├── train.py         <- Entrenamiento (Baseline vs LightGBM), evaluación y registro en MLflow.
-│       └── predict.py       <- Inferencia en batch y diagnóstico cualitativo de 5 ejemplos de test.
-├── models/                  <- Modelos serializados entrenados (lgbm_risk_classifier.joblib).
+│       ├── p2_train.py      <- Entrenamiento (Baseline vs LightGBM), evaluación y registro en MLflow P2.
+│       └── p2_predict.py    <- Inferencia en batch y diagnóstico cualitativo de 5 ejemplos de test P2.
+├── models/                  <- Modelos serializados entrenados (p2_lgbm_risk_classifier.joblib).
 ├── reports/
-│   └── figures/             <- Figuras diagnósticas generadas (confusion_matrix.png, feature_importance.png).
+│   └── figures/             <- Figuras diagnósticas generadas (p2_confusion_matrix.png, p2_feature_importance.png).
 ├── references/              <- Documentación de arquitectura, ML Canvas y manifiesto de datos.
-│   ├── data_manifest.json   <- Manifiesto criptográfico (SHA-256) de versionado de datos en Git.
-│   ├── ml_canvas_pregunta2.md <- Machine Learning Canvas detallado para la Pregunta 2.
-│   └── architecture_diagram.md<- Diagramas de arquitectura del flujo end-to-end.
+│   ├── p2_data_manifest.json <- Manifiesto criptográfico (SHA-256) de versionado de datos P2 en Git.
+│   ├── p2_ml_canvas.md      <- Machine Learning Canvas detallado para la Pregunta 2.
+│   └── p2_architecture_diagram.md <- Diagramas de arquitectura del flujo end-to-end P2.
+├── tests/
+│   ├── test_p2_data.py      <- Pruebas unitarias de configuración y manifiesto P2.
+│   └── test_p2_features.py  <- Pruebas unitarias de ingeniería de características P2.
 ├── pyproject.toml           <- Configuración de empaquetado del módulo MiBici.
 ├── requirements.txt         <- Dependencias con versiones fijadas para reproducibilidad.
 ├── Makefile                 <- Comandos estándar de conveniencia.
@@ -74,43 +76,49 @@ cd TC5061-Proyecto-Equipo30/MLOps_Equipo30
 
 # 2. Instalar las dependencias fijadas del proyecto
 pip install -r requirements.txt
+pip install -e .
 ```
 
 ---
 
-## 🚀 5. Ejecución del Pipeline End-to-End (Sin Pasos Manuales)
+## 🚀 5. Ejecución del Pipeline End-to-End de la Pregunta 2 (Prefijo `P2`)
 
-Cada fase del pipeline es ejecutable desde la línea de comandos mediante interfaces CLI construidas con `typer`:
+Cada fase del pipeline de la Pregunta 2 cuenta con el prefijo `p2_` para mantenerse 100% desacoplado de las implementaciones de los demás compañeros del equipo:
 
-### Paso 1: Ingesta, Normalización y Versionado de Datos
-Descarga automáticamente los 24 meses de viajes y nomenclatura, normaliza tipos y genera el manifiesto SHA-256 en Parquet:
+### Paso 1: Ingesta, Normalización y Versionado de Datos (2025 y 2026)
+Descarga automáticamente los 21 meses de viajes y nomenclatura más reciente, normaliza tipos y genera el manifiesto SHA-256 en Parquet:
 ```bash
-python -m MiBici.dataset
+python -m MiBici.p2_dataset
 ```
-*Salidas:* `data/interim/estaciones.parquet`, `data/interim/viajes_agregados_hora.parquet`, `references/data_manifest.json`.
+*Salidas:* `data/interim/p2_estaciones.parquet`, `data/interim/p2_viajes_agregados_hora.parquet`, `references/p2_data_manifest.json`.
 
 ### Paso 2: Generación del Feature Store y Target
-Construye la rejilla cartesiana con Zero-Filling, calcula el target sin leakage a 2 horas y genera lags y rolling balances:
+Construye la rejilla cartesiana continua con Zero-Filling (7,196,640 filas), calcula el target sin leakage a 2 horas y genera lags y rolling balances:
 ```bash
-python -m MiBici.features
+python -m MiBici.p2_features
 ```
-*Salidas:* `data/processed/mibici_features_target.parquet`.
+*Salidas:* `data/processed/p2_mibici_features_target.parquet`.
 
 ### Paso 3: Entrenamiento del Modelo y Registro en MLflow
-Ajusta el Baseline Estratificado y el modelo candidato LightGBM (`class_weight='balanced'`), evalúa sobre Test (julio - diciembre 2024), guarda el modelo y registra parámetros y artefactos en MLflow:
+Ajusta el Baseline Estratificado y el modelo candidato LightGBM (`class_weight='balanced'`), evalúa sobre Test (enero - septiembre 2026), guarda el modelo y registra parámetros y artefactos en MLflow:
 ```bash
-python -m MiBici.modeling.train
+python -m MiBici.modeling.p2_train
 ```
-*Salidas:* `models/lgbm_risk_classifier.joblib`, `reports/figures/confusion_matrix.png`, `reports/figures/feature_importance.png`, base de datos MLflow `mlflow.db`.
+*Salidas:* `models/p2_lgbm_risk_classifier.joblib`, `reports/figures/p2_confusion_matrix.png`, `reports/figures/p2_feature_importance.png`, base de datos MLflow `mlflow.db`.
 
 ### Paso 4: Inferencia en Batch e Inspección de Casos de Test
-Carga el modelo serializado, ejecuta inferencia sobre las 1.63 millones de observaciones de prueba y presenta una tabla de 5 ejemplos cualitativos (valor predicho vs esperado con probabilidades):
+Carga el modelo serializado, ejecuta inferencia sobre las 3,078,500 observaciones de prueba de 2026 y presenta una tabla de 5 ejemplos cualitativos (valor predicho vs esperado con probabilidades):
 ```bash
-python -m MiBici.modeling.predict --sample-size 5
+python -m MiBici.modeling.p2_predict --sample-size 5
 ```
-*Salidas:* `data/processed/test_predictions.parquet` y resumen tabular en consola.
+*Salidas:* `data/processed/p2_test_predictions.parquet` y resumen tabular en consola.
 
-### Paso 5: Explorador de Experimentos en MLflow UI
+### Paso 5: Ejecución de Pruebas Unitarias
+```bash
+PYTHONPATH=. pytest tests/test_p2_*.py
+```
+
+### Paso 6: Explorador de Experimentos en MLflow UI
 Para inspeccionar gráficamente las métricas, parámetros y artefactos registrados:
 ```bash
 mlflow ui --backend-store-uri sqlite:///mlflow.db

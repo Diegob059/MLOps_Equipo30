@@ -9,14 +9,14 @@ Este documento detalla la arquitectura modular end-to-end implementada para resp
 ```mermaid
 flowchart TD
     subgraph S1["1. Ingesta y Versionado de Datos (src/data/ y MiBici.dataset)"]
-        A["Portal MiBici (Datos Abiertos)"] -->|"Scraping Resiliente / Fallback"| B["data/raw/Viajes/ (24 CSVs)<br/>data/raw/Nomenclatura/ (1 CSV)"]
+        A["Portal MiBici (Datos Abiertos)"] -->|"Scraping Resiliente / Fallback"| B["data/raw/Viajes/ (21 CSVs: 2025-2026)<br/>data/raw/Nomenclatura/ (1 CSV)"]
         B -->|"Normalización, Chunks (latin1 -> UTF-8)"| C["MiBici.dataset"]
         C -->|"Serialización Eficiente"| D["data/interim/estaciones.parquet<br/>data/interim/viajes_agregados_hora.parquet"]
         C -->|"Cálculo de Hashes SHA-256"| E["references/data_manifest.json<br/>(Versionado de Datos en Git)"]
     end
 
     subgraph S2["2. Feature Store & Target (MiBici.features)"]
-        D --> F["Rejilla Cartesiana Espacio-Temporal<br/>(370 Estaciones x 17,544 Horas)"]
+        D --> F["Rejilla Cartesiana Espacio-Temporal<br/>(Estaciones Activas x 15,312 Horas)"]
         F -->|"Imputación Física"| G["Zero-Filling (Ausencia = 0 real)"]
         G -->|"shift(-1, -2) / Capacidad"| H["Cálculo del Target Operativo (2h)<br/>{0: Normal, 1: Desabasto, 2: Saturación}"]
         G -->|"shift(lags, rollings) [t <= 0]"| I["Feature Engineering Histórico<br/>- Lags (1, 2, 24, 168)<br/>- Rollings 3h, 12h<br/>- Cíclicas sin/cos"]
@@ -25,7 +25,7 @@ flowchart TD
     end
 
     subgraph S3["3. Entrenamiento, Validación y MLflow (MiBici.modeling.train)"]
-        J -->|"División Cronológica Estricta<br/>(Train < 2024-07-01 <= Test)"| K["Partición Train / Test"]
+        J -->|"División Cronológica Estricta<br/>(Train < 2026-01-01 <= Test)"| K["Partición Train / Test"]
         K --> L["Baseline Heurístico<br/>(DummyClassifier Estratificado)"]
         K --> M["Modelo Candidato<br/>(LGBMClassifier con class_weight='balanced')"]
         L --> N["Evaluación Cuantitativa<br/>(Macro F1, Balanced Acc, Recall por clase)"]
@@ -51,7 +51,7 @@ flowchart TD
 
 ### Módulo 1: Ingesta y Versionado (`MiBici.dataset`)
 * **Propósito:** Automatizar la descarga desatendida, normalizar nombres de variables, codificación y tipos temporales, consolidando los datos en formato Parquet (`data/interim/`).
-* **Mecanismo de Versionado:** Genera un manifiesto criptográfico en `references/data_manifest.json` que registra el hash SHA-256 de cada archivo individual y calcula un hash global para la versión del dataset (ej. `mibici-v2023_2024-d6201b6995`), consumible directamente por MLflow.
+* **Mecanismo de Versionado:** Genera un manifiesto criptográfico en `references/data_manifest.json` que registra el hash SHA-256 de cada archivo individual y calcula un hash global para la versión del dataset (ej. `mibici-v2025_2026-d6201b6995`), consumible directamente por MLflow.
 
 ### Módulo 2: Ingeniería de Características (`MiBici.features`)
 * **Propósito:** Generar la matriz cartesiana continua y construir variables explicativas utilizando **exclusivamente datos del pasado ($t \le 0$)**.
