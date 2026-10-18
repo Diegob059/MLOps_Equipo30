@@ -1,0 +1,19 @@
+{
+  "selected_methods": {
+    "salidas": "historico",
+    "llegadas": "historico"
+  },
+  "margin": 3.1875,
+  "stations": 368,
+  "data_version": "p1-b82961c841c7089205efb9ef8de938995258201f2ccf81344756af16bdb1241c",
+  "example_date": "2026-09-30",
+  "states": {
+    "Sugerencia revisable": 329,
+    "Falta espacio previsto para devoluciones": 19,
+    "Inventario inicial supera capacidad": 18,
+    "Confirmar operación": 2
+  },
+  "training_rows": 1474944,
+  "validation_rows": 799296,
+  "test_rows": 406272
+}

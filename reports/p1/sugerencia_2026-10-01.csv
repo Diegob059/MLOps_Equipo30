@@ -1,0 +1,369 @@
+estacion,fecha,necesidad_prevista,bicicletas_referencia,nombre,capacidad,actividad_28d_previa,ocupacion_maxima_prevista,estado,bicicletas_inicio_sugeridas,hora_inicio_plan,inicio_pico,hora_fin
+2,2026-10-01,8.829787,13,(GDL-001) C. Epigmenio Glez./ Av. 16 de Sept.,15,3415.0,13.042553178966045,Sugerencia revisable,13,0,7,10
+3,2026-10-01,4.3404255,8,(GDL-002) C. Colonias  / Av.  Niños héroes,15,2640.0,12.297872066497803,Sugerencia revisable,8,0,7,10
+4,2026-10-01,1.0,5,(GDL-003) C. Vidrio / Av. Chapultepec,19,4016.0,14.085105895996094,Sugerencia revisable,5,0,7,10
+5,2026-10-01,9.531915,13,(GDL-004) C. Ghilardi /C. Miraflores,19,3405.0,13.638298034667969,Sugerencia revisable,13,0,7,10
+6,2026-10-01,2.7234044,6,(GDL-005) C. San Diego /Calzada Independencia,11,2655.0,6.234042525291443,Sugerencia revisable,6,0,7,10
+8,2026-10-01,4.06383,8,(GDL-006) C. Venustiano Carranza /C. Reforma,11,1730.0,8.361702114343643,Sugerencia revisable,8,0,7,10
+9,2026-10-01,9.063829,13,(GDL-007) C. Epigmenio Glez./Av. Cristobal C.,15,2714.0,13.148936167359352,Sugerencia revisable,13,0,7,10
+10,2026-10-01,9.06383,13,(GDL-008) C. Ignacio Zaragoza / C. J. Angulo,15,2384.0,13.234042555093765,Sugerencia revisable,13,0,7,10
+11,2026-10-01,34.404255,38,(GDL-009) Calz. Federalismo/ C. J. Angulo,23,10806.0,38.7446808218956,Inventario inicial supera capacidad,,0,7,10
+12,2026-10-01,10.425531,14,(GDL-010) C. Cruz verde / C. Joaquin Angulo,15,4090.0,14.574468076229095,Sugerencia revisable,14,0,7,10
+13,2026-10-01,8.425531,12,(GDL-011) C. Garibaldi / C. Frías,11,2688.0,12.148936182260513,Inventario inicial supera capacidad,,0,7,10
+14,2026-10-01,7.7659574,11,(GDL-012) C. Joaquín Angulo / C. Ghilardi,11,2308.0,11.042553193867207,Falta espacio previsto para devoluciones,,0,7,10
+15,2026-10-01,1.3829787,5,(GDL-013) C. Vidrio  / C. Marsella,11,1367.0,10.106382846832275,Sugerencia revisable,5,0,7,10
+16,2026-10-01,7.808511,11,(GDL-014) C. J. Angulo/C José Clemente Orozco,19,5104.0,11.872340083122253,Sugerencia revisable,11,0,7,10
+17,2026-10-01,8.148936,12,(GDL-015) C. Herrera y Cairo /C. Pedro Buzeta,15,5182.0,12.40425530076027,Sugerencia revisable,12,0,7,10
+18,2026-10-01,4.1063833,8,(GDL-016) C. Bernardo de Balbuena/C J. Angulo,15,2553.0,8.042553193867207,Sugerencia revisable,8,0,7,10
+19,2026-10-01,1.8297871,6,(GDL-017) Av. México /C. Bernardo de Balbuena,15,2880.0,7.404255509376526,Sugerencia revisable,6,0,7,10
+20,2026-10-01,1.7659575,5,(GDL-018) Av. México / C. Manuel M. Diéguez,11,4227.0,7.8510637283325195,Sugerencia revisable,5,0,7,10
+21,2026-10-01,3.5531914,7,(GDL-019)  C. Juan Manuel / C. Andrés Terán,23,6717.0,11.361701965332031,Sugerencia revisable,7,0,7,10
+23,2026-10-01,3.9787233,8,(GDL-021) C. Nicolás Romero / C. Reforma,15,3710.0,9.042553186416626,Sugerencia revisable,8,0,7,10
+24,2026-10-01,3.5957448,7,(GDL-022) C. San Felipe /C Enrique D. de León,15,2813.0,10.702127933502197,Sugerencia revisable,7,0,7,10
+25,2026-10-01,7.5319147,11,(GDL-023) C. Jesús / C. San Felipe,15,2350.0,11.085106387734413,Sugerencia revisable,11,0,7,10
+26,2026-10-01,8.595745,12,(GDL-024) Av.  Federalismo / C. Juan Manuel,15,4297.0,12.148936152458191,Sugerencia revisable,12,0,7,10
+27,2026-10-01,10.6595745,14,(GDL-025) C. Reforma / C. González Ortega,15,4223.0,14.0,Sugerencia revisable,14,0,7,10
+28,2026-10-01,9.021276,13,(GDL-026) C. Pedro Loza / C. Reforma,15,5685.0,13.021276595070958,Sugerencia revisable,13,0,7,10
+29,2026-10-01,5.1063833,9,(GDL-027) C. Belén / C. San Felipe,15,2752.0,9.446808487176895,Sugerencia revisable,9,0,7,10
+30,2026-10-01,10.12766,14,(GDL-028) C. Gregorio Dávila /C. Manuel Acuña,15,3392.0,14.170212760567665,Sugerencia revisable,14,0,7,10
+31,2026-10-01,0.3617022,4,(GDL-029) Calz. Indep. /C. Juan Manuel,19,2456.0,6.340425491333008,Sugerencia revisable,4,0,7,10
+32,2026-10-01,1.7659574,5,(GDL-030) C. Pedro Moreno/ C. Progreso,19,3819.0,18.191489219665527,Sugerencia revisable,5,0,7,10
+33,2026-10-01,6.8510637,11,(GDL-031) C. Hospital / C. Andrés Terán,11,3905.0,11.106382980942726,Falta espacio previsto para devoluciones,,0,7,10
+34,2026-10-01,0.638298,4,(GDL-032) C. Degollado / Av. Miguel Hidalgo,15,7761.0,28.553192138671875,Falta espacio previsto para devoluciones,,0,7,10
+35,2026-10-01,6.276596,10,(GDL-033) Av. Hidalgo / C. Pedro Loza,15,15311.0,35.17021179199219,Falta espacio previsto para devoluciones,,0,7,10
+36,2026-10-01,2.4893618,6,(GDL-034) C. Morelos / C. Donato Guerra,15,5570.0,13.191489219665527,Sugerencia revisable,6,0,7,10
+37,2026-10-01,4.8510637,9,(GDL-035) C. Mezquitán / Av. Hidalgo,11,3482.0,9.042553193867207,Sugerencia revisable,9,0,7,10
+38,2026-10-01,21.340424,25,(GDL-036) C. Marcos Castellanos/ C. Morelos,23,7319.0,25.106382973492146,Inventario inicial supera capacidad,,0,7,10
+39,2026-10-01,3.8297873,8,(GDL-037) C.Juan N. Cumplido /C. Independenci,15,3311.0,9.191488862037659,Sugerencia revisable,8,0,7,10
+40,2026-10-01,4.8297873,9,(GDL-038) C. Nicolás Romero / Av. Hidalgo,15,5543.0,13.723403930664062,Sugerencia revisable,9,0,7,10
+41,2026-10-01,1.893617,6,(GDL-039) C. General Coronado / Av. Hidalgo,15,2081.0,9.085106372833252,Sugerencia revisable,6,0,7,10
+42,2026-10-01,1.0212766,5,(GDL-040) C. Morelos / C. Progreso,19,4814.0,30.0,Falta espacio previsto para devoluciones,,0,7,10
+43,2026-10-01,3.3404255,7,(GDL-041) C. Manuel M. Diéguez / Av. Hidalgo,15,4725.0,15.276596069335938,Falta espacio previsto para devoluciones,,0,7,10
+44,2026-10-01,2.340426,6,(GDL-042) C. Bernardo de Balbuena /Av Hidalgo,15,2435.0,10.106382369995117,Sugerencia revisable,6,0,7,10
+45,2026-10-01,0.44680834,4,(GDL-043) C. Simón Bolivar / C. López Cotilla,11,4578.0,8.340425491333008,Sugerencia revisable,4,0,7,10
+46,2026-10-01,0.29787233,4,(GDL-044) C. Gral. San Martín /Av.  Vallarta,19,3056.0,10.42553186416626,Sugerencia revisable,4,0,7,10
+47,2026-10-01,0.3404255,4,(GDL-045) C. Pedro Moreno / C. Marsella,19,1868.0,11.000000476837158,Sugerencia revisable,4,0,7,10
+48,2026-10-01,1.06383,5,(GDL-046) C. Emerson / Av. Vallarta,11,2335.0,11.382978439331055,Falta espacio previsto para devoluciones,,0,7,10
+49,2026-10-01,4.87234,9,(GDL-047) C. Robles Gil / Av. Vallarta,15,3711.0,9.0,Sugerencia revisable,9,0,7,10
+50,2026-10-01,12.0,16,(GDL-048) C. Constancio Hernández/ Av. Juaréz,23,11515.0,16.531914830207825,Sugerencia revisable,16,0,7,10
+51,2026-10-01,76.893616,81,(GDL-049) Lopez Cotilla / Penitenciaría,39,21580.0,81.02127657085657,Inventario inicial supera capacidad,,0,7,10
+52,2026-10-01,20.638298,24,(GDL-050) C.Pedro Moreno /Federalismo,23,9512.0,28.382978916168213,Inventario inicial supera capacidad,,0,7,10
+53,2026-10-01,5.3404255,9,(GDL-051) C. 8 de Julio / Av. Juárez,15,5095.0,9.595744729042053,Sugerencia revisable,9,0,7,10
+54,2026-10-01,10.936171,15,(GDL-052) Av. Juarez /16 de Septiembre,23,9920.0,15.0,Sugerencia revisable,15,0,7,10
+55,2026-10-01,0.6595745,4,(GDL-053) C. Maestranza / Av. Juárez,15,1924.0,8.14893627166748,Sugerencia revisable,4,0,7,10
+56,2026-10-01,4.8510637,9,(GDL-054) Av. Juárez / Calz. Independencia,27,6293.0,12.319149017333984,Sugerencia revisable,9,0,7,10
+57,2026-10-01,3.0,7,(GDL-055) C. Degollado /C.Prisciliano Sánchez,15,1519.0,7.68085104227066,Sugerencia revisable,7,0,7,10
+58,2026-10-01,17.319149,21,(GDL-056) Av. 16 de Sept. / C. Miguel Blanco,19,6813.0,21.829787373542786,Inventario inicial supera capacidad,,0,7,10
+59,2026-10-01,2.9787233,7,(GDL-057) C. Ocampo / C. Prisciliano Sánchez,11,1748.0,7.212765946984291,Sugerencia revisable,7,0,7,10
+60,2026-10-01,4.765958,8,(GDL-058) C. Pavo / C. Prisciliano Sánchez,11,1853.0,8.382978737354279,Sugerencia revisable,8,0,7,10
+61,2026-10-01,6.787234,10,(GDL-059) C. Miguel Blanco / C. Penitenciaria,15,2028.0,10.042553186416626,Sugerencia revisable,10,0,7,10
+62,2026-10-01,12.12766,16,(GDL-060) C. Madero/ C. Camarena,23,3605.0,16.085106372833252,Sugerencia revisable,16,0,7,10
+63,2026-10-01,8.297873,12,(GDL-061) C. Libertad /  C. Argentina,19,4656.0,12.0,Sugerencia revisable,12,0,7,10
+64,2026-10-01,3.744681,7,(GDL-062) C. Libertad / C. Moscú,15,4544.0,12.829787254333496,Sugerencia revisable,7,0,7,10
+65,2026-10-01,2.5744684,6,(GDL-063) C. Colonias  / C. López Cotilla,27,4633.0,24.148935317993164,Sugerencia revisable,6,0,7,10
+66,2026-10-01,0.9787235,5,(GDL-064) C. Marsella / C. López Cotilla,19,4122.0,18.340425491333008,Sugerencia revisable,5,0,7,10
+67,2026-10-01,0.82978725,5,(GDL-065) C. Simón Bolivar / Av. La Paz,19,2943.0,15.87234115600586,Sugerencia revisable,5,0,7,10
+68,2026-10-01,0.9148935,5,(GDL-066) C Lerdo de Tejada/C Gral. Sn Martín,15,1947.0,14.468086242675781,Sugerencia revisable,5,0,7,10
+69,2026-10-01,16.255318,20,(GDL-067) Calzada Federalismo / C. Vidrio,19,5937.0,20.276595771312714,Inventario inicial supera capacidad,,0,7,10
+70,2026-10-01,0.6595745,4,(GDL-068) C. Guadalupe Zuno / Av. Chapultepec,19,3058.0,16.29787254333496,Sugerencia revisable,4,0,7,10
+71,2026-10-01,4.085106,8,(GDL-069) C. Colonias / C. Guadalupe Zuno,15,2425.0,14.702127456665039,Sugerencia revisable,8,0,7,10
+72,2026-10-01,5.6170216,9,(GDL-070) Av. La  Paz / C. Juan de Ojeda,11,4334.0,9.914893388748169,Sugerencia revisable,9,0,7,10
+73,2026-10-01,10.531915,14,(GDL-071) Av. La Paz /Av.Enrique Díaz de León,15,5143.0,14.34042552113533,Sugerencia revisable,14,0,7,10
+74,2026-10-01,9.914893,14,(GDL-072) Av. La Paz / C. Camarena,15,2735.0,14.297872334718704,Sugerencia revisable,14,0,7,10
+75,2026-10-01,7.6170216,11,(GDL-073) Av. La Paz / Av. Federalismo,19,7299.0,13.489361763000488,Sugerencia revisable,11,0,7,10
+76,2026-10-01,7.085106,11,(GDL-074) C. Enrique González / C. Libertad,11,2566.0,11.425531923770905,Falta espacio previsto para devoluciones,,0,7,10
+77,2026-10-01,6.8510637,11,(GDL-075) C. Pedro Rioseco /C. Nueva Galicia,15,3144.0,11.0,Sugerencia revisable,11,0,7,10
+78,2026-10-01,11.319149,15,(GDL-076) Calz. Revolución / C. San Fernando,19,4777.0,15.617021262645721,Sugerencia revisable,15,0,7,10
+79,2026-10-01,2.382979,6,(GDL-077) C. Argentina / C. Pedro Moreno,15,3555.0,8.0,Sugerencia revisable,6,0,7,10
+80,2026-10-01,11.212767,15,(GDL-078) C. Comercio / C. La Paz,15,4352.0,15.0638297945261,Falta espacio previsto para devoluciones,,0,7,10
+81,2026-10-01,5.9361706,10,(GDL-079)  C. Donato Guerra /Av. La Paz,11,4437.0,11.978723526000977,Falta espacio previsto para devoluciones,,0,7,10
+82,2026-10-01,2.3404255,6,(GDL-080) C. Manuel Acuña / Av. Américas,19,2486.0,10.595744609832764,Sugerencia revisable,6,0,7,10
+83,2026-10-01,2.4255319,6,(GDL-081) C. Venezuela / Av. Niños Héroes,11,1516.0,9.14893627166748,Sugerencia revisable,6,0,7,10
+84,2026-10-01,7.042553,11,(GDL-082) C. Gpe. Montenegro/C.Nuño de Guzman,15,2619.0,11.425531923770905,Sugerencia revisable,11,0,7,10
+85,2026-10-01,7.8936167,12,(GDL-083) C. Vidrio / Av. Enrique Díaz,19,4451.0,12.40425530076027,Sugerencia revisable,12,0,7,10
+86,2026-10-01,0.78723407,4,(GDL-084) C. Montenegro / Av. Chapultepec,23,2765.0,17.53191566467285,Sugerencia revisable,4,0,7,10
+87,2026-10-01,2.2127662,6,(GDL-085) C. Gdpe. Zuno/ Av.  Unión,15,1544.0,10.531914710998535,Sugerencia revisable,6,0,7,10
+88,2026-10-01,4.489362,8,(GDL-086) C. Simón Bolivar / Av. Niños Héroes,15,2051.0,9.617021203041077,Sugerencia revisable,8,0,7,10
+91,2026-10-01,4.212766,8,(ZPN-001) Emilio Carranza /Carretera Tesistán,15,571.0,8.0,Sugerencia revisable,8,0,7,10
+92,2026-10-01,4.212766,8,(ZPN-002) C. Emilio Carranza /C. Independenci,11,784.0,8.106382973492146,Sugerencia revisable,8,0,7,10
+93,2026-10-01,3.9148936,8,(ZPN-003) C. Emilio Carranza / Av. Hidalgo,11,700.0,8.19148936867714,Sugerencia revisable,8,0,7,10
+94,2026-10-01,4.382979,8,(GDL-220) Av. Científicos / C. Filósofos,15,1284.0,8.0,Sugerencia revisable,8,0,7,10
+95,2026-10-01,2.0212765,6,(ZPN-005) C. Del Corral / C. Anáhuac,11,391.0,6.0,Sugerencia revisable,6,0,7,10
+96,2026-10-01,1.744681,5,(ZPN-006) C. Sta. Rita / Av. Avila Camacho,15,1504.0,6.595744609832764,Sugerencia revisable,5,0,7,10
+98,2026-10-01,4.0,8,(ZPN-008) C. Vicente Guerrero / Av. Hidalgo,19,958.0,8.0,Sugerencia revisable,8,0,7,10
+100,2026-10-01,2.3404255,6,(ZPN-010) C. Ramón Corona / C. Cuauhtémoc,11,502.0,6.0,Sugerencia revisable,6,0,7,10
+101,2026-10-01,1.3829787,5,(ZPN-011) C. Pino Suárez / C. López Cotilla,11,415.0,5.0,Sugerencia revisable,5,0,7,10
+102,2026-10-01,0.8085108,4,(ZPN-012) C. Pino Suárez / Av. Juan Pablo II,19,2616.0,7.829787254333496,Sugerencia revisable,4,0,7,10
+103,2026-10-01,2.0851064,6,(ZPN-013) C. Eva Briseño / C. Javier Mina,15,848.0,7.851063966751099,Sugerencia revisable,6,0,7,10
+105,2026-10-01,4.12766,8,(ZPN-015) Blvr. de la Espuela / Blvr. Charros,11,672.0,8.106382980942726,Sugerencia revisable,8,0,7,10
+106,2026-10-01,1.0212765,5,(ZPN-016) Av. Hidalgo/ C. Emiliano Zapata,19,973.0,5.851063787937164,Sugerencia revisable,5,0,7,10
+107,2026-10-01,1.5957446,5,(ZPN-017) C. Juan Manuel / C. Pedro Moreno,15,417.0,5.06382978707552,Sugerencia revisable,5,0,7,10
+108,2026-10-01,0.5531914,4,(ZPN-018) Av. Laureles / Blvrd. Panamericano,23,2469.0,13.510638236999512,Sugerencia revisable,4,0,7,10
+110,2026-10-01,6.8510637,11,(ZPN-020) Av. Aurelio Ortega / Av. Laureles,15,4173.0,12.744681119918823,Sugerencia revisable,11,0,7,10
+111,2026-10-01,0.06382979,4,(ZPN-021) Blvrd. Panamericano/ C.Santa Mónica,15,782.0,8.765957355499268,Sugerencia revisable,4,0,7,10
+112,2026-10-01,2.2765956,6,(ZPN-022) Av. Aurelio Ortega / C. Morelos,15,892.0,6.127659574151039,Sugerencia revisable,6,0,7,10
+115,2026-10-01,4.638298,8,(ZPN-025) Av. V. Carranza / Av. Jose Simeon,15,1099.0,8.106382980942726,Sugerencia revisable,8,0,7,10
+117,2026-10-01,1.9787235,6,(ZPN-027) C. 5 de Mayo / C. Noviembre,11,1455.0,6.0,Sugerencia revisable,6,0,7,10
+118,2026-10-01,1.3404255,5,(ZPN-028) Av. F. Aranguren / Av. Laureles,23,1432.0,5.31914895772934,Sugerencia revisable,5,0,7,10
+119,2026-10-01,2.7872343,6,(ZPN-029) C. La Villa / C. Cuauhtémoc,15,272.0,6.021276595070958,Sugerencia revisable,6,0,7,10
+120,2026-10-01,3.468085,7,(ZPN-030) Av.Juan Pablo II / Lázaro Cárdenas,15,552.0,7.106382980942726,Sugerencia revisable,7,0,7,10
+125,2026-10-01,1.2978723,5,(ZPN-031) C. Niño Obrero/Calz Lázaro Cárdenas,19,844.0,6.42553186416626,Sugerencia revisable,5,0,7,10
+126,2026-10-01,1.3617022,5,(ZPN-032) Calz Lázaro Cárdenas / Av San Fco,19,669.0,5.06382978707552,Sugerencia revisable,5,0,7,10
+127,2026-10-01,0.5531915,4,(ZPN-033) Av Lázaro Cárdenas / Av San Ignacio,15,369.0,4.021276595070958,Sugerencia revisable,4,0,7,10
+128,2026-10-01,2.361702,6,(ZPN-034) C. San Demetrio / C. Niño Obrero,15,412.0,6.042553186416626,Sugerencia revisable,6,0,7,10
+129,2026-10-01,1.6382979,5,(ZPN-035) C. San Juan Bosco / Av. San Ignacio,11,453.0,5.0,Sugerencia revisable,5,0,7,10
+130,2026-10-01,1.0638298,5,(ZPN-036) C. Niño Obrero /C José María Robles,19,960.0,5.765957474708557,Sugerencia revisable,5,0,7,10
+131,2026-10-01,3.0,7,(ZPN-037) Av. San Ignacio / Av. Guadalupe,11,2608.0,7.531915009021759,Sugerencia revisable,7,0,7,10
+132,2026-10-01,0.2978723,4,(ZPN-038) C. Santa Rita / Av. Guadalupe,11,899.0,5.446808576583862,Sugerencia revisable,4,0,7,10
+133,2026-10-01,1.7234042,5,(ZPN-039) Av. Niño Obrero / C. Juan Diego,19,788.0,5.0,Sugerencia revisable,5,0,7,10
+134,2026-10-01,0.5319149,4,(ZPN-040) C. Santa María / C. Árbol,15,534.0,5.638298034667969,Sugerencia revisable,4,0,7,10
+135,2026-10-01,0.8936169,5,(ZPN-041) C. 12 de Diciembre / C. Juan Diego,11,1075.0,5.510638356208801,Sugerencia revisable,5,0,7,10
+136,2026-10-01,0.44680852,4,(ZPN-042) C. Tonatiuh / Av. Netzahualcóyotl,15,496.0,4.234042540192604,Sugerencia revisable,4,0,7,10
+137,2026-10-01,0.5957447,4,(ZPN-043) C. Ermita / C. Del Árbol,11,583.0,5.085106372833252,Sugerencia revisable,4,0,7,10
+139,2026-10-01,0.6595745,4,(ZPN-045) Av. Tizoc / C. Iztaccíhuatl,15,384.0,4.34042552113533,Sugerencia revisable,4,0,7,10
+140,2026-10-01,0.23404254,4,(ZPN-046) Av. Cubilete / Av. López Mateos,19,1885.0,7.723404169082642,Sugerencia revisable,4,0,7,10
+141,2026-10-01,1.0212766,5,(ZPN-047) Av. Tizoc / Av. López Mateos,15,606.0,5.4893617033958435,Sugerencia revisable,5,0,7,10
+142,2026-10-01,4.5319147,8,(TLQ-001) BlvrdGarcía Barragán/C. Río Tajo,19,1196.0,8.021276595070958,Sugerencia revisable,8,0,7,10
+143,2026-10-01,2.6595745,6,(TLQ-002) C. Juárez / Av. Niños Héroes,15,1321.0,6.765957415103912,Sugerencia revisable,6,0,7,10
+144,2026-10-01,0.70212764,4,(TLQ-003) C. Contreras Medellín/Donato Guerra,15,590.0,5.702127695083618,Sugerencia revisable,4,0,7,10
+145,2026-10-01,3.2978723,7,(TLQ-004) C. Donato Guerra / C. Obregón,15,488.0,7.021276608109474,Sugerencia revisable,7,0,7,10
+146,2026-10-01,0.82978725,5,(TLQ-005) C. Zalatitán / C. Jalisco,15,163.0,5.0,Sugerencia revisable,5,0,7,10
+148,2026-10-01,1.8723404,6,(TLQ-007) Blvrd.García Barragán/Donato Guerra,15,1297.0,6.212765946984291,Sugerencia revisable,6,0,7,10
+150,2026-10-01,2.5744681,6,(TLQ-009) C. Progreso / C. Juárez,15,1620.0,6.446808457374573,Sugerencia revisable,6,0,7,10
+151,2026-10-01,1.7659575,5,(TLQ-010) C. Zaragoza / C. Emilio Carranza,15,483.0,5.0,Sugerencia revisable,5,0,7,10
+152,2026-10-01,2.0212765,6,(TLQ-011) C. Jalisco / C. Hidalgo,15,348.0,6.021276595070958,Sugerencia revisable,6,0,7,10
+153,2026-10-01,1.5531914,5,(TLQ-012) C. Paseo Don Bosco / C. Tonalá,15,296.0,5.106382980942726,Sugerencia revisable,5,0,7,10
+154,2026-10-01,0.5957447,4,(GDL-087) Av. Américas / Av. López Mateos,15,3236.0,19.957447052001953,Falta espacio previsto para devoluciones,,0,7,10
+155,2026-10-01,1.212766,5,(GDL-088) Av.Plan de San Luis/C. Andrés Teran,15,2500.0,15.276595115661621,Falta espacio previsto para devoluciones,,0,7,10
+156,2026-10-01,12.382979,16,(GDL-089) C. Juan Álvarez / C. Cruz Verde,15,3352.0,16.1276595890522,Inventario inicial supera capacidad,,0,7,10
+157,2026-10-01,14.851065,19,(GDL-090) Calz. Federalismo / C. Durango,23,7447.0,23.319149017333984,Falta espacio previsto para devoluciones,,0,7,10
+158,2026-10-01,3.638298,7,(GDL-091) C. Magisterio /Av. M. Ávila Camacho,19,3769.0,13.042552947998047,Sugerencia revisable,7,0,7,10
+159,2026-10-01,5.6595745,9,(GDL-092) Calz Federalismo / Av Plan San Luis,15,2508.0,9.255319148302078,Sugerencia revisable,9,0,7,10
+160,2026-10-01,0.48936158,4,(GDL-093) C. H Colegio Militar / Av. Américas,15,3855.0,26.617019653320312,Falta espacio previsto para devoluciones,,0,7,10
+161,2026-10-01,2.4468086,6,(GDL-094) C. Manuel Cambre / C. Andrés Teran,15,2285.0,7.340425491333008,Sugerencia revisable,6,0,7,10
+162,2026-10-01,2.4893618,6,(GDL-095)  C. Mariano Bárcena / Maestros,19,2114.0,6.468085080385208,Sugerencia revisable,6,0,7,10
+163,2026-10-01,7.808511,11,(GDL-096) C. Jesús García / C. González Orte,19,1885.0,11.510638356208801,Sugerencia revisable,11,0,7,10
+164,2026-10-01,10.468085,14,(GDL-097) C.Jesús García / C. Juan N Cumplido,19,3434.0,14.510638296604156,Sugerencia revisable,14,0,7,10
+165,2026-10-01,14.276597,18,(GDL-098) Calz. Federalismo / Av. Maestros,23,4187.0,18.404255270957947,Sugerencia revisable,18,0,7,10
+166,2026-10-01,8.191489,12,(GDL-099) C. Eulogio Parra /C.González Ortega,11,1870.0,12.212765946984291,Inventario inicial supera capacidad,,0,7,10
+167,2026-10-01,0.7446808,4,(GDL-100) C. Ayuntamiento/C. A. R. Plasencia,15,1335.0,11.787233352661133,Sugerencia revisable,4,0,7,10
+168,2026-10-01,2.5744681,6,(GDL-101) C. Amado Nervo /C. José María Vigil,19,2239.0,13.42553186416626,Sugerencia revisable,6,0,7,10
+169,2026-10-01,4.7234044,8,(GDL-102) C. María Vigil/C. Manuel M. Dieguez,11,2445.0,8.872339844703674,Sugerencia revisable,8,0,7,10
+170,2026-10-01,12.042554,16,(GDL-103) J. Clemente Orozco /C. Jesús García,15,4039.0,16.234042555093765,Inventario inicial supera capacidad,,0,7,10
+171,2026-10-01,12.042553,16,(GDL-104) C. Pedro Loza / Av. Manuel Acuña,19,6054.0,16.0,Sugerencia revisable,16,0,7,10
+172,2026-10-01,6.042553,10,(GDL-105) C. Pino Suárez / C. Joaquin Angulo,23,3658.0,10.106382973492146,Sugerencia revisable,10,0,7,10
+173,2026-10-01,5.5319147,9,(GDL-106) C. Juan Álvarez / C. Belén,23,2542.0,9.297872334718704,Sugerencia revisable,9,0,7,10
+174,2026-10-01,7.8936167,12,(GDL-107) Calz. Federalismo/C. J. María Vigil,15,3564.0,12.12765957415104,Sugerencia revisable,12,0,7,10
+175,2026-10-01,12.021276,16,(GDL-108) C. Hospital / C. Alameda,19,0.0,16.148936167359352,Confirmar operación,,0,7,10
+176,2026-10-01,2.787234,6,(GDL-109) C. Eulogio Parra / Av. Américas,19,1674.0,10.680850982666016,Sugerencia revisable,6,0,7,10
+177,2026-10-01,3.2978725,7,(GDL-110) C. Manuel Diéguez/Av. Eulogio Parra,11,2116.0,7.021276595070958,Sugerencia revisable,7,0,7,10
+178,2026-10-01,2.255319,6,(GDL-111) C. José Palomar / C. Hospital,15,2933.0,8.042553424835205,Sugerencia revisable,6,0,7,10
+179,2026-10-01,18.531914,22,(GDL-112) C. C. Orozco/C. Gral. Eulogio Parra,19,3880.0,22.234042555093765,Inventario inicial supera capacidad,,0,7,10
+180,2026-10-01,-0.0,4,(GDL-113) C. Ghilardi / C. Arista,15,991.0,4.0,Sugerencia revisable,4,0,7,10
+181,2026-10-01,2.0425532,6,(GDL-114) C. Monte Cáucaso / C. Alameda,15,1467.0,6.723404228687286,Sugerencia revisable,6,0,7,10
+182,2026-10-01,16.787235,20,(GDL-115) Calz. Federalismo / C. Fco. Zarco,15,4108.0,20.212765961885452,Inventario inicial supera capacidad,,0,7,10
+183,2026-10-01,0.10638298,4,(GDL-116) Av Manuel Acuña/C. Pablo Villaseñor,11,1111.0,8.14893627166748,Sugerencia revisable,4,0,7,10
+184,2026-10-01,1.6595744,5,(GDL-117) Av Manuel Acuña / C Fray Fco Frejes,11,1623.0,8.595744609832764,Sugerencia revisable,5,0,7,10
+185,2026-10-01,0.9574468,5,(GDL-118) C. Antonio de León / C. Garibaldi,15,922.0,9.978723526000977,Sugerencia revisable,5,0,7,10
+186,2026-10-01,0.9148936,5,(GDL-119) C. Fco Rojas González /C. Garibaldi,11,1157.0,5.680851101875305,Sugerencia revisable,5,0,7,10
+187,2026-10-01,2.6595745,6,(GDL-120) C. Agustín de la Rosa /C. Garibaldi,11,1088.0,10.531914710998535,Sugerencia revisable,6,0,7,10
+188,2026-10-01,1.0212767,5,(GDL-121) C. Tomás V. Gómez / Av. México,19,1941.0,10.723403930664062,Sugerencia revisable,5,0,7,10
+189,2026-10-01,0.23404256,4,(GDL-122) C. Fray Luis DePalacio/ Av. México,15,1958.0,11.78723430633545,Sugerencia revisable,4,0,7,10
+190,2026-10-01,3.0,7,(GDL-123) C. Aurelio L. Gallardo / Av. México,11,1997.0,10.021276473999023,Sugerencia revisable,7,0,7,10
+191,2026-10-01,1.8297873,6,(GDL-124) C. Severo Díaz / C. Justo Sierra,15,1105.0,12.489361763000488,Sugerencia revisable,6,0,7,10
+192,2026-10-01,0.70212764,4,(GDL-125) C. Pablo Villaseñor / Av. Hidalgo,15,1598.0,8.255319118499756,Sugerencia revisable,4,0,7,10
+193,2026-10-01,1.8936172,6,(GDL-126) C. Aurelio L. Gallardo / Av Hidalgo,11,3317.0,10.91489315032959,Sugerencia revisable,6,0,7,10
+194,2026-10-01,2.4255319,6,(GDL-127) Av. Vallarta / Av. de Los Arcos,19,6057.0,11.34042501449585,Sugerencia revisable,6,0,7,10
+195,2026-10-01,2.510638,6,(GDL-128) Av. Morelos / C. Emilio Castelar,23,1655.0,10.446808815002441,Sugerencia revisable,6,0,7,10
+196,2026-10-01,3.5744681,7,(GDL-129) C. Lope de Vega / Av. Vallarta,23,4026.0,9.638298034667969,Sugerencia revisable,7,0,7,10
+197,2026-10-01,0.8510637,5,(GDL-130) C. J. Ruíz de Alarcón / Av Vallarta,15,3034.0,10.468085289001465,Sugerencia revisable,5,0,7,10
+198,2026-10-01,4.7446804,8,(GDL-131) C. Emilio Castelar / Av. La Paz,19,2104.0,12.382978916168213,Sugerencia revisable,8,0,7,10
+199,2026-10-01,4.06383,8,(GDL-132) C. Lope de Vega / Av. La Paz,15,2750.0,16.27659511566162,Falta espacio previsto para devoluciones,,0,7,10
+200,2026-10-01,1.148936,5,(GDL-133) C. J. Ruíz de Alarcón / Av. La Paz,15,2762.0,9.617021560668945,Sugerencia revisable,5,0,7,10
+201,2026-10-01,5.7872343,9,(GDL-134) C. Agustín Yáñez / C. Fco Ugarte,19,2076.0,9.957446873188019,Sugerencia revisable,9,0,7,10
+202,2026-10-01,2.255319,6,(GDL-135) C. Victoriano Agüeros / Av. Unión,11,1452.0,6.297872304916382,Sugerencia revisable,6,0,7,10
+203,2026-10-01,1.6170213,5,(GDL-136) C. Lope de Vega/C. Efraín Glez Luna,19,1956.0,13.78723430633545,Sugerencia revisable,5,0,7,10
+204,2026-10-01,0.76595736,4,(GDL-137) C. Ruíz de Alarcón/C. Efraín G Luna,11,1705.0,9.08510684967041,Sugerencia revisable,4,0,7,10
+205,2026-10-01,1.4468086,5,(GDL-138) C. de la Nebulosa / C. Placeres,15,850.0,5.000000001862645,Sugerencia revisable,5,0,7,10
+206,2026-10-01,2.468085,6,(GDL-139) C. Firmamento / Av. Niños Héroes,15,1544.0,7.170212745666504,Sugerencia revisable,6,0,7,10
+207,2026-10-01,5.6595745,9,(GDL-140) C. Constelación / Av. de los Arcos,15,3805.0,11.297872543334961,Sugerencia revisable,9,0,7,10
+208,2026-10-01,2.4893618,6,(GDL-141) C. Ruíz de Alarcón/C. Agustín Yáñez,15,2017.0,12.361701965332031,Sugerencia revisable,6,0,7,10
+209,2026-10-01,0.21276593,4,(GDL-142) C. De la Nebulosa / C. Firmamento,15,513.0,5.957446813583374,Sugerencia revisable,4,0,7,10
+210,2026-10-01,4.744681,8,(GDL-143) C. Eclipse / Av. de Los Arcos,23,1946.0,8.19148936867714,Sugerencia revisable,8,0,7,10
+211,2026-10-01,0.7234043,4,(GDL-144) C. Primo Feliciano / C. San Gabriel,11,952.0,7.829787254333496,Sugerencia revisable,4,0,7,10
+212,2026-10-01,1.7234042,5,(GDL-145) C. San Miguel / Av. San Francisco,19,974.0,5.255319148302078,Sugerencia revisable,5,0,7,10
+213,2026-10-01,2.1276596,6,(GDL-146) Av. Guadalupe / C. Boturini,11,1527.0,6.0,Sugerencia revisable,6,0,7,10
+214,2026-10-01,2.8723404,7,(GDL-147) Calz. Lázaro Cárdenas/Av. Guadalupe,15,1015.0,7.0,Sugerencia revisable,7,0,7,10
+215,2026-10-01,1.7234043,5,(GDL-148) C. San Rafael / Av. Tepeyac,15,478.0,5.0,Sugerencia revisable,5,0,7,10
+216,2026-10-01,3.021277,7,(GDL-149) Calz. Lázaro Cárdenas/López Mateos,15,1370.0,7.446808457374573,Sugerencia revisable,7,0,7,10
+217,2026-10-01,1.1702127,5,(GDL-150) C. Asunción / Av. Chapalita,11,366.0,5.276595652103424,Sugerencia revisable,5,0,7,10
+218,2026-10-01,0.29787233,4,(GDL-151) C. Capuchinas / Av. Chapalita,15,353.0,4.659574508666992,Sugerencia revisable,4,0,7,10
+219,2026-10-01,1.3404255,5,(GDL-152) Parque de las Estrellas/C. Orión,19,588.0,5.042553190141916,Sugerencia revisable,5,0,7,10
+220,2026-10-01,0.44680852,4,(GDL-153) C. Crepúsculo / Av. Tonantzin,11,307.0,4.21276593208313,Sugerencia revisable,4,0,7,10
+221,2026-10-01,1.8510637,6,(GDL-154) C. Capuchinas / Av. Las Rosas,15,964.0,6.0,Sugerencia revisable,6,0,7,10
+222,2026-10-01,1.4468085,5,(GDL-155) Parque de las Estrellas/Mariano Ote,19,614.0,5.0,Sugerencia revisable,5,0,7,10
+224,2026-10-01,2.0851064,6,(GDL-157) Av. Mariano Otero/ Av. De las Rosas,15,961.0,6.468085169792175,Sugerencia revisable,6,0,7,10
+225,2026-10-01,3.1702127,7,(GDL-158) Av. Faro / Av. Las Rosas,15,1042.0,7.170212760567665,Sugerencia revisable,7,0,7,10
+226,2026-10-01,4.0212765,8,(GDL-159) C. Guadalupe Victoria /Del Ejercito,19,3512.0,8.319149017333984,Sugerencia revisable,8,0,7,10
+227,2026-10-01,4.8723407,9,(GDL-160) C.Silverio Garcia/Blvrd. García Ba,11,1339.0,9.021276595070958,Sugerencia revisable,9,0,7,10
+228,2026-10-01,3.8085108,7,(GDL-161) C. Rio Usumacinta/Blvrd García Barr,19,1095.0,7.021276595070958,Sugerencia revisable,7,0,7,10
+229,2026-10-01,6.085107,10,(GDL-162) C. Rio Tuxpan / C. Salvador Lopez C,19,1545.0,10.106382980942726,Sugerencia revisable,10,0,7,10
+230,2026-10-01,3.06383,7,(GDL-163) C. Corregidora / Blvrd. García B.,15,1674.0,7.170212775468826,Sugerencia revisable,7,0,7,10
+231,2026-10-01,2.4893618,6,(GDL-164) Av. Olímpica /C. José Rolon,15,1120.0,6.042553190141916,Sugerencia revisable,6,0,7,10
+232,2026-10-01,1.5957446,5,(GDL-165) C. Rio Panuco/ Blvrd. García B.,19,2305.0,7.127659559249878,Sugerencia revisable,5,0,7,10
+233,2026-10-01,0.87234044,5,(GDL-166) C. Rio Principal / Blvrd. García B.,19,2349.0,9.340425968170166,Sugerencia revisable,5,0,7,10
+234,2026-10-01,5.12766,9,(GDL-167) C. Rio San Juan de Dios/Blvrd. Garc,23,1911.0,9.06382978707552,Sugerencia revisable,9,0,7,10
+235,2026-10-01,3.5957446,7,(GDL-168) Av. Rio Nilo / C. Ramón Pacheco,19,2379.0,7.0,Sugerencia revisable,7,0,7,10
+236,2026-10-01,7.744681,11,(GDL-169) Blvrd. García Barragán/ C. Rio Zapo,23,2553.0,11.0,Sugerencia revisable,11,0,7,10
+237,2026-10-01,2.8936172,7,(GDL-170)  C. Relojeros/ C. Chamizal,15,566.0,7.191489368677139,Sugerencia revisable,7,0,7,10
+238,2026-10-01,2.4255319,6,(GDL-171) C. Maquinistas / C. San Rafael,19,431.0,6.0,Sugerencia revisable,6,0,7,10
+239,2026-10-01,1.3404255,5,(GDL-172) C. Chamizal / Av. Rio Nilo,15,514.0,5.0,Sugerencia revisable,5,0,7,10
+240,2026-10-01,0.21276596,4,ex-(GDL-173) C. Caballerango / C. Caporales,19,0.0,4.021276595070958,Confirmar operación,,0,7,10
+241,2026-10-01,1.5957446,5,(GDL-174) C. Juan de Zumárraga / Av. Tepeyac,11,719.0,5.0,Sugerencia revisable,5,0,7,10
+242,2026-10-01,1.1276596,5,(GDL-175) C. Ermita / C. San Uriel,11,884.0,5.042553193867207,Sugerencia revisable,5,0,7,10
+243,2026-10-01,0.40425533,4,(GDL-176) C. San Bonifacio/ Paseo Benedictino,11,337.0,5.702127695083618,Sugerencia revisable,4,0,7,10
+244,2026-10-01,0.5957445,4,(GDL-177) C. Fray Fco Frejes / C. Fco Zarco,15,1319.0,11.063829898834229,Sugerencia revisable,4,0,7,10
+246,2026-10-01,0.4680851,4,(GDL-178) Salvador Quevedo/López Portillo,15,1423.0,8.085106372833252,Sugerencia revisable,4,0,7,10
+247,2026-10-01,1.3617022,5,(GDL-179) C. Monte Cáucaso / C. Sierra Nevada,23,2590.0,10.319149017333984,Sugerencia revisable,5,0,7,10
+248,2026-10-01,0.12765957,4,(GDL-180) C. Montes Pirineos/Salvador Quevedo,19,1906.0,11.808510780334473,Sugerencia revisable,4,0,7,10
+249,2026-10-01,2.468085,6,(GDL-181) C.Ignacio Rmrz / Av Plan de San Lui,15,2155.0,9.234042167663574,Sugerencia revisable,6,0,7,10
+251,2026-10-01,3.8936172,8,(TLQ-006) C. Miguel Hidalgo / Calz. Revolució,15,885.0,8.12765957415104,Sugerencia revisable,8,0,7,10
+253,2026-10-01,3.2765956,7,(GDL-156) C. Duque de Rivas/ C. López Cotilla,15,2319.0,11.787233829498291,Sugerencia revisable,7,0,7,10
+254,2026-10-01,4.957447,9,(GDL-020) C. General Coronado / C.Juan Manuel,15,2903.0,9.0,Sugerencia revisable,9,0,7,10
+255,2026-10-01,9.319149,13,(GDL-182) C. General Coronado / C. Manuel Acu,15,2490.0,13.53191488981247,Sugerencia revisable,13,0,7,10
+256,2026-10-01,13.042554,17,(GDL-183) Calz. Independencia / Av. Niños Hér,19,3708.0,17.0,Sugerencia revisable,17,0,7,10
+257,2026-10-01,0.08510638,4,(GDL-184) Ingreso Cucei / Revolución,19,6064.0,17.042552947998047,Sugerencia revisable,4,0,7,10
+258,2026-10-01,4.0000005,8,(GDL-185) Dr. Silverio García /Av. Revolución,23,1762.0,8.06382978707552,Sugerencia revisable,8,0,7,10
+259,2026-10-01,2.2978725,6,(GDL-186) C. Argentina / C. Francia,15,2392.0,12.106382846832275,Sugerencia revisable,6,0,7,10
+260,2026-10-01,11.25532,15,(GDL-187) Av. 16 de Septiembre / C. Priscilia,15,8764.0,15.085106372833252,Falta espacio previsto para devoluciones,,0,7,10
+261,2026-10-01,2.255319,6,(GDL-188) Av. de la Presa / Av. Manuel A. Cam,15,2102.0,6.57446813583374,Sugerencia revisable,6,0,7,10
+262,2026-10-01,7.1063833,11,(GDL-189) C. 5 de Mayo/ Av. Revolución,15,2433.0,11.106382980942726,Sugerencia revisable,11,0,7,10
+263,2026-10-01,1.5319152,5,(GDL-190) C. Anahuac / Av. Revolución,31,3184.0,8.021276473999023,Sugerencia revisable,5,0,7,10
+264,2026-10-01,0.21276596,4,(GDL-191) Plaza de los Mariachis,23,1266.0,4.936170220375061,Sugerencia revisable,4,0,7,10
+265,2026-10-01,4.723404,8,(GDL-192) Calle A1 / Av. Manuel A. Camacho,30,3803.0,8.78723394870758,Sugerencia revisable,8,0,7,10
+266,2026-10-01,5.0638304,9,(GDL-193) C. Hawai / C. Nicolás Romero,15,4034.0,9.617021262645721,Sugerencia revisable,9,0,7,10
+267,2026-10-01,2.7021275,6,(GDL-194) Av. Revolución / C. Ramón López Ve,15,3153.0,8.063829898834229,Sugerencia revisable,6,0,7,10
+268,2026-10-01,7.914894,12,(GDL-195) C. Ramón Corona / Av. Juárez,23,5278.0,14.297872304916382,Sugerencia revisable,12,0,7,10
+269,2026-10-01,4.382979,8,(GDL-196) C. Esmeralda / C. Manuel Acuña,23,2901.0,8.148936167359352,Sugerencia revisable,8,0,7,10
+270,2026-10-01,4.1702127,8,(GDL-197) Av. Río Nilo / Av. Revolución,15,984.0,8.34042552113533,Sugerencia revisable,8,0,7,10
+271,2026-10-01,24.872341,29,(GDL-198) Av. Alcalde / C. Hospital,31,12913.0,29.40425533056259,Sugerencia revisable,29,0,7,10
+272,2026-10-01,12.468085,16,(GDL-199) C. Jesús García/Av. Alcalde,15,3831.0,16.0,Inventario inicial supera capacidad,,0,7,10
+273,2026-10-01,5.3617024,9,(GDL-200) Av. Alcalde /Av. Manuel A. Camacho,23,6522.0,14.382978439331055,Sugerencia revisable,9,0,7,10
+274,2026-10-01,-0.0,4,(GDL-201) Av. de los Normalistas / C. M. Guti,15,1003.0,6.9787232875823975,Sugerencia revisable,4,0,7,10
+275,2026-10-01,1.2553191,5,(GDL-202) C. Magisterio / C. Durango,15,2422.0,14.510638236999512,Sugerencia revisable,5,0,7,10
+276,2026-10-01,5.0851064,9,(GDL-203) Av. Federalismo / C. Tamaulipas,23,2471.0,10.340425491333008,Sugerencia revisable,9,0,7,10
+277,2026-10-01,2.148936,6,(GDL-204) C. España/ Av. Chapultepec,23,2776.0,12.127659797668457,Sugerencia revisable,6,0,7,10
+278,2026-10-01,0.5957446,4,(GDL-205) Av. Agustín Yáñez /C. Venezuela,15,1174.0,7.744680881500244,Sugerencia revisable,4,0,7,10
+279,2026-10-01,6.0212765,10,(GDL-206) C. Suiza / Av. Enrique Díaz de león,15,1804.0,10.148936167359352,Sugerencia revisable,10,0,7,10
+280,2026-10-01,6.234042,10,(GDL-207) C. Lázaro Pérez / C. Escorza,15,2481.0,10.510638296604156,Sugerencia revisable,10,0,7,10
+281,2026-10-01,13.936171,18,(GDL-208) Av. España / Av. Federalismo,31,2978.0,18.0,Sugerencia revisable,18,0,7,10
+282,2026-10-01,2.4255314,6,(GDL-209) Calz. del Campesino / Calz. Indepen,19,2438.0,8.829787731170654,Sugerencia revisable,6,0,7,10
+283,2026-10-01,10.06383,14,(GDL-210) Av. Washington / Calz. Independenci,31,3806.0,16.702127695083618,Sugerencia revisable,14,0,7,10
+284,2026-10-01,2.4893618,6,(GDL-211) Av. Washington / C. Rusia,15,1173.0,7.212766051292419,Sugerencia revisable,6,0,7,10
+285,2026-10-01,3.3829787,7,(GDL-212) C. Nicolás Romero / C. Jaime Nunó,15,1345.0,8.191489338874817,Sugerencia revisable,7,0,7,10
+286,2026-10-01,10.851064,15,(ZPN-023) Blvrd. de la Espuela / C. Silvano B,15,1408.0,15.0,Sugerencia revisable,15,0,7,10
+287,2026-10-01,1.4893618,5,(ZPN-024) C. Francisco Sarabia / Av. Laureles,15,282.0,5.0,Sugerencia revisable,5,0,7,10
+288,2026-10-01,9.723404,13,(ZPN-048) Av. J. Parres Arias / Prol. López C,31,3536.0,13.425531923770905,Sugerencia revisable,13,0,7,10
+289,2026-10-01,0.25531915,4,(ZPN-049) Ávila Camacho/ Lábaro Patrio,15,1993.0,5.489361763000488,Sugerencia revisable,4,0,7,10
+290,2026-10-01,9.382978,13,(ZPN-050) C. el Mediero / Prol. Laureles,15,1428.0,13.0,Sugerencia revisable,13,0,7,10
+291,2026-10-01,0.106382966,4,(ZPN-051) Av. Periférico G. Morín / Av. J. Pa,31,2983.0,19.957447052001953,Sugerencia revisable,4,0,7,10
+292,2026-10-01,2.1702127,6,(ZPN-052) C. del Pial / C. del Vigía,15,347.0,6.021276595070958,Sugerencia revisable,6,0,7,10
+293,2026-10-01,0.04255319,4,(ZPN-053) Prol. Laureles / Av. Periférico G.,31,1067.0,7.744680881500244,Sugerencia revisable,4,0,7,10
+294,2026-10-01,0.10638298,4,(ZPN-054) Av. J. Parres Arias / C. Ignacio Ja,19,755.0,10.27659559249878,Sugerencia revisable,4,0,7,10
+295,2026-10-01,6.3404255,10,(ZPN-055) Prol. Laureles / Av. J. Parres Aria,15,1294.0,10.063829779624939,Sugerencia revisable,10,0,7,10
+296,2026-10-01,1.7234043,5,(ZPN-056) Av. M. Ávila Camacho / C. San Jorge,15,4270.0,16.14893627166748,Falta espacio previsto para devoluciones,,0,7,10
+302,2026-10-01,2.5957446,6,(TLQ-008) C. Independencia / C. Allende,15,676.0,6.042553190141916,Sugerencia revisable,6,0,7,10
+303,2026-10-01,2.5531912,6,(GDL-217) C. Ontario / Av. Manuel Acuña,19,1989.0,14.170212745666504,Sugerencia revisable,6,0,7,10
+304,2026-10-01,7.8297877,12,(GDL-214) C. Chihuahua / C. Miguel Galindo,19,1240.0,12.12765957415104,Sugerencia revisable,12,0,7,10
+305,2026-10-01,2.531915,6,(GDL-223) C. Dr. Pérez Arce/ C. Gómez Farias,19,497.0,6.0,Sugerencia revisable,6,0,7,10
+306,2026-10-01,2.5531914,6,(ZPN-066) C. Cuauhtémoc / Av. Tepeyac,19,977.0,6.0,Sugerencia revisable,6,0,7,10
+307,2026-10-01,2.8723402,7,(GDL-215) C. Durango / C. Gregorio Davila,19,788.0,7.510638236999512,Sugerencia revisable,7,0,7,10
+308,2026-10-01,1.7234044,5,(ZPN-065) C. Del Carmen / Av. Guadalupe,19,990.0,5.553191304206848,Sugerencia revisable,5,0,7,10
+309,2026-10-01,0.95744675,5,(ZPN-064) C. Sto de Aquino / Av. Sta Teresa,15,389.0,5.744680821895599,Sugerencia revisable,5,0,7,10
+311,2026-10-01,9.702127,13,(GDL-216) C. Tepic / C. Frías.,15,1956.0,13.425531923770905,Sugerencia revisable,13,0,7,10
+312,2026-10-01,5.212766,9,(ZPN-067) C. Chimalhuacán / Av. López Mateos,19,1799.0,9.0,Sugerencia revisable,9,0,7,10
+313,2026-10-01,1.3829787,5,(ZPN-057) C. Escultores / Av. Guadalupe,15,544.0,5.0,Sugerencia revisable,5,0,7,10
+314,2026-10-01,2.06383,6,(ZPN-062) C. Loyola / C. Organización,15,373.0,6.0,Sugerencia revisable,6,0,7,10
+315,2026-10-01,2.4468086,6,(ZPN-061) C. Organización / Av. Guadalupe,19,980.0,6.021276595070958,Sugerencia revisable,6,0,7,10
+316,2026-10-01,2.744681,6,(ZPN-060) C. De Los Leones / Av. Tepeyac,19,676.0,6.0,Sugerencia revisable,6,0,7,10
+317,2026-10-01,1.6170213,5,(GDL-224) C. Reyes Flores/ C.Federico Medrano,19,319.0,5.148936167359352,Sugerencia revisable,5,0,7,10
+318,2026-10-01,0.9574468,5,(GDL-222) C. Aldama / C. Dr. Leonardo Oliva,19,219.0,5.0,Sugerencia revisable,5,0,7,10
+319,2026-10-01,3.3404255,7,(ZPN-058) Av. Labna / Av. Tepeyac,19,937.0,7.06382978707552,Sugerencia revisable,7,0,7,10
+320,2026-10-01,1.8936169,6,(ZPN-059) C. Prados los Pinos/ Av. Tepeyac,15,497.0,6.0,Sugerencia revisable,6,0,7,10
+321,2026-10-01,2.2340426,6,(GDL-218) C.Hércules / Av. De la Arboleda,19,2053.0,6.617021381855011,Sugerencia revisable,6,0,7,10
+322,2026-10-01,6.085106,10,(GDL-225) C. Gral Carlos Fuero/Av. Revolución,19,1555.0,10.0,Sugerencia revisable,10,0,7,10
+323,2026-10-01,2.9574468,7,(GDL-213) C. Palavicini / Av. Circunvalación,19,2108.0,8.319148778915405,Sugerencia revisable,7,0,7,10
+324,2026-10-01,6.0212765,10,(GDL-221) De los científicos/ J. J. Tablada,23,1453.0,10.255319148302078,Sugerencia revisable,10,0,7,10
+325,2026-10-01,3.744681,7,(GDL-226) C. Luis G. Cuevas /Av. Revolución,15,787.0,7.0,Sugerencia revisable,7,0,7,10
+326,2026-10-01,6.2340426,10,(GDL-219) C. D. Rivera / C. Filósofos,15,1042.0,10.021276595070958,Sugerencia revisable,10,0,7,10
+327,2026-10-01,0.6595745,4,(GDL-227) C. Artistas / C. Carlos Pereira,19,777.0,6.36170220375061,Sugerencia revisable,4,0,7,10
+328,2026-10-01,1.7446809,5,(GDL-233) S .Juan de Ulúa /Andrés Q.R.,19,681.0,5.5106382966041565,Sugerencia revisable,5,0,7,10
+329,2026-10-01,0.021276595,4,(GDL-235) Félix Palavicini / División del Nte,19,915.0,5.319148898124695,Sugerencia revisable,4,0,7,10
+330,2026-10-01,0.40425527,4,(GDL-236) Félix Palavicini / Antonio Alcalde,15,1288.0,5.063829779624939,Sugerencia revisable,4,0,7,10
+331,2026-10-01,0.6382978,4,(GDL-259) C. Dionisio Rodriguez  / C. Cabañas,23,2238.0,6.489361763000488,Sugerencia revisable,4,0,7,10
+332,2026-10-01,4.510638,8,(GDL-234) C. Chihuahua / C. Francisco Tejeda,15,1027.0,8.085106380283833,Sugerencia revisable,8,0,7,10
+333,2026-10-01,6.7872343,10,(GDL-239) Silvestre Revueltas Fray Antonio A,19,4764.0,10.489361763000488,Sugerencia revisable,10,0,7,10
+334,2026-10-01,2.7659576,6,"(GDL-261) C. Jarauta, Javier Mina",15,1207.0,6.106382980942726,Sugerencia revisable,6,0,7,10
+335,2026-10-01,6.1063833,10,(GDL-242) C. Sevilla / Av. de los Maestros,19,605.0,10.085106380283833,Sugerencia revisable,10,0,7,10
+336,2026-10-01,3.255319,7,(GDL-243)Av. De los Maestros / C. Mil Cumbres,23,985.0,7.127659574151039,Sugerencia revisable,7,0,7,10
+337,2026-10-01,8.531915,12,(GDL-245)C. Alejandrina / C. Torres Quintero,19,1392.0,12.319148927927017,Sugerencia revisable,12,0,7,10
+338,2026-10-01,2.255319,6,(GDL-258) Manuel Doblado / Dionisio Rodriguez,15,677.0,6.170212760567665,Sugerencia revisable,6,0,7,10
+339,2026-10-01,1.6595745,5,(ZPN-068)Francisco Mora / Aurelio Ortega,15,924.0,5.085106372833252,Sugerencia revisable,5,0,7,10
+340,2026-10-01,3.382979,7,(ZPN-069)Jesús María Romo /Av. Aurelio Ortega,19,1465.0,10.999999523162842,Sugerencia revisable,7,0,7,10
+341,2026-10-01,1.0851064,5,(ZPN-070)Av. Avila Camacho / Av. Patria,19,3026.0,15.0,Sugerencia revisable,5,0,7,10
+342,2026-10-01,0.5106383,4,(ZPN-073)C. Pintores/ Av. Jose Luis Gonzaga,15,266.0,4.148936167359352,Sugerencia revisable,4,0,7,10
+343,2026-10-01,0.34042555,4,(ZPN-074) C. Doctores / Av. San Luis Gonzaga,19,272.0,4.574468016624451,Sugerencia revisable,4,0,7,10
+344,2026-10-01,0.31914893,4,(ZPN-076)C. Pintores / Av. Guadalupe,15,806.0,5.851063966751099,Sugerencia revisable,4,0,7,10
+345,2026-10-01,1.5744681,5,(ZPN-075) C. Arquitectos / Av. Guadalupe,15,609.0,5.0,Sugerencia revisable,5,0,7,10
+346,2026-10-01,-0.0,4,(GDL-248) C. Hospital / C. Humboldt,19,4330.0,11.553191184997559,Sugerencia revisable,4,0,7,10
+347,2026-10-01,5.808511,9,(GDL-249)C. Agustín Rivera / C. Manuel Acuña,23,2255.0,9.46808511018753,Sugerencia revisable,9,0,7,10
+348,2026-10-01,1.7446809,5,(GDL-250) Clemente Aguirre / Roque Abarca,19,729.0,5.06382978707552,Sugerencia revisable,5,0,7,10
+349,2026-10-01,3.468085,7,(GDL-244)C. Paricutin / Calz. Independencia,23,2870.0,9.936170101165771,Sugerencia revisable,7,0,7,10
+350,2026-10-01,1.6382979,5,(GDL-228)C. La Soledad / Av. Ávila Camacho,23,2087.0,7.212765693664551,Sugerencia revisable,5,0,7,10
+351,2026-10-01,0.6382978,4,(ZPN-071)Av. San Ignacio / Av. Vallarta,19,870.0,5.319149017333984,Sugerencia revisable,4,0,7,10
+352,2026-10-01,0.4042554,4,(ZPN-072) Av. San Francisco / Av. San Ignacio,19,1027.0,4.510638236999512,Sugerencia revisable,4,0,7,10
+353,2026-10-01,2.5531912,6,(GDL-263)C. Aldama / C. 5 de Mayo,19,568.0,6.0,Sugerencia revisable,6,0,7,10
+354,2026-10-01,6.9787235,11,(GDL-247) C. Tenerías / C. Belén,19,2452.0,11.106382980942726,Sugerencia revisable,11,0,7,10
+355,2026-10-01,4.2978725,8,(GDL-257)C. Dionisio Rodr./ C. José Fernando,19,1009.0,8.0,Sugerencia revisable,8,0,7,10
+356,2026-10-01,0.97872335,5,(GDL-270)C.Gómez Farías  / Calz. del Ejército,15,205.0,5.0,Sugerencia revisable,5,0,7,10
+357,2026-10-01,2.4468088,6,(GDL-268)Heroico Colegio Militar/Revolución,15,1301.0,6.212765961885452,Sugerencia revisable,6,0,7,10
+358,2026-10-01,2.3617022,6,(GDL-269)Valentín Gómez Farías/Riva Palacio,15,411.0,6.0,Sugerencia revisable,6,0,7,10
+359,2026-10-01,4.574468,8,(GDL-230)Francisco Marquez/Federalismo,23,1384.0,8.53191488981247,Sugerencia revisable,8,0,7,10
+360,2026-10-01,0.29787233,4,(GDL-255) C. Cabañas / C. Industria,15,653.0,5.127659559249878,Sugerencia revisable,4,0,7,10
+361,2026-10-01,2.6382978,6,(GDL-275)C. Antonio Tello / C. Lindavista,15,727.0,6.319148927927017,Sugerencia revisable,6,0,7,10
+362,2026-10-01,1.893617,6,(TLQ-015) Contreras Medellín / Niños Héroes,15,411.0,6.0,Sugerencia revisable,6,0,7,10
+363,2026-10-01,10.893617,15,(GDL-229)C. Guanajuato / C. Miguel Galindo,23,1606.0,15.425531923770905,Sugerencia revisable,15,0,7,10
+364,2026-10-01,0.7446809,4,(GDL-265)C. Clavel / Av. Gigantes,15,849.0,4.276595711708069,Sugerencia revisable,4,0,7,10
+365,2026-10-01,3.06383,7,(GDL-274) Corregidora/Pensador Mexicano,15,833.0,7.042553190141916,Sugerencia revisable,7,0,7,10
+366,2026-10-01,2.7659574,6,(GDL-271) Román Morales / Álvaro Obregón,15,433.0,6.0851063802838326,Sugerencia revisable,6,0,7,10
+368,2026-10-01,2.212766,6,(GDL-256)Josefa Ortíz/Juan Díaz Covarrubias,19,989.0,6.191489353775978,Sugerencia revisable,6,0,7,10
+369,2026-10-01,1.7446809,5,(GDL-262) Av. Gigantes / C. Aquiles Serdán,15,900.0,5.0,Sugerencia revisable,5,0,7,10
+370,2026-10-01,1.8297873,6,(GDL-273) C. Aldama / C. Orozco Berra,15,225.0,6.702127695083618,Sugerencia revisable,6,0,7,10
+371,2026-10-01,9.212766,13,(GDL-237)Av. Ramón Corona / C. Leandro Valle,15,3592.0,13.574468612670898,Sugerencia revisable,13,0,7,10
+372,2026-10-01,2.9148936,7,(GDL-238)José Juan Tablada / José Vasconcelos,19,918.0,7.0,Sugerencia revisable,7,0,7,10
+373,2026-10-01,6.7659574,10,(GDL-251)C. Pablo Valdez / C. Mariano Jiménez,19,878.0,10.425531923770905,Sugerencia revisable,10,0,7,10
+374,2026-10-01,1.2127659,5,(GDL-260) Churubusco / Álvaro Obregón,15,649.0,5.978723406791687,Sugerencia revisable,5,0,7,10
+375,2026-10-01,1.7446809,5,(GDL-264) Federico Medrano / Antonio Rosales,15,605.0,5.234042555093765,Sugerencia revisable,5,0,7,10
+376,2026-10-01,8.489362,12,(GDL-266) C. Matamoros / Calz. Revolución,15,1980.0,12.170212760567665,Sugerencia revisable,12,0,7,10
+377,2026-10-01,3.8085108,7,(GDL-232)Tamaulipas/Andrés Quintana Roo,19,1291.0,8.893616795539856,Sugerencia revisable,7,0,7,10
+378,2026-10-01,1.7234044,5,(TLQ-014) C. Hornos / C. Francisco I. Madero,15,283.0,5.0,Sugerencia revisable,5,0,7,10
+379,2026-10-01,0.53191483,4,(GDL-241)Junípero Serra/José Encarnación,19,951.0,4.893617033958435,Sugerencia revisable,4,0,7,10
+380,2026-10-01,0.38297874,4,(TLQ-013)Zalatitan/Francisco Silva Romero,15,242.0,4.042553190141916,Sugerencia revisable,4,0,7,10
+381,2026-10-01,5.4680853,9,(GDL-231) C. Tabasco / C. Juan de la Barrera,19,895.0,9.0,Sugerencia revisable,9,0,7,10
+382,2026-10-01,4.106383,8,(GDL-272)C. Jaime Nunó / C. De la Costa ,15,1242.0,8.085106380283833,Sugerencia revisable,8,0,7,10
+383,2026-10-01,9.3404255,13,(GDL-240)Hilarion Romero Gil/Gabriela Mistral,19,1546.0,13.574468076229095,Sugerencia revisable,13,0,7,10
+384,2026-10-01,1.4255319,5,(GDL-252) C. Calpulalpan / C. Independencia,23,3288.0,23.46808624267578,Falta espacio previsto para devoluciones,,0,7,10
+385,2026-10-01,6.06383,10,(GDL-246)Juan José Baz/Silvestre Revueltas,19,1738.0,10.085106380283833,Sugerencia revisable,10,0,7,10
+386,2026-10-01,4.574468,8,(GDL-254) Porfirio Díaz/Francisco Javier Mina,23,884.0,8.489361703395844,Sugerencia revisable,8,0,7,10
+387,2026-10-01,7.8297873,12,(GDL-267) C. Diego Rivera / C. Sanganguey,19,2371.0,12.042553190141916,Sugerencia revisable,12,0,7,10
+388,2026-10-01,4.319149,8,(GDL-253) C. General Salazar / C. Federación,23,1143.0,8.255319118499756,Sugerencia revisable,8,0,7,10
+389,2026-10-01,2.7659574,6,(ZPN-014) Av. D / San Jorge,15,775.0,6.0,Sugerencia revisable,6,0,7,10
+390,2026-10-01,7.404255,11,(ZPN-063) Paulino Navarro/Ma del Refugio Puga,19,1119.0,11.148936167359352,Sugerencia revisable,11,0,7,10
+391,2026-10-01,0.08510639,4,(ZPN-078) Lago Constanza / San Jorge,19,1140.0,5.808510661125183,Sugerencia revisable,4,0,7,10
+392,2026-10-01,5.3829784,9,(GDL-278) Ignacio Ramirez / Del Istmo,19,1366.0,9.106382973492146,Sugerencia revisable,9,0,7,10
+393,2026-10-01,0.6595744,4,(GDL-277) Av. 8 de julio / Alemania ,19,1548.0,6.3617024421691895,Sugerencia revisable,4,0,7,10
+394,2026-10-01,3.1702127,7,(ZPN-077) Helios / Av. Tepeyac,15,500.0,7.0,Sugerencia revisable,7,0,7,10
+395,2026-10-01,2.4680853,6,(GDL-276) Francisco de Quevedo / Miguel Lerdo,19,1330.0,9.361701965332031,Sugerencia revisable,6,0,7,10
+396,2026-10-01,0.5106383,4,(GDL-280) Av. Vallarta / C. Aurelio Aceves,19,2736.0,10.063829898834229,Sugerencia revisable,4,0,7,10
+397,2026-10-01,2.8085105,6,(GDL-279) Belen / Av. de los Maestros,19,1624.0,6.617021322250366,Sugerencia revisable,6,0,7,10
+398,2026-10-01,1.3617022,5,(GDL-281) Nevado Toluca / Av de los Maestros,19,2035.0,5.5957446694374084,Sugerencia revisable,5,0,7,10

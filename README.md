@@ -10,7 +10,7 @@ El objetivo general es transformar los datos históricos abiertos de MiBici en c
 
 El proyecto aborda tres preguntas estratégicas:
 
-1. **Pregunta 1 (Demanda Espacio-Temporal):** ¿Cómo se distribuye y evoluciona la demanda horaria y diaria de viajes entre las distintas zonas del AMG?
+1. **Pregunta 1 (Demanda e Inventario Inicial):** ¿Cuántos viajes se iniciarán por estación hasta terminar el primer pico de la mañana y con cuántas bicicletas debería iniciar cada estación, considerando las llegadas previstas? Regresión de salidas y llegadas horarias, seguida de un balance conservador de inventario.
 2. **Pregunta 2 (Riesgo Operativo en Estaciones — Foco Principal de este Módulo):**  
    *¿Una estación estará en riesgo de quedarse sin bicicletas (Desabasto) o sin anclajes libres (Saturación) en un horizonte futuro de 2 horas?*  
    Permite a los despachadores del CCO planificar rutas proactivas de rebalanceo antes de que el usuario experimente la falta de servicio.
@@ -148,6 +148,21 @@ make mlflow
 mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5005
 ```
 Acceder en el navegador a: **`http://127.0.0.1:5005`** (seleccionar la pestaña **"Model training"** para ver las corridas registradas).
+
+---
+
+## P1: bicicletas al inicio del día
+
+La implementación de P1 combina regresión horaria de salidas y llegadas con un balance de inventario hasta el final del primer pico matutino. Compara baseline semanal, promedio histórico y árboles sobre las mismas estaciones, fechas y horas, incluidas las horas sin actividad.
+
+```bash
+python -m src.data.p1_dataset
+python -m src.features.p1_features
+python -m src.models.p1_train
+python -m src.models.p1_predict --date 2026-10-01
+```
+
+La [guía de P1](docs/p1-inventario-inicial.md) detalla el entorno Python 3.12, las particiones temporales, las cuatro corridas de MLflow, los comandos y los supuestos. El [notebook explicativo](notebooks/1.3-ge-p1-balance-salidas-llegadas.ipynb) presenta las gráficas y los resultados. El experimento compartido es `mibici-equipo30`.
 
 ---
 

@@ -4,7 +4,7 @@ Script de Orquestación y Registro Unificado de Experimentos en MLflow (Equipo 3
 Cumple rigurosamente con la rúbrica y especificación oficial de MLOps TC5061:
 1. Experimento unificado con el número de equipo: `mibici-equipo30`.
 2. Al menos un run por cada pregunta (P1, P2 y P3) con nombres descriptivos:
-   - P1: `p1_baseline_demanda_historica_horaria`
+   - P1: baselines semanal e histórico, árboles e inventario inicial
    - P2 Baseline: `p2_baseline_dummy_stratified`
    - P2 Candidato: `p2_lgbm_risk_classifier_2025_2026`
    - P3: `p3_baseline_kmeans_clustering_estaciones`
@@ -13,8 +13,8 @@ Cumple rigurosamente con la rúbrica y especificación oficial de MLOps TC5061:
 4. Métricas con prefijo de conjunto (`test_`, `train_`).
 5. Artefactos registrados en cada run (gráficas diagnósticas, mapas, reportes y modelos).
 6. Etiquetas estandarizadas: equipo ("Equipo 30"), pregunta ("P1", "P2", "P3"), commit de Git y autor.
-7. Soporte dual de almacenamiento: SQLite local (`mlflow.db`) y FileStore (`mlruns`) para
-   garantizar visibilidad sin importar cómo se invoque la UI de MLflow.
+7. P1 usa MLFLOW_TRACKING_URI o SQLite local (`mlflow.db`). P2 y P3 conservan
+   el registro dual existente en SQLite y FileStore (`mlruns`).
 
 Ejecución desde CLI:
     python -m src.models.run_all_experiments
@@ -38,11 +38,8 @@ from sklearn.metrics import (
     classification_report,
     davies_bouldin_score,
     f1_score,
-    mean_absolute_error,
     precision_score,
-    r2_score,
     recall_score,
-    root_mean_squared_error,
     silhouette_score,
 )
 from sklearn.preprocessing import StandardScaler
@@ -109,134 +106,21 @@ def log_run_dual(
 
 
 # ==============================================================================
-# 1. PREGUNTA 1: PREDICCIÓN DE DEMANDA HORARIA (BASELINE)
+# 1. PREGUNTA 1: DEMANDA HORARIA Y BICICLETAS AL INICIO DEL DÍA
 # ==============================================================================
 def run_p1_baseline(data_version: str, git_commit: str):
-    logger.info("=" * 70)
-    logger.info("EJECUTANDO BASELINE: PREGUNTA 1 (DEMANDA HORARIA MIBICI)")
-    logger.info("=" * 70)
+    """Ejecuta P1 con su manifiesto, rejilla completa y comparación común.
 
-    trips = pd.read_parquet(P2_TRIPS_HOURLY_PARQUET)
-    trips["dt"] = pd.to_datetime(trips["timestamp"])
-    trips["hour"] = trips["dt"].dt.hour
-    trips["dow"] = trips["dt"].dt.dayofweek
+    Los argumentos se conservan por compatibilidad con el orquestador. P1
+    registra su propia versión de datos y el commit real de la ejecución.
+    """
+    from src.data.p1_dataset import prepare_dataset
+    from src.features.p1_features import build_features
+    from src.models.p1_train import run_pipeline
 
-    train_mask = trips["dt"] < TRAIN_END_DATE
-    test_mask = trips["dt"] >= TRAIN_END_DATE
-
-    train_df = trips[train_mask]
-    test_df = trips[test_mask].copy()
-
-    # Heurística: Promedio histórico por estación, día de semana y hora
-    lookup = (
-        train_df.groupby(["station_id", "dow", "hour"])["salidas"]
-        .mean()
-        .rename("pred_salidas")
-    )
-    overall_mean = train_df["salidas"].mean()
-
-    test_df = test_df.merge(lookup, on=["station_id", "dow", "hour"], how="left")
-    test_df["pred_salidas"] = test_df["pred_salidas"].fillna(overall_mean)
-
-    mae = mean_absolute_error(test_df["salidas"], test_df["pred_salidas"])
-    rmse = root_mean_squared_error(test_df["salidas"], test_df["pred_salidas"])
-    r2 = r2_score(test_df["salidas"], test_df["pred_salidas"])
-
-    logger.info(f"P1 Test MAE : {mae:.4f} viajes/hora")
-    logger.info(f"P1 Test RMSE: {rmse:.4f} viajes/hora")
-    logger.info(f"P1 Test R²  : {r2:.4f}")
-
-    # Gráfica de diagnóstico: Demanda agregada por hora en ventana representativa
-    FIGURES_DIR.mkdir(parents=True, exist_ok=True)
-    p1_plot_path = FIGURES_DIR / "p1_demanda_prediccion_vs_real.png"
-
-    # Agregación temporal por hora para visualización clara
-    agg_eval = (
-        test_df.groupby("timestamp")[["salidas", "pred_salidas"]].sum().reset_index()
-    )
-    sample_window = agg_eval.iloc[: 24 * 7]  # 1 semana representativa
-
-    plt.figure(figsize=(12, 5), dpi=150)
-    plt.plot(
-        range(len(sample_window)),
-        sample_window["salidas"],
-        label="Demanda Real Observada (Viajes)",
-        color="#1f77b4",
-        linewidth=2,
-    )
-    plt.plot(
-        range(len(sample_window)),
-        sample_window["pred_salidas"],
-        label="Predicción Baseline Histórico",
-        color="#ff7f0e",
-        linestyle="--",
-        linewidth=2,
-    )
-    plt.title(
-        "P1 - Baseline de Demanda Horaria vs Real Observada (MiBici Guadalajara)",
-        fontsize=12,
-        fontweight="bold",
-    )
-    plt.xlabel(
-        "Horas continuas (Muestra de 7 días representativos - 2026)", fontsize=10
-    )
-    plt.ylabel("Volumen total de viajes por hora", fontsize=10)
-    plt.grid(True, alpha=0.3)
-    plt.legend(frameon=True)
-    plt.tight_layout()
-    plt.savefig(p1_plot_path)
-    plt.close()
-
-    p1_report_path = REPORTS_DIR / "p1_baseline_metrics.txt"
-    p1_report_path.write_text(
-        f"PREGUNTA 1: BASELINE DE DEMANDA HORARIA (MIBICI)\n"
-        f"================================================\n"
-        f"Modelo           : Promedio Histórico por Estación, Día y Hora\n"
-        f"Conjunto Eval    : Test (>= {TRAIN_END_DATE[:10]})\n"
-        f"Muestras Train   : {len(train_df):,}\n"
-        f"Muestras Test    : {len(test_df):,}\n"
-        f"Test MAE         : {mae:.4f} viajes/hora\n"
-        f"Test RMSE        : {rmse:.4f} viajes/hora\n"
-        f"Test R²          : {r2:.4f}\n",
-        encoding="utf-8",
-    )
-
-    params = {
-        "pregunta": "P1",
-        "model_class": "HistoricalHourlyMeanBaseline",
-        "date_range": "2025-01-01 to 2026-09-30",
-        "data_version": data_version,
-        "train_end_date": TRAIN_END_DATE,
-        "prediction_horizon": "1_hour",
-        "random_seed": RANDOM_SEED,
-        "train_samples": len(train_df),
-        "test_samples": len(test_df),
-    }
-    metrics = {
-        "test_mae": float(mae),
-        "test_rmse": float(rmse),
-        "test_r2": float(r2),
-    }
-    tags = {
-        "equipo": "Equipo 30",
-        "pregunta": "P1",
-        "git_commit": git_commit,
-        "author": "Equipo 30",
-        "problem_type": "regression_hourly_demand",
-        "system": "MiBici Guadalajara",
-    }
-    artifacts = [
-        (p1_plot_path, "figures"),
-        (p1_report_path, "reports"),
-    ]
-    log_run_dual(
-        experiment_name=MLFLOW_EXPERIMENT_NAME,
-        run_name="p1_baseline_demanda_historica_horaria",
-        params=params,
-        metrics=metrics,
-        tags=tags,
-        artifacts=artifacts,
-    )
+    prepare_dataset()
+    build_features()
+    return run_pipeline()
 
 
 # ==============================================================================
