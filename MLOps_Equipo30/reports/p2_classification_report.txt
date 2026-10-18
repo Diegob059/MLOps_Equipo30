@@ -1,0 +1,9 @@
+                precision    recall  f1-score   support
+
+    Normal (0)     0.9994    0.8399    0.9127   3049794
+ Desabasto (1)     0.0430    0.8780    0.0820     11897
+Saturación (2)     0.0560    0.9073    0.1054     16809
+
+      accuracy                         0.8404   3078500
+     macro avg     0.3661    0.8751    0.3667   3078500
+  weighted avg     0.9905    0.8404    0.9051   3078500

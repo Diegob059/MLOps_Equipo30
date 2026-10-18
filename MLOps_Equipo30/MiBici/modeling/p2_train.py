@@ -36,6 +36,7 @@ from MiBici.p2_config import (
     MLFLOW_TRACKING_URI,
     P2_FEATURES_TARGET_PARQUET,
     RANDOM_SEED,
+    REPORTS_DIR,
     TRAIN_END_DATE,
     logger,
 )
@@ -124,57 +125,115 @@ def train_and_evaluate(
     joblib.dump(clf, model_output_path)
     logger.success(f"✓ Modelo serializado guardado en: {model_output_path}")
 
-    # 6. Generación de Figuras en reports/figures/
+    # 6. Generación de Figuras y Reportes en reports/
     cm_path = plot_confusion_matrix(y_test.values, y_pred)
     fi_path = plot_feature_importance(clf.feature_importances_, feature_cols)
 
-    # 7. Tracking y Registro en MLflow
+    report_path = REPORTS_DIR / "p2_classification_report.txt"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(report_str, encoding="utf-8")
+
+    # 7. Tracking y Registro en MLflow (Cumplimiento de Rúbrica TC5061)
     data_version = get_current_data_version()
-    metrics_dict = {
-        "macro_f1": float(macro_f1),
-        "balanced_accuracy": float(bal_acc),
-        "baseline_macro_f1": float(baseline_macro_f1),
-        "recall_normal": float(recalls[0]),
-        "recall_desabasto": float(recalls[1]),
-        "recall_saturacion": float(recalls[2]),
-        "precision_normal": float(precisions[0]),
-        "precision_desabasto": float(precisions[1]),
-        "precision_saturacion": float(precisions[2]),
-        "training_time_seconds": float(fit_duration),
-    }
+    
+    # Obtener commit de git para ligar la corrida con el código exacto
+    import subprocess
+    try:
+        git_commit = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], text=True
+        ).strip()
+    except Exception:
+        git_commit = "unknown"
+
+    dummy_bal_acc = balanced_accuracy_score(y_test, y_pred_dummy)
+    recalls_dummy = recall_score(y_test, y_pred_dummy, average=None)
 
     try:
         logger.info(f"Registrando experimento en MLflow ({mlflow_tracking_uri})...")
         mlflow.set_tracking_uri(mlflow_tracking_uri)
         mlflow.set_experiment(experiment_name)
 
-        with mlflow.start_run(run_name="LGBM-P2-Risk-Predictor") as run:
-            # Parámetros
+        # ------------------------------------------------------------------
+        # RUN 1: Baseline Heurístico Estratificado
+        # ------------------------------------------------------------------
+        with mlflow.start_run(run_name="p2_baseline_dummy_stratified") as run_dummy:
+            mlflow.log_params({
+                "model_class": "DummyClassifier",
+                "strategy": "stratified",
+                "random_seed": RANDOM_SEED,
+                "train_samples": len(X_train),
+                "test_samples": len(X_test),
+                "train_end_date": TRAIN_END_DATE,
+                "date_range": "2025-01-01 to 2026-09-30",
+                "data_version": data_version,
+            })
+            mlflow.log_metrics({
+                "test_macro_f1": float(baseline_macro_f1),
+                "test_balanced_accuracy": float(dummy_bal_acc),
+                "test_recall_normal": float(recalls_dummy[0]),
+                "test_recall_desabasto": float(recalls_dummy[1]),
+                "test_recall_saturacion": float(recalls_dummy[2]),
+            })
+            mlflow.set_tags({
+                "pregunta": "Pregunta 2 - Riesgo Desabasto/Saturacion",
+                "git_commit": git_commit,
+                "model_class": "DummyClassifier",
+                "author": "Ricardo Bahamon (Equipo 30)",
+                "target_horizon": "2_hours",
+                "problem_type": "multiclass_imbalanced",
+            })
+            logger.info(f"✓ Run de Baseline registrado con ID: {run_dummy.info.run_id}")
+
+        # ------------------------------------------------------------------
+        # RUN 2: Modelo Candidato LightGBM con Class Weighting
+        # ------------------------------------------------------------------
+        with mlflow.start_run(run_name="p2_lgbm_risk_classifier_2025_2026") as run_lgbm:
+            # Parámetros del modelo y del pipeline
             mlflow.log_params(lgbm_params)
-            mlflow.log_param("train_samples", len(X_train))
-            mlflow.log_param("test_samples", len(X_test))
-            mlflow.log_param("num_features", len(feature_cols))
-            mlflow.log_param("train_end_date", TRAIN_END_DATE)
+            mlflow.log_params({
+                "model_class": "LGBMClassifier",
+                "train_samples": len(X_train),
+                "test_samples": len(X_test),
+                "num_features": len(feature_cols),
+                "train_end_date": TRAIN_END_DATE,
+                "date_range": "2025-01-01 to 2026-09-30",
+                "data_version": data_version,
+            })
 
-            # Tags de trazabilidad y gobernanza de datos
-            mlflow.set_tag("model_type", "LGBMClassifier")
-            mlflow.set_tag("data_version", data_version)
-            mlflow.set_tag("target_horizon", "2_hours")
-            mlflow.set_tag("problem_type", "multiclass_imbalanced")
-            mlflow.set_tag("question", "Pregunta 2 - Riesgo Desabasto/Saturacion")
+            # Etiquetas del run: linaje de código, pregunta y gobernanza
+            mlflow.set_tags({
+                "pregunta": "Pregunta 2 - Riesgo Desabasto/Saturacion",
+                "git_commit": git_commit,
+                "model_class": "LGBMClassifier",
+                "author": "Ricardo Bahamon (Equipo 30)",
+                "target_horizon": "2_hours",
+                "problem_type": "multiclass_imbalanced",
+            })
 
-            # Métricas
-            mlflow.log_metrics(metrics_dict)
+            # Métricas del run nombradas indicando el conjunto de datos (test_ / train_)
+            mlflow.log_metrics({
+                "test_macro_f1": float(macro_f1),
+                "test_balanced_accuracy": float(bal_acc),
+                "test_recall_normal": float(recalls[0]),
+                "test_recall_desabasto": float(recalls[1]),
+                "test_recall_saturacion": float(recalls[2]),
+                "test_precision_normal": float(precisions[0]),
+                "test_precision_desabasto": float(precisions[1]),
+                "test_precision_saturacion": float(precisions[2]),
+                "train_fit_duration_seconds": float(fit_duration),
+            })
 
-            # Artefactos
+            # Artefactos (Figuras diagnósticas, modelo serializado y reporte)
             if cm_path.exists():
                 mlflow.log_artifact(str(cm_path), artifact_path="figures")
             if fi_path.exists():
                 mlflow.log_artifact(str(fi_path), artifact_path="figures")
+            if report_path.exists():
+                mlflow.log_artifact(str(report_path), artifact_path="reports")
             if model_output_path.exists():
                 mlflow.log_artifact(str(model_output_path), artifact_path="models")
 
-            logger.info(f"✓ Corrida de MLflow registrada exitosamente con ID: {run.info.run_id}")
+            logger.info(f"✓ Run de LightGBM registrado con ID: {run_lgbm.info.run_id}")
 
     except Exception as exc:
         logger.warning(f"No fue posible completar el registro en MLflow: {exc}")

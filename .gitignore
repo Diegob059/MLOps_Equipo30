@@ -4,3 +4,31 @@
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
+
+# Datos de gran volumen (MiBici)
+data/raw/*
+data/interim/*
+data/processed/*
+data/external/*
+*.parquet
+*.csv
+!MLOps_Equipo30/**/.gitkeep
+
+# Modelos y pesos serializados
+models/*
+*.joblib
+*.pkl
+*.onnx
+
+# MLflow Tracking y artefactos
+mlruns/
+**/mlruns/
+mlartifacts/
+**/mlartifacts/
+*.db
+.mlflow/
+
+# Variables de entorno y credenciales
+.env
+.env.*
+!.env.example

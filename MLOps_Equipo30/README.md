@@ -36,7 +36,7 @@ MLOps_Equipo30/
 │   ├── interim/             <- Datos limpios en Parquet (p2_estaciones.parquet, p2_viajes_agregados_hora.parquet).
 │   └── processed/           <- Datasets finales para modelado (p2_mibici_features_target.parquet).
 ├── notebooks/
-│   └── 1.0-pregunta-2-riesgo-estaciones.ipynb <- Exploración interactiva y blueprint analítico P2.
+│   └── 1.0-rb-p2-riesgo-estaciones.ipynb <- Exploración interactiva y blueprint analítico P2 (convención 1.0-iniciales-descripcion).
 ├── src/data/
 │   └── p2_download_raw_data.py <- Descargador automatizado de datos abiertos 2025-2026.
 ├── MiBici/                  <- Código fuente modular del paquete Python del proyecto.
