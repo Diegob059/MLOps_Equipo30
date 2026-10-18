@@ -11,8 +11,8 @@ Este repositorio contiene la plataforma integral de MLOps para la optimización 
 * **ML Canvas de la Pregunta 2:** [`MLOps_Equipo30/references/ml_canvas_pregunta2.md`](MLOps_Equipo30/references/ml_canvas_pregunta2.md)
 * **Diagrama de Arquitectura End-to-End:** [`MLOps_Equipo30/references/architecture_diagram.md`](MLOps_Equipo30/references/architecture_diagram.md)
 * **Notebook de Exploración y Blueprint:** [`MLOps_Equipo30/notebooks/1.0-rb-p2-riesgo-estaciones.ipynb`](MLOps_Equipo30/notebooks/1.0-rb-p2-riesgo-estaciones.ipynb)
-* **Propuesta Entregable DOCX:** [`MLOps_Equipo30/docs/TC5061_Propuesta_Proyecto_Equipo30.docx`](MLOps_Equipo30/docs/TC5061_Propuesta_Proyecto_Equipo30.docx)
-* **ML Canvas (v1.2):** [`MLOps_Equipo30/docs/docs/Machine Learning Canvas (v1.2).docx`](MLOps_Equipo30/docs/docs/Machine%20Learning%20Canvas%20(v1.2).docx) y [`MLOps_Equipo30/references/p2_machine_learning_canvas.docx`](MLOps_Equipo30/references/p2_machine_learning_canvas.docx)
+* **Propuesta Entregable DOCX:** [`docs/TC5061_Propuesta_Proyecto_Equipo30.docx`](docs/TC5061_Propuesta_Proyecto_Equipo30.docx)
+* **ML Canvas Oficial (v1.2):** [`MLOps_Equipo30/docs/Machine Learning Canvas (v1.2).docx`](MLOps_Equipo30/docs/Machine%20Learning%20Canvas%20(v1.2).docx) y [`MLOps_Equipo30/references/p2_machine_learning_canvas.docx`](MLOps_Equipo30/references/p2_machine_learning_canvas.docx)
 
 ---
 
