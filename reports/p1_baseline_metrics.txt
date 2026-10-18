@@ -1,0 +1,9 @@
+PREGUNTA 1: BASELINE DE DEMANDA HORARIA (MIBICI)
+================================================
+Modelo           : Promedio Histórico por Estación, Día y Hora
+Conjunto Eval    : Test (>= 2026-01-01)
+Muestras Train   : 1,887,813
+Muestras Test    : 1,455,918
+Test MAE         : 1.2912 viajes/hora
+Test RMSE        : 2.0143 viajes/hora
+Test R²          : 0.5382
