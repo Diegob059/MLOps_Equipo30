@@ -42,7 +42,9 @@ from src.p2_config import (
 )
 from src.visualization.p2_plots import plot_confusion_matrix, plot_feature_importance
 
-app = typer.Typer(help="CLI de Entrenamiento y Evaluación de Modelos para la Pregunta 2 (MiBici).")
+app = typer.Typer(
+    help="CLI de Entrenamiento y Evaluación de Modelos para la Pregunta 2 (MiBici)."
+)
 
 
 def train_and_evaluate(
@@ -59,7 +61,9 @@ def train_and_evaluate(
         lgbm_params = LGBM_PARAMS
 
     logger.info("=" * 70)
-    logger.info("INICIO DE ENTRENAMIENTO Y EVALUACIÓN (PREGUNTA 2 - RIESGO DE ESTACIONES)")
+    logger.info(
+        "INICIO DE ENTRENAMIENTO Y EVALUACIÓN (PREGUNTA 2 - RIESGO DE ESTACIONES)"
+    )
     logger.info("=" * 70)
     logger.info(f"Cargando dataset procesado desde: {features_parquet}")
 
@@ -100,7 +104,9 @@ def train_and_evaluate(
 
     logger.info("=" * 70)
     logger.info(f"RESULTADOS SOBRE TEST (Evaluación >= {TRAIN_END_DATE[:10]}):")
-    logger.info(f"  Macro F1-Score       : {macro_f1:.4f} (vs Baseline: {baseline_macro_f1:.4f})")
+    logger.info(
+        f"  Macro F1-Score       : {macro_f1:.4f} (vs Baseline: {baseline_macro_f1:.4f})"
+    )
     logger.info(f"  Balanced Accuracy    : {bal_acc:.4f}")
     logger.info(f"  Recall Desabasto (1) : {recalls[1]:.2%}")
     logger.info(f"  Recall Saturación (2): {recalls[2]:.2%}")
@@ -135,7 +141,9 @@ def train_and_evaluate(
     import subprocess
 
     try:
-        git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+        git_commit = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], text=True
+        ).strip()
     except Exception:
         git_commit = "unknown"
 

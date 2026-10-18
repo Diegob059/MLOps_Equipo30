@@ -62,7 +62,9 @@ P2_ARCHITECTURE_DIAGRAM_PATH: Path = REFERENCES_DIR / "p2_architecture_diagram.m
 # Artefactos procesados en Parquet para alto rendimiento desacoplados para P2
 P2_STATIONS_PARQUET: Path = INTERIM_DATA_DIR / "p2_estaciones.parquet"
 P2_TRIPS_HOURLY_PARQUET: Path = INTERIM_DATA_DIR / "p2_viajes_agregados_hora.parquet"
-P2_FEATURES_TARGET_PARQUET: Path = PROCESSED_DATA_DIR / "p2_mibici_features_target.parquet"
+P2_FEATURES_TARGET_PARQUET: Path = (
+    PROCESSED_DATA_DIR / "p2_mibici_features_target.parquet"
+)
 P2_TEST_PREDICTIONS_PARQUET: Path = PROCESSED_DATA_DIR / "p2_test_predictions.parquet"
 
 # ==============================================================================
@@ -121,7 +123,9 @@ LGBM_PARAMS: Dict = {
 # ==============================================================================
 os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
 os.environ["MLFLOW_DISABLE_AGENT_HINT"] = "1"
-MLFLOW_TRACKING_URI: str = os.getenv("MLFLOW_TRACKING_URI", f"sqlite:///{PROJ_ROOT / 'mlflow.db'}")
+MLFLOW_TRACKING_URI: str = os.getenv(
+    "MLFLOW_TRACKING_URI", f"sqlite:///{PROJ_ROOT / 'mlflow.db'}"
+)
 MLFLOW_EXPERIMENT_NAME: str = "mibici-equipo30"
 
 # Configuración de loguru con tqdm si está disponible

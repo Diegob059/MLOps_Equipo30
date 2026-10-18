@@ -52,54 +52,189 @@ PORTAL_URL = "https://www.mibici.net/es/datos-abiertos/"
 # Garantiza que el script funcione aun si la estructura HTML del portal llegara a modificarse
 FALLBACK_TRIPS: Dict[Tuple[int, int], str] = {
     # 2023
-    (2023, 1): "https://www.mibici.net/site/assets/files/36762/datos_abiertos_2023_01.csv",
-    (2023, 2): "https://www.mibici.net/site/assets/files/40197/datos_abiertos_2023_02.csv",
-    (2023, 3): "https://www.mibici.net/site/assets/files/43035/datos_abiertos_2023_03.csv",
-    (2023, 4): "https://www.mibici.net/site/assets/files/46758/datos_abiertos_2023_04.csv",
-    (2023, 5): "https://www.mibici.net/site/assets/files/46759/datos_abiertos_2023_05.csv",
-    (2023, 6): "https://www.mibici.net/site/assets/files/48116/datos_abiertos_2023_06.csv",
-    (2023, 7): "https://www.mibici.net/site/assets/files/49448/datos_abiertos_2023_07.csv",
-    (2023, 8): "https://www.mibici.net/site/assets/files/51295/datos_abiertos_2023_08.csv",
-    (2023, 9): "https://www.mibici.net/site/assets/files/53344/datos_abiertos_2023_09.csv",
-    (2023, 10): "https://www.mibici.net/site/assets/files/54935/datos_abiertos_2023_10.csv",
-    (2023, 11): "https://www.mibici.net/site/assets/files/57344/datos_abiertos_2023_11.csv",
-    (2023, 12): "https://www.mibici.net/site/assets/files/58715/datos_abiertos_2023_12.csv",
+    (
+        2023,
+        1,
+    ): "https://www.mibici.net/site/assets/files/36762/datos_abiertos_2023_01.csv",
+    (
+        2023,
+        2,
+    ): "https://www.mibici.net/site/assets/files/40197/datos_abiertos_2023_02.csv",
+    (
+        2023,
+        3,
+    ): "https://www.mibici.net/site/assets/files/43035/datos_abiertos_2023_03.csv",
+    (
+        2023,
+        4,
+    ): "https://www.mibici.net/site/assets/files/46758/datos_abiertos_2023_04.csv",
+    (
+        2023,
+        5,
+    ): "https://www.mibici.net/site/assets/files/46759/datos_abiertos_2023_05.csv",
+    (
+        2023,
+        6,
+    ): "https://www.mibici.net/site/assets/files/48116/datos_abiertos_2023_06.csv",
+    (
+        2023,
+        7,
+    ): "https://www.mibici.net/site/assets/files/49448/datos_abiertos_2023_07.csv",
+    (
+        2023,
+        8,
+    ): "https://www.mibici.net/site/assets/files/51295/datos_abiertos_2023_08.csv",
+    (
+        2023,
+        9,
+    ): "https://www.mibici.net/site/assets/files/53344/datos_abiertos_2023_09.csv",
+    (
+        2023,
+        10,
+    ): "https://www.mibici.net/site/assets/files/54935/datos_abiertos_2023_10.csv",
+    (
+        2023,
+        11,
+    ): "https://www.mibici.net/site/assets/files/57344/datos_abiertos_2023_11.csv",
+    (
+        2023,
+        12,
+    ): "https://www.mibici.net/site/assets/files/58715/datos_abiertos_2023_12.csv",
     # 2024
-    (2024, 1): "https://www.mibici.net/site/assets/files/61450/datos_abiertos_2024_01.csv",
-    (2024, 2): "https://www.mibici.net/site/assets/files/77251/datos_abiertos_2024_02.csv",
-    (2024, 3): "https://www.mibici.net/site/assets/files/77252/datos_abiertos_2024_03.csv",
-    (2024, 4): "https://www.mibici.net/site/assets/files/80028/datos_abiertos_2024_04.csv",
-    (2024, 5): "https://www.mibici.net/site/assets/files/81663/datos_abiertos_2024_05.csv",
-    (2024, 6): "https://www.mibici.net/site/assets/files/83901/datos_abiertos_2024_06.csv",
-    (2024, 7): "https://www.mibici.net/site/assets/files/85500/datos_abiertos_2024_07.csv",
-    (2024, 8): "https://www.mibici.net/site/assets/files/87665/datos_abiertos_2024_08.csv",
-    (2024, 9): "https://www.mibici.net/site/assets/files/89736/datos_abiertos_2024_09.csv",
-    (2024, 10): "https://www.mibici.net/site/assets/files/91758/datos_abiertos_2024_10.csv",
-    (2024, 11): "https://www.mibici.net/site/assets/files/93516/datos_abiertos_2024_11.csv",
-    (2024, 12): "https://www.mibici.net/site/assets/files/94962/datos_abiertos_2024_12.csv",
+    (
+        2024,
+        1,
+    ): "https://www.mibici.net/site/assets/files/61450/datos_abiertos_2024_01.csv",
+    (
+        2024,
+        2,
+    ): "https://www.mibici.net/site/assets/files/77251/datos_abiertos_2024_02.csv",
+    (
+        2024,
+        3,
+    ): "https://www.mibici.net/site/assets/files/77252/datos_abiertos_2024_03.csv",
+    (
+        2024,
+        4,
+    ): "https://www.mibici.net/site/assets/files/80028/datos_abiertos_2024_04.csv",
+    (
+        2024,
+        5,
+    ): "https://www.mibici.net/site/assets/files/81663/datos_abiertos_2024_05.csv",
+    (
+        2024,
+        6,
+    ): "https://www.mibici.net/site/assets/files/83901/datos_abiertos_2024_06.csv",
+    (
+        2024,
+        7,
+    ): "https://www.mibici.net/site/assets/files/85500/datos_abiertos_2024_07.csv",
+    (
+        2024,
+        8,
+    ): "https://www.mibici.net/site/assets/files/87665/datos_abiertos_2024_08.csv",
+    (
+        2024,
+        9,
+    ): "https://www.mibici.net/site/assets/files/89736/datos_abiertos_2024_09.csv",
+    (
+        2024,
+        10,
+    ): "https://www.mibici.net/site/assets/files/91758/datos_abiertos_2024_10.csv",
+    (
+        2024,
+        11,
+    ): "https://www.mibici.net/site/assets/files/93516/datos_abiertos_2024_11.csv",
+    (
+        2024,
+        12,
+    ): "https://www.mibici.net/site/assets/files/94962/datos_abiertos_2024_12.csv",
     # 2025
-    (2025, 1): "https://www.mibici.net/site/assets/files/97653/datos_abiertos_2025_01.csv",
-    (2025, 2): "https://www.mibici.net/site/assets/files/99879/datos_abiertos_2025_02.csv",
-    (2025, 3): "https://www.mibici.net/site/assets/files/101986/datos_abiertos_2025_03.csv",
-    (2025, 4): "https://www.mibici.net/site/assets/files/103813/datos_abiertos_2025_04.csv",
-    (2025, 5): "https://www.mibici.net/site/assets/files/105513/datos_abiertos_2025_05.csv",
-    (2025, 6): "https://www.mibici.net/site/assets/files/107088/datos_abiertos_2025_06.csv",
-    (2025, 7): "https://www.mibici.net/site/assets/files/108898/datos_abiertos_2025_07.csv",
-    (2025, 8): "https://www.mibici.net/site/assets/files/111021/datos_abiertos_2025_08.csv",
-    (2025, 9): "https://www.mibici.net/site/assets/files/113216/datos_abiertos_2025_09.csv",
-    (2025, 10): "https://www.mibici.net/site/assets/files/115104/datos_abiertos_2025_10.csv",
-    (2025, 11): "https://www.mibici.net/site/assets/files/116773/datos_abiertos_2025_11.csv",
-    (2025, 12): "https://www.mibici.net/site/assets/files/118153/datos_abiertos_2025_12.csv",
+    (
+        2025,
+        1,
+    ): "https://www.mibici.net/site/assets/files/97653/datos_abiertos_2025_01.csv",
+    (
+        2025,
+        2,
+    ): "https://www.mibici.net/site/assets/files/99879/datos_abiertos_2025_02.csv",
+    (
+        2025,
+        3,
+    ): "https://www.mibici.net/site/assets/files/101986/datos_abiertos_2025_03.csv",
+    (
+        2025,
+        4,
+    ): "https://www.mibici.net/site/assets/files/103813/datos_abiertos_2025_04.csv",
+    (
+        2025,
+        5,
+    ): "https://www.mibici.net/site/assets/files/105513/datos_abiertos_2025_05.csv",
+    (
+        2025,
+        6,
+    ): "https://www.mibici.net/site/assets/files/107088/datos_abiertos_2025_06.csv",
+    (
+        2025,
+        7,
+    ): "https://www.mibici.net/site/assets/files/108898/datos_abiertos_2025_07.csv",
+    (
+        2025,
+        8,
+    ): "https://www.mibici.net/site/assets/files/111021/datos_abiertos_2025_08.csv",
+    (
+        2025,
+        9,
+    ): "https://www.mibici.net/site/assets/files/113216/datos_abiertos_2025_09.csv",
+    (
+        2025,
+        10,
+    ): "https://www.mibici.net/site/assets/files/115104/datos_abiertos_2025_10.csv",
+    (
+        2025,
+        11,
+    ): "https://www.mibici.net/site/assets/files/116773/datos_abiertos_2025_11.csv",
+    (
+        2025,
+        12,
+    ): "https://www.mibici.net/site/assets/files/118153/datos_abiertos_2025_12.csv",
     # 2026
-    (2026, 1): "https://www.mibici.net/site/assets/files/120163/datos_abiertos_2026_01.csv",
-    (2026, 2): "https://www.mibici.net/site/assets/files/121761/datos_abiertos_2026_02.csv",
-    (2026, 3): "https://www.mibici.net/site/assets/files/123236/datos_abiertos_2026_03.csv",
-    (2026, 4): "https://www.mibici.net/site/assets/files/124927/datos_abiertos_2026_04.csv",
-    (2026, 5): "https://www.mibici.net/site/assets/files/125943/datos_abiertos_2026_05.csv",
-    (2026, 6): "https://www.mibici.net/site/assets/files/127734/datos_abiertos_2026_06.csv",
-    (2026, 7): "https://www.mibici.net/site/assets/files/129006/datos_abiertos_2026_07.csv",
-    (2026, 8): "https://www.mibici.net/site/assets/files/130362/datos_abiertos_2026_08.csv",
-    (2026, 9): "https://www.mibici.net/site/assets/files/131825/datos_abiertos_2026_09.csv",
+    (
+        2026,
+        1,
+    ): "https://www.mibici.net/site/assets/files/120163/datos_abiertos_2026_01.csv",
+    (
+        2026,
+        2,
+    ): "https://www.mibici.net/site/assets/files/121761/datos_abiertos_2026_02.csv",
+    (
+        2026,
+        3,
+    ): "https://www.mibici.net/site/assets/files/123236/datos_abiertos_2026_03.csv",
+    (
+        2026,
+        4,
+    ): "https://www.mibici.net/site/assets/files/124927/datos_abiertos_2026_04.csv",
+    (
+        2026,
+        5,
+    ): "https://www.mibici.net/site/assets/files/125943/datos_abiertos_2026_05.csv",
+    (
+        2026,
+        6,
+    ): "https://www.mibici.net/site/assets/files/127734/datos_abiertos_2026_06.csv",
+    (
+        2026,
+        7,
+    ): "https://www.mibici.net/site/assets/files/129006/datos_abiertos_2026_07.csv",
+    (
+        2026,
+        8,
+    ): "https://www.mibici.net/site/assets/files/130362/datos_abiertos_2026_08.csv",
+    (
+        2026,
+        9,
+    ): "https://www.mibici.net/site/assets/files/131825/datos_abiertos_2026_09.csv",
 }
 
 FALLBACK_NOMENCLATURA_URL = (
@@ -198,7 +333,9 @@ def scrape_portal_links(
                         logger.debug(f"Encontrada nomenclatura en DOM: {filename}")
 
                 # 2. Archivos mensuales de viajes: datos_abiertos_AAAA_MM.csv
-                match = re.search(r"datos_abiertos_(\d{4})_(\d{2})", filename, re.IGNORECASE)
+                match = re.search(
+                    r"datos_abiertos_(\d{4})_(\d{2})", filename, re.IGNORECASE
+                )
                 if match:
                     y = int(match.group(1))
                     m = int(match.group(2))
@@ -219,7 +356,9 @@ def scrape_portal_links(
                 f"El portal respondió con HTTP {response.status_code}. Se activará fallback."
             )
     except Exception as exc:
-        logger.warning(f"Error al conectar con {portal_url}: {exc}. Se utilizará fallback.")
+        logger.warning(
+            f"Error al conectar con {portal_url}: {exc}. Se utilizará fallback."
+        )
 
     # Mecanismo de Fallback para viajes faltantes
     for y in sorted(years_set):
@@ -368,7 +507,9 @@ def download_item(
     try:
         with session.get(item.url, stream=True, timeout=timeout) as resp:
             if resp.status_code != 200:
-                logger.error(f"Código HTTP {resp.status_code} al solicitar {item.filename}.")
+                logger.error(
+                    f"Código HTTP {resp.status_code} al solicitar {item.filename}."
+                )
                 return False
 
             total_bytes = int(resp.headers.get("Content-Length", 0))
@@ -527,16 +668,12 @@ def main() -> None:
     args = parse_args()
 
     # Resolución inteligente del directorio de salida:
-    # Si 'data/raw' se pasa por defecto y no existe en CWD pero existe en MLOps_Equipo30/data/raw,
-    # se auto-resuelve para conveniencia de ejecución desde cualquier nivel del repositorio.
+    # Si 'data/raw' se pasa por defecto y no existe en CWD, se resuelve respecto a la raíz del proyecto.
     raw_path = Path(args.output_dir)
-    if not raw_path.is_absolute():
-        if not raw_path.exists() and (Path("MLOps_Equipo30") / raw_path).exists():
-            raw_path = Path("MLOps_Equipo30") / raw_path
-        elif not raw_path.exists():
-            script_parent = Path(__file__).resolve().parents[2] / "data" / "raw"
-            if script_parent.exists():
-                raw_path = script_parent
+    if not raw_path.is_absolute() and not raw_path.exists():
+        proj_root_raw = Path(__file__).resolve().parents[2] / "data" / "raw"
+        if proj_root_raw.exists():
+            raw_path = proj_root_raw
 
     run_pipeline(
         years=args.years,

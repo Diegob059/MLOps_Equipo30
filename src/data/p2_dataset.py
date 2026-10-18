@@ -54,13 +54,19 @@ def ensure_raw_data_present(years: List[int] = TARGET_YEARS) -> None:
     el pipeline de descarga automatizada sin requerir interacción manual.
     """
     raw_files = (
-        [f for f in RAW_VIAJES_DIR.glob("*.csv") if any(f"_{y}_" in f.name for y in years)]
+        [
+            f
+            for f in RAW_VIAJES_DIR.glob("*.csv")
+            if any(f"_{y}_" in f.name for y in years)
+        ]
         if RAW_VIAJES_DIR.exists()
         else []
     )
 
     has_nomenclature = (
-        bool(list(RAW_NOMENCLATURA_DIR.glob("*.csv"))) if RAW_NOMENCLATURA_DIR.exists() else False
+        bool(list(RAW_NOMENCLATURA_DIR.glob("*.csv")))
+        if RAW_NOMENCLATURA_DIR.exists()
+        else False
     )
 
     if len(raw_files) < 20 or not has_nomenclature:
@@ -124,7 +130,9 @@ def process_stations_catalog(
     required = ["station_id", "capacity", "latitude", "longitude"]
     missing = [c for c in required if c not in df_nom.columns]
     if missing:
-        raise ValueError(f"Columnas obligatorias ausentes en catálogo de estaciones: {missing}")
+        raise ValueError(
+            f"Columnas obligatorias ausentes en catálogo de estaciones: {missing}"
+        )
 
     # Limpieza: coerción numérica y filtro de integridad física
     df_nom["station_id"] = pd.to_numeric(df_nom["station_id"], errors="coerce")
@@ -145,7 +153,9 @@ def process_stations_catalog(
     # Persistencia en Parquet
     output_parquet.parent.mkdir(parents=True, exist_ok=True)
     df_nom.to_parquet(output_parquet, index=False)
-    logger.info(f"✓ Estaciones guardadas en Parquet: {output_parquet} ({len(df_nom)} estaciones).")
+    logger.info(
+        f"✓ Estaciones guardadas en Parquet: {output_parquet} ({len(df_nom)} estaciones)."
+    )
     return df_nom
 
 
@@ -163,14 +173,20 @@ def process_hourly_trips(
     - Serializa la tabla agregada en Parquet.
     """
     csv_files = sorted(
-        [f for f in raw_viajes_dir.glob("*.csv") if any(f"_{y}_" in f.name for y in TARGET_YEARS)]
+        [
+            f
+            for f in raw_viajes_dir.glob("*.csv")
+            if any(f"_{y}_" in f.name for y in TARGET_YEARS)
+        ]
     )
     if not csv_files:
         raise FileNotFoundError(
             f"No se encontraron archivos de viajes para los años {TARGET_YEARS} en {raw_viajes_dir}."
         )
 
-    logger.info(f"Agregando viajes de {len(csv_files)} archivos mensuales ({TARGET_YEARS})...")
+    logger.info(
+        f"Agregando viajes de {len(csv_files)} archivos mensuales ({TARGET_YEARS})..."
+    )
     t0 = time.time()
     salidas_chunks, llegadas_chunks = [], []
     total_trips = 0
@@ -197,7 +213,9 @@ def process_hourly_trips(
 
             # Demanda (salidas)
             s = (
-                chunk.groupby([chunk["Origen_Id"].astype(np.int16), t_start], observed=False)
+                chunk.groupby(
+                    [chunk["Origen_Id"].astype(np.int16), t_start], observed=False
+                )
                 .size()
                 .reset_index(name="salidas")
             )
@@ -206,7 +224,9 @@ def process_hourly_trips(
 
             # Oferta (llegadas)
             chunk_llegadas = (
-                chunk.groupby([chunk["Destino_Id"].astype(np.int16), t_end], observed=False)
+                chunk.groupby(
+                    [chunk["Destino_Id"].astype(np.int16), t_end], observed=False
+                )
                 .size()
                 .reset_index(name="llegadas")
             )
@@ -228,7 +248,9 @@ def process_hourly_trips(
     df_llegadas["llegadas"] = df_llegadas["llegadas"].astype(np.int16)
 
     # Consolidación de salidas y llegadas en una tabla horaria única
-    df_hourly = pd.merge(df_salidas, df_llegadas, on=["station_id", "timestamp"], how="outer")
+    df_hourly = pd.merge(
+        df_salidas, df_llegadas, on=["station_id", "timestamp"], how="outer"
+    )
     df_hourly["salidas"] = df_hourly["salidas"].fillna(0).astype(np.int16)
     df_hourly["llegadas"] = df_hourly["llegadas"].fillna(0).astype(np.int16)
     df_hourly.sort_values(["station_id", "timestamp"], inplace=True)
@@ -300,7 +322,9 @@ def generate_data_manifest(
     with open(manifest_path, "w", encoding="utf-8") as f:
         json.dump(manifest_data, f, indent=2, ensure_ascii=False)
 
-    logger.success(f"✓ Manifiesto de datos guardado: {manifest_path} (Versión: {data_version})")
+    logger.success(
+        f"✓ Manifiesto de datos guardado: {manifest_path} (Versión: {data_version})"
+    )
     return manifest_data
 
 

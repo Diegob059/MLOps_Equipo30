@@ -100,7 +100,9 @@ def log_run_dual(
                 mlflow.set_tags(tags)
                 for file_path, artifact_subpath in artifacts:
                     if file_path.exists():
-                        mlflow.log_artifact(str(file_path), artifact_path=artifact_subpath)
+                        mlflow.log_artifact(
+                            str(file_path), artifact_path=artifact_subpath
+                        )
             logger.info(f"✓ Run '{run_name}' registrado exitosamente en {uri}")
         except Exception as exc:
             logger.warning(f"Aviso al registrar '{run_name}' en {uri}: {exc}")
@@ -127,7 +129,9 @@ def run_p1_baseline(data_version: str, git_commit: str):
 
     # Heurística: Promedio histórico por estación, día de semana y hora
     lookup = (
-        train_df.groupby(["station_id", "dow", "hour"])["salidas"].mean().rename("pred_salidas")
+        train_df.groupby(["station_id", "dow", "hour"])["salidas"]
+        .mean()
+        .rename("pred_salidas")
     )
     overall_mean = train_df["salidas"].mean()
 
@@ -147,7 +151,9 @@ def run_p1_baseline(data_version: str, git_commit: str):
     p1_plot_path = FIGURES_DIR / "p1_demanda_prediccion_vs_real.png"
 
     # Agregación temporal por hora para visualización clara
-    agg_eval = test_df.groupby("timestamp")[["salidas", "pred_salidas"]].sum().reset_index()
+    agg_eval = (
+        test_df.groupby("timestamp")[["salidas", "pred_salidas"]].sum().reset_index()
+    )
     sample_window = agg_eval.iloc[: 24 * 7]  # 1 semana representativa
 
     plt.figure(figsize=(12, 5), dpi=150)
@@ -171,7 +177,9 @@ def run_p1_baseline(data_version: str, git_commit: str):
         fontsize=12,
         fontweight="bold",
     )
-    plt.xlabel("Horas continuas (Muestra de 7 días representativos - 2026)", fontsize=10)
+    plt.xlabel(
+        "Horas continuas (Muestra de 7 días representativos - 2026)", fontsize=10
+    )
     plt.ylabel("Volumen total de viajes por hora", fontsize=10)
     plt.grid(True, alpha=0.3)
     plt.legend(frameon=True)
@@ -391,7 +399,9 @@ def run_p3_clustering(data_version: str, git_commit: str):
     trips = pd.read_parquet(P2_TRIPS_HOURLY_PARQUET)
 
     trips["hour"] = pd.to_datetime(trips["timestamp"]).dt.hour
-    st_hourly = trips.groupby(["station_id", "hour"])["salidas"].mean().unstack(fill_value=0)
+    st_hourly = (
+        trips.groupby(["station_id", "hour"])["salidas"].mean().unstack(fill_value=0)
+    )
     st_hourly.columns = [f"hour_{c}" for c in st_hourly.columns]
 
     merged = estaciones.set_index("station_id").join(st_hourly).fillna(0)

@@ -2,19 +2,14 @@
 Pruebas unitarias para la configuración y el manifiesto de datos (Pregunta 2).
 """
 
-from pathlib import Path
-import pytest
-import pandas as pd
-import numpy as np
-
+from src.data.p2_dataset import compute_sha256, get_current_data_version
 from src.p2_config import (
-    P2_DATA_MANIFEST_PATH,
     LABEL_MAPPING,
     OVERFLOW_RATIO_THRESHOLD,
+    P2_DATA_MANIFEST_PATH,
     TARGET_HORIZON_HOURS,
     UNDERFLOW_RATIO_THRESHOLD,
 )
-from src.data.p2_dataset import compute_sha256, get_current_data_version
 
 
 def test_p2_config_thresholds_and_targets():
@@ -29,7 +24,9 @@ def test_p2_config_thresholds_and_targets():
 
 def test_p2_data_manifest_accessible():
     """Valida que el manifiesto de datos de P2 exista y tenga un formato válido."""
-    assert P2_DATA_MANIFEST_PATH.exists(), "El manifiesto p2_data_manifest.json debe existir."
+    assert P2_DATA_MANIFEST_PATH.exists(), (
+        "El manifiesto p2_data_manifest.json debe existir."
+    )
     version = get_current_data_version()
     assert version != "unversioned_p2_data"
     assert "p2-mibici-v2025_2026" in version

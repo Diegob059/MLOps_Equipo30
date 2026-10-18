@@ -1,40 +1,64 @@
-.DS_Store
-*.swp
-*.swo
-__pycache__/
-*.py[cod]
-.ipynb_checkpoints/
-build/
-dist/
-*.egg-info/
-.pytest_cache/
+# ==============================================================================
+# MiBici MLOps - .gitignore (CCDS v1)
+# ==============================================================================
 
-# Datos de gran volumen (MiBici)
-data/raw/*
-data/interim/*
-data/processed/*
-data/external/*
-*.parquet
-*.csv
-!MLOps_Equipo30/**/.gitkeep
+# Datos locales y binarios
+/data/raw/*
+/data/interim/*
+/data/processed/*
+/data/external/*
+!/data/**/.gitkeep
 
-# Modelos y pesos serializados
-models/*
-*.joblib
+# Modelos Serializados y Artefactos de Entrenamiento
+/models/*
+!/models/.gitkeep
 *.pkl
+*.joblib
 *.onnx
 
-# MLflow Tracking y artefactos
-mlruns
-mlruns/
-**/mlruns
-**/mlruns/
-mlartifacts/
-**/mlartifacts/
-*.db
-.mlflow/
-
-# Variables de entorno y credenciales
+# Entornos y compilación
 .env
 .env.*
 !.env.example
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+develop-eggs/
+eggs/
+.eggs/
+*.egg
+
+# Tests y linters
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+
+# MLOps / MLflow
+mlruns/
+mlartifacts/
+**/mlruns/
+**/mlartifacts/
+.mlflow/
+*.db
+*.sqlite
+mlflow.db
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# IDEs y SO
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

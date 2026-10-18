@@ -51,7 +51,9 @@ def build_spatiotemporal_grid(
     """
     Construye la rejilla cartesiana continua (Estaciones x Horas) con imputación Zero-Filling.
     """
-    logger.info("Construyendo rejilla cartesiana espacio-temporal (Estaciones x Horas)...")
+    logger.info(
+        "Construyendo rejilla cartesiana espacio-temporal (Estaciones x Horas)..."
+    )
     active_station_ids = np.intersect1d(
         df_stations["station_id"].values,
         df_hourly["station_id"].unique(),
@@ -81,7 +83,9 @@ def build_spatiotemporal_grid(
     df_grid.reset_index(drop=True, inplace=True)
 
     # Balance instantáneo de la hora (Llegadas - Salidas)
-    df_grid["balance_neto"] = (df_grid["llegadas"] - df_grid["salidas"]).astype(np.int16)
+    df_grid["balance_neto"] = (df_grid["llegadas"] - df_grid["salidas"]).astype(
+        np.int16
+    )
 
     logger.info(
         f"✓ Rejilla generada: {len(df_grid):,} filas ({len(active_station_ids)} estaciones x {len(date_range)} horas)."
@@ -105,12 +109,12 @@ def compute_target_variable(
     df = df.copy()
 
     # Desplazamientos hacia adelante por estación
-    fut_llegadas = df.groupby("station_id")["llegadas"].shift(-1) + df.groupby("station_id")[
-        "llegadas"
-    ].shift(-2)
-    fut_salidas = df.groupby("station_id")["salidas"].shift(-1) + df.groupby("station_id")[
-        "salidas"
-    ].shift(-2)
+    fut_llegadas = df.groupby("station_id")["llegadas"].shift(-1) + df.groupby(
+        "station_id"
+    )["llegadas"].shift(-2)
+    fut_salidas = df.groupby("station_id")["salidas"].shift(-1) + df.groupby(
+        "station_id"
+    )["salidas"].shift(-2)
 
     df["delta_net"] = (fut_llegadas - fut_salidas).astype("float32")
     df["ratio"] = (df["delta_net"] / df["capacity"]).astype("float32")
@@ -156,7 +160,9 @@ def add_rolling_balance_features(
     windows: List[int] = ROLLING_WINDOWS,
 ) -> Tuple[pd.DataFrame, List[str]]:
     """Calcula medias móviles rodantes del balance neto pasado con shift(1) anti-leakage."""
-    logger.info(f"Calculando medias móviles rodantes de balance neto (ventanas: {windows}h)...")
+    logger.info(
+        f"Calculando medias móviles rodantes de balance neto (ventanas: {windows}h)..."
+    )
     df = df.copy()
     rolling_cols = []
 
@@ -221,8 +227,12 @@ def build_full_feature_pipeline(
     # 5. Cíclicas
     df_full, cyc_cols = add_cyclical_calendar_features(df_with_roll)
 
-    feature_cols = lag_cols + roll_cols + cyc_cols + ["capacity", "latitude", "longitude"]
-    logger.info(f"✓ Creadas {len(feature_cols)} variables predictoras estrictamente del pasado.")
+    feature_cols = (
+        lag_cols + roll_cols + cyc_cols + ["capacity", "latitude", "longitude"]
+    )
+    logger.info(
+        f"✓ Creadas {len(feature_cols)} variables predictoras estrictamente del pasado."
+    )
 
     output_parquet.parent.mkdir(parents=True, exist_ok=True)
     df_full.to_parquet(output_parquet, index=False)
@@ -245,7 +255,9 @@ def get_train_test_data(
     - Test : timestamp >= split_date
     """
     if not features_parquet.exists():
-        raise FileNotFoundError(f"No existe el archivo de características: {features_parquet}")
+        raise FileNotFoundError(
+            f"No existe el archivo de características: {features_parquet}"
+        )
 
     df = pd.read_parquet(features_parquet)
 

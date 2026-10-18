@@ -2,7 +2,7 @@
 # GLOBALS                                                                       #
 #################################################################################
 
-PROJECT_NAME = MLOps_Equipo30
+PROJECT_NAME = TC5061-Proyecto-Equipo30
 PYTHON_VERSION = 3.13
 PYTHON_INTERPRETER = python3
 

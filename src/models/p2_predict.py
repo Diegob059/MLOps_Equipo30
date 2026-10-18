@@ -58,13 +58,16 @@ def run_batch_inference(
         split_date=TRAIN_END_DATE,
     )
 
-    logger.info(f"Generando inferencia para {len(X_test):,} registros del periodo Test...")
+    logger.info(
+        f"Generando inferencia para {len(X_test):,} registros del periodo Test..."
+    )
     y_pred = clf.predict(X_test)
     y_proba = clf.predict_proba(X_test)
 
     # Construcción de tabla de resultados
     df_results = df_clean.loc[
-        X_test.index, ["station_id", "timestamp", "capacity", "delta_net", "ratio", "target"]
+        X_test.index,
+        ["station_id", "timestamp", "capacity", "delta_net", "ratio", "target"],
     ].copy()
     df_results["pred_target"] = y_pred
     df_results["prob_normal"] = y_proba[:, 0].round(3)
@@ -79,7 +82,9 @@ def run_batch_inference(
         )
         df_results.rename(columns={"name": "nombre_estacion"}, inplace=True)
     else:
-        df_results["nombre_estacion"] = "Estación " + df_results["station_id"].astype(str)
+        df_results["nombre_estacion"] = "Estación " + df_results["station_id"].astype(
+            str
+        )
 
     # Mapeo a etiquetas legibles
     df_results["etiqueta_esperada"] = df_results["target"].map(LABEL_MAPPING)
@@ -112,13 +117,15 @@ def run_batch_inference(
     sample_desabasto = df_results[df_results["target"] == 1].head(2)
     sample_saturacion = df_results[df_results["target"] == 2].head(2)
 
-    df_sample = pd.concat([sample_normal, sample_desabasto, sample_saturacion]).reset_index(
-        drop=True
-    )
+    df_sample = pd.concat(
+        [sample_normal, sample_desabasto, sample_saturacion]
+    ).reset_index(drop=True)
     df_sample = df_sample[cols_display]
 
     print("\n" + "=" * 115)
-    print("5 EJEMPLOS DE TEST (P2): VALOR ESPERADO (REAL) VS. VALOR PREDICHO (LIGHTGBM)")
+    print(
+        "5 EJEMPLOS DE TEST (P2): VALOR ESPERADO (REAL) VS. VALOR PREDICHO (LIGHTGBM)"
+    )
     print("=" * 115)
     print(df_sample.to_string())
     print("=" * 115 + "\n")
@@ -127,7 +134,11 @@ def run_batch_inference(
 
 
 @app.command()
-def main(sample_size: int = typer.Option(5, help="Número de ejemplos a desplegar en consola.")):
+def main(
+    sample_size: int = typer.Option(
+        5, help="Número de ejemplos a desplegar en consola."
+    ),
+):
     """Ejecuta la inferencia en batch para la Pregunta 2."""
     run_batch_inference(sample_size=sample_size)
 

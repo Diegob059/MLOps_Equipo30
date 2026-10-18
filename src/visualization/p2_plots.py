@@ -45,7 +45,9 @@ def plot_confusion_matrix(
         cbar=False,
         ax=ax,
     )
-    ax.set_title("Matriz de Confusión Normalizada (Recall por Clase - P2)", fontsize=12, pad=12)
+    ax.set_title(
+        "Matriz de Confusión Normalizada (Recall por Clase - P2)", fontsize=12, pad=12
+    )
     ax.set_xlabel("Clase Predicha", fontsize=10)
     ax.set_ylabel("Clase Real (Ground Truth)", fontsize=10)
     plt.tight_layout()
@@ -69,7 +71,9 @@ def plot_feature_importance(
 
     fig, ax = plt.subplots(figsize=(8, 6))
     s_top.plot(kind="barh", color="#1f77b4", ax=ax)
-    ax.set_title(f"Top {top_n} Variables Más Importantes (LightGBM - P2)", fontsize=12, pad=12)
+    ax.set_title(
+        f"Top {top_n} Variables Más Importantes (LightGBM - P2)", fontsize=12, pad=12
+    )
     ax.set_xlabel("Importancia de División (Splits)", fontsize=10)
     ax.set_ylabel("Variable", fontsize=10)
     plt.tight_layout()

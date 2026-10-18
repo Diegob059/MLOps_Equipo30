@@ -13,9 +13,9 @@ Se recomienda utilizar un entorno virtual con Python 3.10 o superior (ejecutado 
 python3 -m venv .venv
 source .venv/bin/activate
 
-# Instalar dependencias del proyecto
-cd MLOps_Equipo30
+# Instalar dependencias del proyecto y paquete local
 pip install -r requirements.txt
+pip install -e .
 ```
 
 ---

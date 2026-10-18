@@ -18,13 +18,15 @@ from src.features.p2_features import (
 def sample_station_grid():
     """Genera una serie temporal sintética para 1 estación durante 10 horas."""
     timestamps = pd.date_range("2025-01-01 00:00:00", periods=10, freq="h")
-    df = pd.DataFrame({
-        "station_id": [1] * 10,
-        "timestamp": timestamps,
-        "capacity": [20] * 10,
-        "salidas": [2, 3, 5, 1, 0, 8, 2, 1, 0, 0],
-        "llegadas": [1, 1, 2, 4, 10, 1, 0, 1, 0, 0],
-    })
+    df = pd.DataFrame(
+        {
+            "station_id": [1] * 10,
+            "timestamp": timestamps,
+            "capacity": [20] * 10,
+            "salidas": [2, 3, 5, 1, 0, 8, 2, 1, 0, 0],
+            "llegadas": [1, 1, 2, 4, 10, 1, 0, 1, 0, 0],
+        }
+    )
     df["balance_neto"] = (df["llegadas"] - df["salidas"]).astype(np.int16)
     return df
 
