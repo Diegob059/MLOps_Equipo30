@@ -1,29 +1,30 @@
-from pathlib import Path
+"""
+Punto de Entrada General de Entrenamiento para el Proyecto (Equipo 30).
+=======================================================================
+Permite entrenar y registrar todos los experimentos (P1, P2 y P3) en MLflow
+o ejecutar selectivamente el pipeline deseado.
 
-from loguru import logger
-from tqdm import tqdm
+Ejecución desde CLI:
+    python -m MiBici.modeling.train
+"""
+
 import typer
+from MiBici.modeling.run_all_experiments import main as run_all
+from MiBici.modeling.p2_train import train_and_evaluate as run_p2
 
-from MiBici.config import MODELS_DIR, PROCESSED_DATA_DIR
-
-app = typer.Typer()
+app = typer.Typer(help="CLI de Entrenamiento y Registro en MLflow - MiBici Equipo 30")
 
 
 @app.command()
-def main(
-    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
-    features_path: Path = PROCESSED_DATA_DIR / "features.csv",
-    labels_path: Path = PROCESSED_DATA_DIR / "labels.csv",
-    model_path: Path = MODELS_DIR / "model.pkl",
-    # -----------------------------------------
-):
-    # ---- REPLACE THIS WITH YOUR OWN CODE ----
-    logger.info("Training some model...")
-    for i in tqdm(range(10), total=10):
-        if i == 5:
-            logger.info("Something happened for iteration 5.")
-    logger.success("Modeling training complete.")
-    # -----------------------------------------
+def all():
+    """Ejecuta y registra en MLflow todos los experimentos (P1, P2 y P3)."""
+    run_all()
+
+
+@app.command()
+def p2():
+    """Ejecuta y registra en MLflow el pipeline específico de Pregunta 2."""
+    run_p2()
 
 
 if __name__ == "__main__":

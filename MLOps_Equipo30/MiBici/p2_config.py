@@ -122,7 +122,7 @@ os.environ["MLFLOW_DISABLE_AGENT_HINT"] = "1"
 MLFLOW_TRACKING_URI: str = os.getenv(
     "MLFLOW_TRACKING_URI", f"sqlite:///{PROJ_ROOT / 'mlflow.db'}"
 )
-MLFLOW_EXPERIMENT_NAME: str = "MiBici-Pregunta2-Riesgo-Estaciones"
+MLFLOW_EXPERIMENT_NAME: str = "mibici-equipo30"
 
 # Configuración de loguru con tqdm si está disponible
 if hasattr(logger, "remove"):

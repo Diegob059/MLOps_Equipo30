@@ -1,0 +1,9 @@
+PREGUNTA 2: BASELINE HEURÍSTICO ESTRATIFICADO
+=============================================
+Muestras Train     : 4,038,240
+Muestras Test      : 3,078,500
+Test Macro F1      : 0.3330
+Test Balanced Acc  : 0.3331
+Recall Normal (0)  : 98.66%
+Recall Desabasto(1): 0.55%
+Recall Saturacion(2): 0.70%

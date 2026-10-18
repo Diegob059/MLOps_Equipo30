@@ -174,8 +174,22 @@ def train_and_evaluate(
                 "test_recall_desabasto": float(recalls_dummy[1]),
                 "test_recall_saturacion": float(recalls_dummy[2]),
             })
+            baseline_summary_path = REPORTS_DIR / "p2_baseline_summary.txt"
+            baseline_summary_path.write_text(
+                f"BASELINE HEURÍSTICO ESTRATIFICADO (PREGUNTA 2)\n"
+                f"================================================\n"
+                f"Macro F1-Score      : {baseline_macro_f1:.4f}\n"
+                f"Balanced Accuracy   : {dummy_bal_acc:.4f}\n"
+                f"Recall Normal (0)   : {recalls_dummy[0]:.2%}\n"
+                f"Recall Desabasto (1): {recalls_dummy[1]:.2%}\n"
+                f"Recall Saturación (2): {recalls_dummy[2]:.2%}\n"
+                f"Fecha Evaluación    : >= {TRAIN_END_DATE}\n",
+                encoding="utf-8",
+            )
+            mlflow.log_artifact(str(baseline_summary_path), artifact_path="reports")
             mlflow.set_tags({
-                "pregunta": "Pregunta 2 - Riesgo Desabasto/Saturacion",
+                "equipo": "Equipo 30",
+                "pregunta": "P2",
                 "git_commit": git_commit,
                 "model_class": "DummyClassifier",
                 "author": "Ricardo Bahamon (Equipo 30)",
@@ -202,7 +216,8 @@ def train_and_evaluate(
 
             # Etiquetas del run: linaje de código, pregunta y gobernanza
             mlflow.set_tags({
-                "pregunta": "Pregunta 2 - Riesgo Desabasto/Saturacion",
+                "equipo": "Equipo 30",
+                "pregunta": "P2",
                 "git_commit": git_commit,
                 "model_class": "LGBMClassifier",
                 "author": "Ricardo Bahamon (Equipo 30)",

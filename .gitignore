@@ -21,7 +21,9 @@ models/*
 *.onnx
 
 # MLflow Tracking y artefactos
+mlruns
 mlruns/
+**/mlruns
 **/mlruns/
 mlartifacts/
 **/mlartifacts/
