@@ -1,12 +1,12 @@
 """
-Pruebas unitarias para las transformaciones de ingeniería de características y target.
+Pruebas unitarias para las transformaciones de ingeniería de características y target (Pregunta 2).
 """
 
 import numpy as np
 import pandas as pd
 import pytest
 
-from MiBici.features import (
+from MiBici.p2_features import (
     add_cyclical_calendar_features,
     add_demand_lags,
     add_rolling_balance_features,
@@ -17,7 +17,7 @@ from MiBici.features import (
 @pytest.fixture
 def sample_station_grid():
     """Genera una serie temporal sintética para 1 estación durante 10 horas."""
-    timestamps = pd.date_range("2024-01-01 00:00:00", periods=10, freq="h")
+    timestamps = pd.date_range("2025-01-01 00:00:00", periods=10, freq="h")
     df = pd.DataFrame({
         "station_id": [1] * 10,
         "timestamp": timestamps,
@@ -29,7 +29,7 @@ def sample_station_grid():
     return df
 
 
-def test_compute_target_variable(sample_station_grid):
+def test_p2_compute_target_variable(sample_station_grid):
     """Verifica que el target a 2 horas compute correctamente las clases."""
     df_res = compute_target_variable(sample_station_grid)
     assert "delta_net" in df_res.columns
@@ -45,7 +45,7 @@ def test_compute_target_variable(sample_station_grid):
     assert valid_targets.issubset({0, 1, 2})
 
 
-def test_add_demand_lags(sample_station_grid):
+def test_p2_add_demand_lags(sample_station_grid):
     """Verifica el cálculo de retardos temporales y ausencia de fugas."""
     df_res, lag_cols = add_demand_lags(sample_station_grid, lags=[1, 2])
     assert "salidas_lag_1" in df_res.columns
@@ -56,7 +56,7 @@ def test_add_demand_lags(sample_station_grid):
     assert df_res.iloc[1]["salidas_lag_1"] == sample_station_grid.iloc[0]["salidas"]
 
 
-def test_add_rolling_balance_features(sample_station_grid):
+def test_p2_add_rolling_balance_features(sample_station_grid):
     """Verifica que el balance rodante aplique shift(1) para evitar leakage."""
     df_res, roll_cols = add_rolling_balance_features(sample_station_grid, windows=[3])
     assert "balance_rolling_3h" in df_res.columns
@@ -64,7 +64,7 @@ def test_add_rolling_balance_features(sample_station_grid):
     assert np.isnan(df_res.iloc[0]["balance_rolling_3h"])
 
 
-def test_add_cyclical_calendar_features(sample_station_grid):
+def test_p2_add_cyclical_calendar_features(sample_station_grid):
     """Verifica la generación de componentes cíclicas seno y coseno."""
     df_res, cyc_cols = add_cyclical_calendar_features(sample_station_grid)
     for col in ["sin_hour", "cos_hour", "sin_dow", "cos_dow"]:
