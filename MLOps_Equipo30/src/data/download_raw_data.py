@@ -3,7 +3,7 @@
 Módulo de Extracción de Datos Abiertos de MiBici Guadalajara.
 =============================================================
 Este script automatiza la descarga de los datos históricos de viajes (CSV)
-para los años solicitados (por defecto 2023 y 2024), así como el catálogo de
+para los años solicitados (por defecto 2025 y 2026), así como el catálogo de
 nomenclatura y capacidad de las estaciones del sistema MiBici.
 
 Características:
@@ -16,8 +16,8 @@ Características:
     - Soporte CLI completo mediante argparse (Cookiecutter Data Science).
 
 Uso:
-    python src/data/download_raw_data.py --years 2023 2024
-    python src/data/download_raw_data.py --years 2024 --output_dir data/raw --force
+    python src/data/download_raw_data.py --years 2025 2026
+    python src/data/download_raw_data.py --years 2026 --output_dir data/raw --force
 """
 
 from dataclasses import dataclass
@@ -78,6 +78,29 @@ FALLBACK_TRIPS: Dict[Tuple[int, int], str] = {
     (2024, 10): "https://www.mibici.net/site/assets/files/91758/datos_abiertos_2024_10.csv",
     (2024, 11): "https://www.mibici.net/site/assets/files/93516/datos_abiertos_2024_11.csv",
     (2024, 12): "https://www.mibici.net/site/assets/files/94962/datos_abiertos_2024_12.csv",
+    # 2025
+    (2025, 1): "https://www.mibici.net/site/assets/files/97653/datos_abiertos_2025_01.csv",
+    (2025, 2): "https://www.mibici.net/site/assets/files/99879/datos_abiertos_2025_02.csv",
+    (2025, 3): "https://www.mibici.net/site/assets/files/101986/datos_abiertos_2025_03.csv",
+    (2025, 4): "https://www.mibici.net/site/assets/files/103813/datos_abiertos_2025_04.csv",
+    (2025, 5): "https://www.mibici.net/site/assets/files/105513/datos_abiertos_2025_05.csv",
+    (2025, 6): "https://www.mibici.net/site/assets/files/107088/datos_abiertos_2025_06.csv",
+    (2025, 7): "https://www.mibici.net/site/assets/files/108898/datos_abiertos_2025_07.csv",
+    (2025, 8): "https://www.mibici.net/site/assets/files/111021/datos_abiertos_2025_08.csv",
+    (2025, 9): "https://www.mibici.net/site/assets/files/113216/datos_abiertos_2025_09.csv",
+    (2025, 10): "https://www.mibici.net/site/assets/files/115104/datos_abiertos_2025_10.csv",
+    (2025, 11): "https://www.mibici.net/site/assets/files/116773/datos_abiertos_2025_11.csv",
+    (2025, 12): "https://www.mibici.net/site/assets/files/118153/datos_abiertos_2025_12.csv",
+    # 2026
+    (2026, 1): "https://www.mibici.net/site/assets/files/120163/datos_abiertos_2026_01.csv",
+    (2026, 2): "https://www.mibici.net/site/assets/files/121761/datos_abiertos_2026_02.csv",
+    (2026, 3): "https://www.mibici.net/site/assets/files/123236/datos_abiertos_2026_03.csv",
+    (2026, 4): "https://www.mibici.net/site/assets/files/124927/datos_abiertos_2026_04.csv",
+    (2026, 5): "https://www.mibici.net/site/assets/files/125943/datos_abiertos_2026_05.csv",
+    (2026, 6): "https://www.mibici.net/site/assets/files/127734/datos_abiertos_2026_06.csv",
+    (2026, 7): "https://www.mibici.net/site/assets/files/129006/datos_abiertos_2026_07.csv",
+    (2026, 8): "https://www.mibici.net/site/assets/files/130362/datos_abiertos_2026_08.csv",
+    (2026, 9): "https://www.mibici.net/site/assets/files/131825/datos_abiertos_2026_09.csv",
 }
 
 FALLBACK_NOMENCLATURA_URL = (
@@ -405,7 +428,7 @@ def run_pipeline(
     """
     start_time = time.time()
     logger.info("=" * 70)
-    logger.info("PIPELINE DE DESCARGA DE DATOS ABIERTOS MIBICI (2023 - 2024)")
+    logger.info("PIPELINE DE DESCARGA DE DATOS ABIERTOS MIBICI (2025 - 2026)")
     logger.info(f"Años objetivo       : {years}")
     logger.info(f"Directorio de salida: {output_dir.resolve()}")
     logger.info(f"Incluir nomenclatura: {not skip_nomenclatura}")
@@ -469,14 +492,14 @@ def run_pipeline(
 def parse_args() -> argparse.Namespace:
     """Configuración de argumentos CLI."""
     parser = argparse.ArgumentParser(
-        description="Descarga automatizada de datos abiertos de MiBici (Años 2023 y 2024)."
+        description="Descarga automatizada de datos abiertos de MiBici (Años 2025 y 2026)."
     )
     parser.add_argument(
         "--years",
         nargs="+",
         type=int,
-        default=[2023, 2024],
-        help="Años de viajes a descargar (ej. --years 2023 2024). Por defecto: 2023 2024.",
+        default=[2025, 2026],
+        help="Años de viajes a descargar (ej. --years 2025 2026). Por defecto: 2025 2026.",
     )
     parser.add_argument(
         "--output_dir",

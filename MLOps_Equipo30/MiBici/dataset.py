@@ -56,17 +56,20 @@ def ensure_raw_data_present(years: List[int] = TARGET_YEARS) -> None:
     Verifica que los datos crudos existan en disco. Si falta alguno, ejecuta
     el pipeline de descarga automatizada sin requerir interacción manual.
     """
-    raw_files = list(RAW_VIAJES_DIR.glob("*.csv")) if RAW_VIAJES_DIR.exists() else []
-    expected_trip_files = len(years) * 12
+    raw_files = [
+        f for f in RAW_VIAJES_DIR.glob("*.csv")
+        if any(f"_{y}_" in f.name for y in years)
+    ] if RAW_VIAJES_DIR.exists() else []
+    
     has_nomenclature = (
         bool(list(RAW_NOMENCLATURA_DIR.glob("*.csv")))
         if RAW_NOMENCLATURA_DIR.exists()
         else False
     )
 
-    if len(raw_files) < expected_trip_files or not has_nomenclature:
+    if len(raw_files) < 20 or not has_nomenclature:
         logger.warning(
-            f"Faltan datos crudos ({len(raw_files)}/{expected_trip_files} viajes, nomenclatura={has_nomenclature}). "
+            f"Faltan datos crudos ({len(raw_files)} archivos encontrados para años {years}, nomenclatura={has_nomenclature}). "
             "Iniciando descarga desatendida..."
         )
         run_raw_download(
@@ -147,11 +150,21 @@ def process_hourly_trips(
     - Agrega salidas (origen) y llegadas (destino) por estación y hora.
     - Serializa la tabla agregada en Parquet.
     """
-    csv_files = sorted(list(raw_viajes_dir.glob("*.csv")))
+    csv_files = sorted(
+        [
+            f
+            for f in raw_viajes_dir.glob("*.csv")
+            if any(f"_{y}_" in f.name for y in TARGET_YEARS)
+        ]
+    )
     if not csv_files:
-        raise FileNotFoundError(f"No se encontraron archivos de viajes en {raw_viajes_dir}.")
+        raise FileNotFoundError(
+            f"No se encontraron archivos de viajes para los años {TARGET_YEARS} en {raw_viajes_dir}."
+        )
 
-    logger.info(f"Agregando viajes de {len(csv_files)} archivos mensuales...")
+    logger.info(
+        f"Agregando viajes de {len(csv_files)} archivos mensuales ({TARGET_YEARS})..."
+    )
     t0 = time.time()
     salidas_chunks, llegadas_chunks = [], []
     total_trips = 0
@@ -244,12 +257,13 @@ def generate_data_manifest(
             "size_bytes": p.stat().st_size,
         }
 
-    # 2. Archivos de Viajes crudos
+    # 2. Archivos de Viajes crudos correspondientes a los años objetivo
     for p in sorted(RAW_VIAJES_DIR.glob("*.csv")):
-        manifest_files[f"raw/Viajes/{p.name}"] = {
-            "sha256": compute_sha256(p),
-            "size_bytes": p.stat().st_size,
-        }
+        if any(f"_{y}_" in p.name for y in TARGET_YEARS):
+            manifest_files[f"raw/Viajes/{p.name}"] = {
+                "sha256": compute_sha256(p),
+                "size_bytes": p.stat().st_size,
+            }
 
     # 3. Artefactos Parquet generados
     for p in [INTERIM_STATIONS_PARQUET, INTERIM_TRIPS_HOURLY_PARQUET]:
@@ -266,7 +280,8 @@ def generate_data_manifest(
         "".join(sorted([f["sha256"] for f in manifest_files.values()])).encode()
     ).hexdigest()
 
-    data_version = f"mibici-v2023_2024-{combined_hash[:10]}"
+    years_str = "_".join(str(y) for y in sorted(TARGET_YEARS))
+    data_version = f"mibici-v{years_str}-{combined_hash[:10]}"
 
     manifest_data = {
         "dataset_name": "MiBici Guadalajara Open Data",

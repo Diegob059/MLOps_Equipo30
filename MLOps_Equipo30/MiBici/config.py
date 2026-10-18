@@ -66,10 +66,10 @@ TEST_PREDICTIONS_PARQUET: Path = PROCESSED_DATA_DIR / "test_predictions.parquet"
 # CONFIGURACIÓN DE INGESTA Y FECHAS
 # ==============================================================================
 PORTAL_URL: str = "https://www.mibici.net/es/datos-abiertos/"
-TARGET_YEARS: List[int] = [2023, 2024]
-START_TIMESTAMP: str = "2023-01-01 00:00:00"
-END_TIMESTAMP: str = "2024-12-31 23:00:00"
-TRAIN_END_DATE: str = "2024-07-01 00:00:00"
+TARGET_YEARS: List[int] = [2025, 2026]
+START_TIMESTAMP: str = "2025-01-01 00:00:00"
+END_TIMESTAMP: str = "2026-09-30 23:00:00"
+TRAIN_END_DATE: str = "2026-01-01 00:00:00"
 
 # ==============================================================================
 # DEFINICIÓN DEL TARGET OPERATIVO (PREGUNTA 2)

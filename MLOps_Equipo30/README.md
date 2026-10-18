@@ -20,9 +20,8 @@ El proyecto aborda tres preguntas estratégicas:
 
 ## 📊 2. Datos Utilizados
 
-* **Fuente Oficial:** Portal de Datos Abiertos de MiBici ([https://www.mibici.net/es/datos-abiertos/](https://www.mibici.net/es/datos-abiertos/)).
-* **Periodo Histórico:** Años completos 2023 y 2024 (24 archivos mensuales de viajes).
-* **Volumen:** Más de **8.93 millones de viajes** registrados y agregados en series de tiempo horarias para 370 estaciones activas.
+* **Periodo Histórico:** Años 2025 y 2026 (21 archivos mensuales de viajes: 2025 completo y 2026 hasta septiembre).
+* **Volumen:** Más de **7.89 millones de viajes** registrados y agregados en series de tiempo horarias para 470 estaciones activas.
 * **Catálogo de Nomenclatura:** Catálogo oficial con ID de estación, nombre, geolocalización (latitud, longitud) y capacidad física de anclajes instalados (`capacity`).
 * **Formato Intermedio:** **Apache Parquet** comprimido para alta velocidad de I/O y bajo consumo de disco.
 

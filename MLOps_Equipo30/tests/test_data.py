@@ -32,7 +32,7 @@ def test_data_manifest_accessible():
     assert DATA_MANIFEST_PATH.exists(), "El manifiesto data_manifest.json debe existir."
     version = get_current_data_version()
     assert version != "unversioned_data"
-    assert "mibici-v2023_2024" in version
+    assert "mibici-v2025_2026" in version
 
 
 def test_sha256_computation(tmp_path):
