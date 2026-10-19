@@ -7,7 +7,10 @@ Cumple rigurosamente con la rúbrica y especificación oficial de MLOps TC5061:
    - P1: baselines semanal e histórico, árboles e inventario inicial
    - P2 Baseline: `p2_baseline_dummy_stratified`
    - P2 Candidato: `p2_lgbm_risk_classifier_2025_2026`
-   - P3: `p3_baseline_kmeans_clustering_estaciones`
+   - P3 Baseline: `p3_baseline_kmeans_clustering_estaciones`
+   - P3 Candidato: `p3_candidato_<conjunto_features>_<algoritmo>_k<k>` (mejor
+     combinación de un barrido k=2..10 sobre K-Means/Gaussian Mixture, ver
+     `src/models/p3_train.py`)
 3. Parámetros completos de reproducibilidad (rango de fechas, versión de datos,
    semilla, cortes temporales, hiperparámetros).
 4. Métricas con prefijo de conjunto (`test_`, `train_`).
@@ -30,19 +33,14 @@ from lightgbm import LGBMClassifier
 import matplotlib.pyplot as plt
 import mlflow
 import pandas as pd
-from sklearn.cluster import KMeans
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import (
     balanced_accuracy_score,
-    calinski_harabasz_score,
     classification_report,
-    davies_bouldin_score,
     f1_score,
     precision_score,
     recall_score,
-    silhouette_score,
 )
-from sklearn.preprocessing import StandardScaler
 
 from src.data.p2_dataset import get_current_data_version
 from src.features.p2_features import get_train_test_data
@@ -272,158 +270,33 @@ def run_p2_experiments(data_version: str, git_commit: str):
 
 
 # ==============================================================================
-# 3. PREGUNTA 3: CLUSTERING DE ESTACIONES (K-MEANS)
+# 3. PREGUNTA 3: CLUSTERING DE ESTACIONES (K-MEANS / GAUSSIAN MIXTURE)
 # ==============================================================================
 def run_p3_clustering(data_version: str, git_commit: str):
     logger.info("=" * 70)
     logger.info("EJECUTANDO PREGUNTA 3: CLUSTERING Y PERFILAMIENTO DE ESTACIONES")
     logger.info("=" * 70)
 
-    estaciones = pd.read_parquet(P2_STATIONS_PARQUET)
-    trips = pd.read_parquet(P2_TRIPS_HOURLY_PARQUET)
+    from src.models.p3_train import guardar_asignaciones_cluster, guardar_mejor_modelo, preparar_runs
 
-    trips["hour"] = pd.to_datetime(trips["timestamp"]).dt.hour
-    st_hourly = (
-        trips.groupby(["station_id", "hour"])["salidas"].mean().unstack(fill_value=0)
-    )
-    st_hourly.columns = [f"hour_{c}" for c in st_hourly.columns]
-
-    merged = estaciones.set_index("station_id").join(st_hourly).fillna(0)
-    feature_cols = [c for c in merged.columns if c.startswith("hour_")] + ["capacity"]
-
-    X = StandardScaler().fit_transform(merged[feature_cols])
-
-    k_clusters = 4
-    km = KMeans(n_clusters=k_clusters, random_state=RANDOM_SEED, n_init=10)
-    labels = km.fit_predict(X)
-    merged["cluster"] = labels
-
-    sil = silhouette_score(X, labels)
-    db = davies_bouldin_score(X, labels)
-    ch = calinski_harabasz_score(X, labels)
-
-    logger.info(
-        f"P3 Clustering -> Silhouette: {sil:.4f}, Davies-Bouldin: {db:.4f}, Calinski: {ch:.1f}"
-    )
-
-    # Generación de Artefactos Visuales
-    p3_map_path = FIGURES_DIR / "p3_clusters_estaciones_mapa.png"
-    plt.figure(figsize=(9, 7), dpi=150)
-    colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]
-    cluster_names = [
-        "C0: Residencial / Origen Matutino",
-        "C1: Alta Densidad Comercial",
-        "C2: Flujo Moderado Constante",
-        "C3: Nodos Intermodales Críticos",
-    ]
-    for cid in range(k_clusters):
-        sub = merged[merged["cluster"] == cid]
-        plt.scatter(
-            sub["longitude"],
-            sub["latitude"],
-            s=sub["capacity"] * 3,
-            c=colors[cid],
-            label=f"{cluster_names[cid]} (n={len(sub)})",
-            alpha=0.8,
-            edgecolors="black",
-            linewidth=0.5,
+    runs = preparar_runs()
+    for clave in ("baseline", "candidato"):
+        run = runs[clave]
+        logger.info(
+            f"P3 {clave} -> silhouette: {run['metrics']['test_silhouette_score']:.4f}, "
+            f"davies-bouldin: {run['metrics']['test_davies_bouldin_index']:.4f}"
         )
-    plt.title(
-        "P3 - Distribución Geoespacial de Clusters de Estaciones (MiBici)",
-        fontsize=12,
-        fontweight="bold",
-    )
-    plt.xlabel("Longitud", fontsize=10)
-    plt.ylabel("Latitud", fontsize=10)
-    plt.grid(True, alpha=0.3)
-    plt.legend(frameon=True, fontsize=8, loc="upper right")
-    plt.tight_layout()
-    plt.savefig(p3_map_path)
-    plt.close()
-
-    p3_profile_path = FIGURES_DIR / "p3_perfil_clusters.png"
-    plt.figure(figsize=(10, 5), dpi=150)
-    hours = list(range(24))
-    hour_cols = [f"hour_{h}" for h in hours]
-    for cid in range(k_clusters):
-        mean_profile = merged[merged["cluster"] == cid][hour_cols].mean().values
-        plt.plot(
-            hours,
-            mean_profile,
-            marker="o",
-            label=cluster_names[cid],
-            color=colors[cid],
-            linewidth=2,
+        log_run_dual(
+            experiment_name=MLFLOW_EXPERIMENT_NAME,
+            run_name=run["run_name"],
+            params=run["params"],
+            metrics=run["metrics"],
+            tags=run["tags"],
+            artifacts=runs["artefactos"],
         )
-    plt.title(
-        "P3 - Perfil Horario Promedio de Salidas por Cluster de Estación",
-        fontsize=12,
-        fontweight="bold",
-    )
-    plt.xlabel("Hora del día (0 - 23)", fontsize=10)
-    plt.ylabel("Salidas promedio por estación/hora", fontsize=10)
-    plt.xticks(hours)
-    plt.grid(True, alpha=0.3)
-    plt.legend(frameon=True, fontsize=9)
-    plt.tight_layout()
-    plt.savefig(p3_profile_path)
-    plt.close()
 
-    p3_report_path = REPORTS_DIR / "p3_clustering_report.txt"
-    p3_report_path.write_text(
-        f"PREGUNTA 3: CLUSTERING Y PERFILAMIENTO DE ESTACIONES (MIBICI)\n"
-        f"============================================================\n"
-        f"Algoritmo               : K-Means (k={k_clusters})\n"
-        f"Escalador               : StandardScaler\n"
-        f"Total Estaciones        : {len(merged)}\n"
-        f"Silhouette Score        : {sil:.4f}\n"
-        f"Davies-Bouldin Score    : {db:.4f}\n"
-        f"Calinski-Harabasz Score : {ch:.1f}\n"
-        f"Distribución Estaciones : {dict(pd.Series(labels).value_counts())}\n",
-        encoding="utf-8",
-    )
-
-    params_p3 = {
-        "pregunta": "P3",
-        "algorithm": "KMeans",
-        "k": k_clusters,
-        "features": "perfil_horario_y_capacidad",
-        "scaling": "StandardScaler",
-        "random_seed": RANDOM_SEED,
-        "date_range": "2025-01-01 to 2026-09-30",
-        "data_version": data_version,
-        "n_stations": len(merged),
-    }
-    metrics_p3 = {
-        "test_silhouette_score": float(sil),
-        "test_davies_bouldin_index": float(db),
-        "test_calinski_harabasz_score": float(ch),
-        "cluster_0_stations": int((labels == 0).sum()),
-        "cluster_1_stations": int((labels == 1).sum()),
-        "cluster_2_stations": int((labels == 2).sum()),
-        "cluster_3_stations": int((labels == 3).sum()),
-    }
-    tags_p3 = {
-        "equipo": "Equipo 30",
-        "pregunta": "P3",
-        "git_commit": git_commit,
-        "author": "Equipo 30",
-        "problem_type": "unsupervised_clustering",
-        "system": "MiBici Guadalajara",
-    }
-    artifacts_p3 = [
-        (p3_map_path, "figures"),
-        (p3_profile_path, "figures"),
-        (p3_report_path, "reports"),
-    ]
-    log_run_dual(
-        experiment_name=MLFLOW_EXPERIMENT_NAME,
-        run_name="p3_baseline_kmeans_clustering_estaciones",
-        params=params_p3,
-        metrics=metrics_p3,
-        tags=tags_p3,
-        artifacts=artifacts_p3,
-    )
+    guardar_mejor_modelo(runs["candidato"]["resultado"])
+    guardar_asignaciones_cluster(runs["candidato"]["resultado"])
 
 
 # ==============================================================================

@@ -10,7 +10,6 @@ Ejecución desde CLI:
 
 import typer
 
-
 app = typer.Typer(help="CLI de Entrenamiento y Registro en MLflow - MiBici Equipo 30")
 
 
@@ -36,6 +35,14 @@ def p1():
     from src.models.p1_train import run_pipeline
 
     run_pipeline()
+
+
+@app.command()
+def p3():
+    """Ejecuta y registra en MLflow el pipeline específico de Pregunta 3 (clustering)."""
+    from src.models.p3_train import entrenar_y_registrar as run_p3
+
+    run_p3()
 
 
 if __name__ == "__main__":
