@@ -15,8 +15,8 @@ Plataforma de Machine Learning Operations (MLOps) para análisis de demanda, pre
 ## 📋 Documentos Clave
 
 - [Guía de Inicio Rápido (Getting Started)](getting-started.md)
-- [Diagrama de Arquitectura End-to-End](../references/p2_architecture_diagram.md)
-- [Machine Learning Canvas Oficial (v1.2)](Machine%20Learning%20Canvas%20(v1.2).docx)
+- [Diagrama de arquitectura general de P1, P2 y P3](../references/architecture_diagram.md)
+- [Machine Learning Canvas completo de P1, P2 y P3](../references/ml_canvas_equipo30.docx)
 - [Manifiesto de Versionado de Datos SHA-256](../references/p2_data_manifest.json)
 
 ---
