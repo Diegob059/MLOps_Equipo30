@@ -99,3 +99,14 @@ export PRINT_HELP_PYSCRIPT
 
 help:
 	@$(PYTHON_INTERPRETER) -c "${PRINT_HELP_PYSCRIPT}" < $(MAKEFILE_LIST)
+
+## Prepare Question 1 hourly flows and features
+.PHONY: data_p1
+data_p1:
+	$(PYTHON_INTERPRETER) -m src.data.p1_dataset
+	$(PYTHON_INTERPRETER) -m src.features.p1_features
+
+## Train Question 1 and log the four comparable MLflow runs
+.PHONY: train_p1
+train_p1:
+	$(PYTHON_INTERPRETER) -m src.models.p1_train

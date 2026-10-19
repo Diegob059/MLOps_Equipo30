@@ -17,6 +17,8 @@
 *.onnx
 
 # Entornos y compilación
+/.venv/
+/reports/p1/evaluacion_inventario_prueba.csv
 .env
 .env.*
 !.env.example

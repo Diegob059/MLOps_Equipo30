@@ -1,0 +1,22 @@
+[
+  {
+    "metodo": "semanal",
+    "run_id": "7f215a21218d4dc69f301dd371a49937",
+    "experiment": "mibici-equipo30"
+  },
+  {
+    "metodo": "historico",
+    "run_id": "df1d61f57de04cf480d79fd4da98f5ee",
+    "experiment": "mibici-equipo30"
+  },
+  {
+    "metodo": "arbol",
+    "run_id": "3f2d682eb35e4e198889a4df9a24a84d",
+    "experiment": "mibici-equipo30"
+  },
+  {
+    "metodo": "seleccionado",
+    "run_id": "c50ae35534fa4800ba4f7001e78675b0",
+    "experiment": "mibici-equipo30"
+  }
+]

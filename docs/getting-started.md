@@ -53,7 +53,7 @@ python -m src.models.p2_train
 ```
 
 ### Runs Registrados en `mibici-equipo30`:
-1. **`p1_baseline_demanda_historica_horaria`** (P1): Baseline de promedio histórico horario por estación. Métricas: `test_mae`, `test_rmse`, `test_r2`. Artefacto: `p1_demanda_prediccion_vs_real.png`.
+1. **P1 — Inventario inicial:** `p1_baseline_semanal_balance`, `p1_baseline_historico_balance`, `p1_arboles_balance` y `p1_inventario_inicial`. Comparan salidas y llegadas sobre la misma rejilla completa. Métricas: `test_salidas_mae`, `test_llegadas_mae`, `test_inventario_mae` y cobertura de conteos horarios. La [guía de P1](p1-inventario-inicial.md) describe su entorno y evaluación independiente.
 2. **`p2_baseline_dummy_stratified`** (P2 Baseline): Heurística estratificada para riesgo de desabasto y saturación. Métricas: `test_macro_f1: 0.3330`, `test_balanced_accuracy: 0.3331`.
 3. **`p2_lgbm_risk_classifier_2025_2026`** (P2 Candidato): Clasificador LightGBM con `class_weight='balanced'`. Métricas: `test_macro_f1: 0.3667`, `test_balanced_accuracy: 87.51%`, `recall_desabasto: 87.80%`, `recall_saturacion: 90.73%`. Artefactos: Matriz de confusión, importancia de variables, reporte y modelo `.joblib`.
 4. **`p3_baseline_kmeans_clustering_estaciones`** (P3): Clustering no supervisado de estaciones (K-Means k=4). Métricas: `test_silhouette_score: 0.2735`, `test_davies_bouldin_index: 1.3819`. Artefactos: Mapa de clusters y perfiles horarios.
