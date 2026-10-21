@@ -1,0 +1,38 @@
+name: tc5061-equipo30-mibici
+
+python_env: python_env.yaml
+
+entry_points:
+  # Ingesta + ingeniería de características de una pregunta (o las tres).
+  # Equivalente a los targets `data`/`data_p1`/`data_p3` del Makefile.
+  ingest:
+    parameters:
+      question: {type: string, default: "all"}
+    command: "python scripts/ingest.py --question {question}"
+
+  # Entrenamiento y registro en MLflow de una pregunta (p1, p2 o p3), con
+  # modelo/algoritmo e hiperparámetros opcionales. Las rutas, fechas y la
+  # semilla NO se repiten aquí: cada módulo de entrenamiento las toma de su
+  # config.py correspondiente; solo se exponen los hiperparámetros que tiene
+  # sentido sobreescribir desde la línea de comandos.
+  #
+  # Ejemplos:
+  #   mlflow run . -e train -P question=p1 -P max_depth=8
+  #   mlflow run . -e train -P question=p2 -P model=lgbm -P n_estimators=300
+  #   mlflow run . -e train -P question=p3 -P model=kmeans -P k=4
+  train:
+    parameters:
+      question: {type: string}
+      model: {type: string, default: ""}
+      n_estimators: {type: string, default: ""}
+      max_depth: {type: string, default: ""}
+      min_samples_leaf: {type: string, default: ""}
+      learning_rate: {type: string, default: ""}
+      num_leaves: {type: string, default: ""}
+      k: {type: string, default: ""}
+      feature_set: {type: string, default: ""}
+    command: >-
+      python scripts/train.py --question {question} --model {model}
+      --n-estimators {n_estimators} --max-depth {max_depth}
+      --min-samples-leaf {min_samples_leaf} --learning-rate {learning_rate}
+      --num-leaves {num_leaves} --k {k} --feature-set {feature_set}

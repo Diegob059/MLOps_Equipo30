@@ -15,6 +15,7 @@ corridas para registrar en MLflow, siguiendo la misma convención
 
 Ejecución desde terminal:
     python -m src.models.p3_train
+    python -m src.models.p3_train --algoritmo kmeans --k 4   # un solo run, sin el barrido completo
 """
 
 import subprocess
@@ -356,10 +357,66 @@ def entrenar_y_registrar() -> dict:
     return runs
 
 
+def entrenar_run_individual(
+    algoritmo: str,
+    k: int,
+    conjunto_caracteristicas: str = "hourly",
+    processed_dir: Path = PROCESSED_DATA_DIR,
+) -> dict:
+    """Ajusta y registra un único run de P3 con `algoritmo`/`k`/`conjunto_caracteristicas` explícitos.
+
+    Usado por el entry point `train` del `MLproject` (ver `scripts/train.py`),
+    p. ej. `mlflow run . -e train -P question=p3 -P model=kmeans -P k=4`.
+    A diferencia de `entrenar_y_registrar`, no recorre el barrido completo ni
+    sobreescribe el modelo candidato serializado que usa `p3_predict.py`.
+    """
+    data_version = get_current_data_version()
+    git_commit = get_git_commit()
+
+    df, columnas_caracteristicas = load_feature_set(conjunto_caracteristicas, processed_dir)
+    escalador = StandardScaler()
+    X = escalador.fit_transform(df[columnas_caracteristicas])
+    modelo, etiquetas, metricas = fit_and_evaluate(X, algoritmo, k)
+    resultado = ResultadoModelo(
+        modelo=modelo,
+        escalador=escalador,
+        conjunto_caracteristicas=conjunto_caracteristicas,
+        algoritmo=algoritmo,
+        k=k,
+        columnas_caracteristicas=columnas_caracteristicas,
+        etiquetas=etiquetas,
+        df=df,
+    )
+    params, tags = _build_params_tags(resultado, data_version, git_commit, es_baseline=False)
+    tags["model_role"] = "single_run_override"
+    run_name = f"p3_run_{conjunto_caracteristicas}_{algoritmo}_k{k}"
+
+    FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+    fig_mapa = graficar_mapa_clusters(resultado.df, resultado.etiquetas)
+    fig_mapa.savefig(P3_MAP_FIGURE, dpi=150)
+    fig_perfil = graficar_mapa_calor_perfil_clusters(
+        resultado.df, resultado.columnas_caracteristicas, resultado.etiquetas
+    )
+    fig_perfil.savefig(P3_PROFILE_FIGURE, dpi=150)
+    artefactos = [(P3_MAP_FIGURE, "figures"), (P3_PROFILE_FIGURE, "figures")]
+
+    registrar_run_mlflow(run_name, params, metricas, tags, artefactos)
+    return {"resultado": resultado, "params": params, "metrics": metricas, "tags": tags, "run_name": run_name}
+
+
 @app.command()
-def main():
-    """Ejecuta el pipeline completo de P3 y registra 2 runs (baseline + candidato) en MLflow."""
-    entrenar_y_registrar()
+def main(
+    algoritmo: str = typer.Option(None, "--algoritmo", help="kmeans|gmm. Junto con --k, ejecuta un solo run en vez del barrido completo."),
+    k: int = typer.Option(None, "--k", help="Número de clusters para el run individual (requerido junto con --algoritmo)."),
+    conjunto_caracteristicas: str = typer.Option("hourly", "--conjunto-caracteristicas", help="hourly|bucketed (solo aplica al run individual)."),
+):
+    """Ejecuta el pipeline completo de P3 (barrido + baseline + candidato), o un solo run si se dan --algoritmo/--k."""
+    if algoritmo is not None or k is not None:
+        if algoritmo is None or k is None:
+            raise typer.BadParameter("--algoritmo y --k deben especificarse juntos para un run individual.")
+        entrenar_run_individual(algoritmo=algoritmo, k=k, conjunto_caracteristicas=conjunto_caracteristicas)
+    else:
+        entrenar_y_registrar()
 
 
 if __name__ == "__main__":
