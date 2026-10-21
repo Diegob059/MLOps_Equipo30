@@ -1,6 +1,7 @@
 """Entrena P1 sobre una evaluación común y registra resultados en MLflow.
 
 python -m src.models.p1_train
+python -m src.models.p1_train --max-depth 8 --min-samples-leaf 50
 """
 import argparse
 import json
@@ -24,10 +25,10 @@ def regression_metrics(real, predicted):
             'rmse': float(np.sqrt(mean_squared_error(real, predicted)))}
 
 
-def fit_models(train):
+def fit_models(train, tree_params=None):
     models = {}
     for flow in cfg.FLOWS:
-        tree = DecisionTreeRegressor(**cfg.TREE_PARAMS)
+        tree = DecisionTreeRegressor(**(tree_params or cfg.TREE_PARAMS))
         tree.fit(train[cfg.VARIABLES], train[flow])
         lookup = train.groupby(['estacion', 'dia_semana', 'hora'])[flow].mean()
         models[flow] = {'tree': tree, 'lookup': lookup, 'fallback': float(train[flow].mean())}
@@ -124,7 +125,7 @@ def log_experiments(scores, bundle, manifest):
     return runs
 
 
-def run_pipeline(log_mlflow=True, catalog=cfg.CATALOG):
+def run_pipeline(log_mlflow=True, catalog=cfg.CATALOG, tree_params=None):
     hourly, manifest = load_prepared()
     if not cfg.FEATURES.exists() or sha256(cfg.FEATURES) != manifest.get('features_sha256'):
         raise ValueError('Genera las características con python -m src.features.p1_features')
@@ -134,7 +135,7 @@ def run_pipeline(log_mlflow=True, catalog=cfg.CATALOG):
     train = data[data['fecha'].between(cfg.TRAIN_START, '2025-12-31')]
     validation = data[data['fecha'].between(cfg.VALIDATION_START, '2026-06-30')]
     test = data[data['fecha'].between(cfg.TEST_START, cfg.END)]
-    models = fit_models(train)
+    models = fit_models(train, tree_params=tree_params)
     validation, test = predict_flows(validation, models), predict_flows(test, models)
     selected = {}
     for flow in cfg.FLOWS:
@@ -189,5 +190,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--catalog', type=Path, default=cfg.CATALOG)
     parser.add_argument('--no-mlflow', action='store_true', help='Ejecutar solo el análisis local, sin tracking')
+    parser.add_argument('--max-depth', type=int, default=None,
+                         help='Sobreescribe cfg.TREE_PARAMS["max_depth"] (árbol de decisión del método "arbol").')
+    parser.add_argument('--min-samples-leaf', type=int, default=None,
+                         help='Sobreescribe cfg.TREE_PARAMS["min_samples_leaf"].')
     args = parser.parse_args()
-    run_pipeline(log_mlflow=not args.no_mlflow, catalog=args.catalog)
+    tree_params = dict(cfg.TREE_PARAMS)
+    if args.max_depth is not None:
+        tree_params['max_depth'] = args.max_depth
+    if args.min_samples_leaf is not None:
+        tree_params['min_samples_leaf'] = args.min_samples_leaf
+    run_pipeline(log_mlflow=not args.no_mlflow, catalog=args.catalog, tree_params=tree_params)

@@ -166,22 +166,69 @@ La [guía de P1](docs/p1-inventario-inicial.md) detalla el entorno Python 3.12, 
 
 ---
 
-## 🌿 6. Flujo de Trabajo con Git y GitHub (GitHub Flow)
+## 🧪 6. Reproducibilidad con MLflow Projects (`MLproject`)
+
+Todas las corridas de este entregable se lanzan desde el `MLproject` de la raíz del repositorio (no desde notebooks), usando `mlflow run`. El entorno (`python_env.yaml`) y los valores por defecto de rutas/fechas/semilla viven en `requirements.txt` y en el `config.py` de cada pregunta respectivamente; el `MLproject` **no los repite**, solo expone los hiperparámetros que tiene sentido variar por corrida.
+
+### 6.1 Requisitos previos (desde un clon limpio)
+```bash
+git clone https://github.com/Diegob059/TC5061-Proyecto-Equipo30.git
+cd TC5061-Proyecto-Equipo30
+python3.12 -m venv .venv
+.venv\Scripts\activate          # Windows (PowerShell/cmd)
+# source .venv/bin/activate      # macOS/Linux
+pip install -r requirements.txt
+```
+Levanta el servidor de tracking en otra terminal (ver sección 5, Paso 0) y, en la terminal donde ejecutarás `mlflow run`, **exporta la misma URI** (el `MLproject` crea su propio run "envoltorio" por invocación antes de llamar a tu código, y necesita saber dónde registrarlo):
+```powershell
+$env:MLFLOW_TRACKING_URI = "http://127.0.0.1:5000"   # PowerShell
+# export MLFLOW_TRACKING_URI=http://127.0.0.1:5000    # macOS/Linux
+```
+
+### 6.2 Entry point `ingest`
+Ejecuta la ingesta + feature engineering de una pregunta (o las tres):
+```bash
+mlflow run . -e ingest -P question=p3 --env-manager local
+mlflow run . -e ingest --env-manager local              # question=all (P1+P2+P3) por defecto
+```
+
+### 6.3 Entry point `train`
+Recibe la pregunta, el modelo/algoritmo (opcional) y sus hiperparámetros (opcionales; si se omiten, cada módulo corre su pipeline por defecto tal como en la sección 5):
+```bash
+# P1: compara semanal/histórico/árbol (sin --model); solo el árbol acepta overrides
+mlflow run . -e train -P question=p1 -P max_depth=8 --experiment-name mibici-equipo30 --env-manager local
+
+# P2: baseline + candidato LightGBM
+mlflow run . -e train -P question=p2 -P model=lgbm -P n_estimators=300 --experiment-name mibici-equipo30 --env-manager local
+
+# P3: un solo run de clustering (algoritmo + k explícitos), en vez del barrido completo
+mlflow run . -e train -P question=p3 -P model=kmeans -P k=4 --experiment-name mibici-equipo30 --env-manager local
+```
+`--env-manager local` reutiliza el entorno activo (recomendado para este proyecto, dado que ya instalamos `requirements.txt`/`python_env.yaml` manualmente); `--experiment-name mibici-equipo30` evita que el run "envoltorio" que crea `mlflow run` caiga en el experimento `Default`.
+
+**Nota:** `--env-manager local` requiere que el virtualenv esté **activado** en la misma terminal (no basta con invocar `python.exe` por ruta completa), de lo contrario el subproceso que lanza `mlflow run` no encontrará el paquete `src` instalado en modo editable.
+
+### 6.4 Qué no se entrega
+Por diseño, el repositorio **no incluye** (ver `.gitignore`): los archivos de datos crudos de MiBici, `mlflow.db`, las carpetas `mlruns/`/`mlartifacts/`, ni modelos serializados (`models/*.joblib`, `*.pkl`). Todo eso se reconstruye con los comandos de `ingest`/`train` anteriores desde un clon limpio.
+
+---
+
+## 🌿 7. Flujo de Trabajo con Git y GitHub (GitHub Flow)
 
 Para asegurar la calidad, reproducibilidad y trazabilidad del código, el equipo opera bajo las siguientes políticas:
 
-### 6.1 Rama Principal Protegida (`main`)
+### 7.1 Rama Principal Protegida (`main`)
 * La rama `main` representa código en estado de producción y está protegida contra *direct pushes*.
 * Cualquier cambio debe integrarse obligatoriamente a través de un **Pull Request (PR)** verificado.
 
-### 6.2 Convención de Nombres de Ramas
+### 7.2 Convención de Nombres de Ramas
 Las ramas de trabajo se crean a partir de `main` siguiendo la nomenclatura semántica:
 * `feature/<descripción-corta>`: Nuevas funcionalidades o pipelines (ej. `feature/ingesta-parquet`, `feature/eda-prediccion-desabasto`).
 * `fix/<descripción-corta>`: Correcciones de bugs o errores en transformaciones.
 * `refactor/<descripción-corta>`: Mejoras estructurales sin alterar la lógica de negocio.
 * `docs/<descripción-corta>`: Cambios en documentación o artefactos en `references/`.
 
-### 6.3 Convención de Mensajes de Commit (Conventional Commits)
+### 7.3 Convención de Mensajes de Commit (Conventional Commits)
 Se adopta el estándar de [Conventional Commits](https://www.conventionalcommits.org/es/v1.0.0/):
 ```
 <tipo>(<alcance>): <descripción concisa en imperativo>
@@ -190,14 +237,14 @@ Se adopta el estándar de [Conventional Commits](https://www.conventionalcommits
 ```
 *Tipos aceptados:* `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`, `perf:`.
 
-### 6.4 Política de Revisión entre Pares (Peer Code Review)
+### 7.4 Política de Revisión entre Pares (Peer Code Review)
 * **Apertura de PRs:** Cada integrante del equipo es responsable de abrir al menos un Pull Request describiendo los cambios, comandos de prueba y evidencia de ejecución.
 * **Revisión Obligatoria:** Cada integrante debe realizar al menos una revisión formal (*Code Review*) con comentarios técnicos y aprobación explícita (*Approved*) a otro compañero antes de realizar el merge hacia `main`.
 * **Fusión:** Se utiliza *Squash and Merge* o *Merge Commit* manteniendo un historial limpio.
 
 ---
 
-## 👥 7. Integrantes del Equipo y Roles (Equipo 30)
+## 👥 8. Integrantes del Equipo y Roles (Equipo 30)
 
 | Integrante | Rol en el Proyecto | Responsabilidades Principales |
 |---|---|---|
@@ -208,5 +255,5 @@ Se adopta el estándar de [Conventional Commits](https://www.conventionalcommits
 
 ---
 
-## 📄 8. Licencia
+## 📄 9. Licencia
 Este proyecto está desarrollado bajo fines académicos para el curso TC5061 (Operaciones de Inteligencia Artificial) en el Tecnológico de Monterrey. Licencia MIT.

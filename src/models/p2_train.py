@@ -8,6 +8,7 @@ métricas y artefactos en SQLite MLflow.
 
 Ejecución desde terminal:
     python -m src.models.p2_train
+    python -m src.models.p2_train --n-estimators 300 --max-depth 9
 """
 
 from pathlib import Path
@@ -277,10 +278,26 @@ def train_and_evaluate(
 
 
 @app.command()
-def main():
+def main(
+    n_estimators: Optional[int] = typer.Option(None, help="Sobreescribe LGBM_PARAMS['n_estimators']."),
+    max_depth: Optional[int] = typer.Option(None, help="Sobreescribe LGBM_PARAMS['max_depth']."),
+    learning_rate: Optional[float] = typer.Option(None, help="Sobreescribe LGBM_PARAMS['learning_rate']."),
+    num_leaves: Optional[int] = typer.Option(None, help="Sobreescribe LGBM_PARAMS['num_leaves']."),
+):
     """Ejecuta el entrenamiento y evaluación para P2 desde CLI."""
     t0 = time.time()
-    train_and_evaluate()
+    overrides = {
+        key: value
+        for key, value in {
+            "n_estimators": n_estimators,
+            "max_depth": max_depth,
+            "learning_rate": learning_rate,
+            "num_leaves": num_leaves,
+        }.items()
+        if value is not None
+    }
+    lgbm_params = {**LGBM_PARAMS, **overrides} if overrides else None
+    train_and_evaluate(lgbm_params=lgbm_params)
     logger.info(f"Pipeline de modelado finalizado en {time.time() - t0:.1f}s.")
 
 
