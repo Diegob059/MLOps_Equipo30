@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -6,6 +7,14 @@ from loguru import logger
 
 # Load environment variables from .env file if it exists
 load_dotenv()
+
+if sys.platform == "win32":
+    # Evita UnicodeEncodeError en consolas Windows (cp1252) cuando MLflow
+    # imprime el emoji del enlace de la corrida al registrar contra un
+    # tracking server HTTP (ver `MLFLOW_TRACKING_URI` más abajo). Sin esto,
+    # una corrida puede quedar marcada "RUNNING" en vez de "FINISHED".
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 # Paths
 PROJ_ROOT = Path(__file__).resolve().parents[1]
@@ -54,7 +63,11 @@ RANDOM_SEED = 42
 
 os.environ.setdefault("MLFLOW_ALLOW_FILE_STORE", "true")
 os.environ.setdefault("MLFLOW_DISABLE_AGENT_HINT", "1")
-MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", f"sqlite:///{PROJ_ROOT / 'mlflow.db'}")
+# Apunta al servidor local de MLflow (ver `make mlflow`:
+# `mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000`),
+# requerido para que el Model Registry funcione. El servidor debe estar
+# corriendo antes de ejecutar cualquier entrenamiento.
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://127.0.0.1:5000")
 # Experimento único del equipo: agrupa los runs de P1, P2 y P3.
 MLFLOW_EXPERIMENT_NAME = "mibici-equipo30"
 

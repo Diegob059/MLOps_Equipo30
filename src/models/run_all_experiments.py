@@ -16,8 +16,10 @@ Cumple rigurosamente con la rúbrica y especificación oficial de MLOps TC5061:
 4. Métricas con prefijo de conjunto (`test_`, `train_`).
 5. Artefactos registrados en cada run (gráficas diagnósticas, mapas, reportes y modelos).
 6. Etiquetas estandarizadas: equipo ("Equipo 30"), pregunta ("P1", "P2", "P3"), commit de Git y autor.
-7. P1 usa MLFLOW_TRACKING_URI o SQLite local (`mlflow.db`). P2 y P3 conservan
-   el registro dual existente en SQLite y FileStore (`mlruns`).
+7. Todas las preguntas (P1, P2 y P3) registran sus corridas contra el
+   servidor local de MLflow Tracking (`MLFLOW_TRACKING_URI`, por defecto
+   `http://127.0.0.1:5000`), levantado con `make mlflow` (ver README). El
+   servidor debe estar corriendo antes de ejecutar cualquier entrenamiento.
 
 Ejecución desde CLI:
     python -m src.models.run_all_experiments
@@ -48,11 +50,11 @@ from src.p2_config import (
     FIGURES_DIR,
     LGBM_PARAMS,
     MLFLOW_EXPERIMENT_NAME,
+    MLFLOW_TRACKING_URI,
     P2_FEATURES_TARGET_PARQUET,
     P2_MODEL_PATH,
     P2_STATIONS_PARQUET,
     P2_TRIPS_HOURLY_PARQUET,
-    PROJ_ROOT,
     RANDOM_SEED,
     REPORTS_DIR,
     TRAIN_END_DATE,
@@ -70,10 +72,15 @@ def get_git_commit() -> str:
 
 
 def get_tracking_uris() -> List[str]:
-    """Retorna las URIs de tracking para sincronización dual (SQLite + mlruns)."""
-    sqlite_uri = f"sqlite:///{PROJ_ROOT / 'mlflow.db'}"
-    file_uri = str(PROJ_ROOT / "mlruns")
-    return [sqlite_uri, file_uri]
+    """Retorna la URI del servidor local de MLflow Tracking (ver `make mlflow`).
+
+    El servidor debe levantarse antes con:
+        mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
+    Todos los runs (P1, P2 y P3) se registran a través de él; ya no se
+    escribe directamente al archivo SQLite ni a una carpeta `mlruns/` local
+    desde el cliente, evitando accesos concurrentes al mismo archivo.
+    """
+    return [MLFLOW_TRACKING_URI]
 
 
 def log_run_dual(
@@ -84,7 +91,12 @@ def log_run_dual(
     tags: Dict,
     artifacts: List[Tuple[Path, str]],
 ):
-    """Registra una corrida en ambos backends de MLflow (SQLite y FileStore)."""
+    """Registra una corrida en el servidor de MLflow Tracking.
+
+    Se conserva el nombre `log_run_dual` por compatibilidad con los llamados
+    existentes (P2 y P3); internamente ya solo registra contra el servidor
+    (ver `get_tracking_uris`).
+    """
     for uri in get_tracking_uris():
         try:
             mlflow.set_tracking_uri(uri)

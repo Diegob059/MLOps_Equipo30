@@ -1,6 +1,15 @@
 """Rutas y decisiones del pronóstico de inventario inicial de P1."""
 from pathlib import Path
 import os
+import sys
+
+if sys.platform == "win32":
+    # Evita UnicodeEncodeError en consolas Windows (cp1252) cuando MLflow
+    # imprime el emoji del enlace de la corrida al registrar contra un
+    # tracking server HTTP. Sin esto, una corrida puede quedar marcada
+    # "RUNNING" en vez de "FINISHED".
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW_DIR = ROOT / 'data/raw/Viajes'
@@ -12,7 +21,11 @@ MODEL = ROOT / 'models/p1_inventario_inicial.joblib'
 REPORTS = ROOT / 'reports/p1'
 FIGURES = ROOT / 'reports/figures/p1'
 EXPERIMENT = 'mibici-equipo30'
-TRACKING_URI = os.getenv('MLFLOW_TRACKING_URI', f'sqlite:///{ROOT / "mlflow.db"}')
+# Apunta al servidor local de MLflow (ver `make mlflow`:
+# `mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000`),
+# requerido para que el Model Registry funcione. El servidor debe estar
+# corriendo antes de ejecutar cualquier entrenamiento.
+TRACKING_URI = os.getenv('MLFLOW_TRACKING_URI', 'http://127.0.0.1:5000')
 START = '2025-01-01'
 END = '2026-09-30'
 TRAIN_START = '2025-02-01'
