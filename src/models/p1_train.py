@@ -106,8 +106,8 @@ def log_experiments(scores, bundle, manifest):
                            if key not in ['metodo', 'particion'] and pd.notna(value)}
                 mlflow.log_metrics(metrics)
             for path in [cfg.MANIFEST, cfg.REPORTS / 'metricas.csv', cfg.REPORTS / 'resumen.json',
-                         cfg.REPORTS / 'franjas.csv', cfg.ROOT / 'requirements-p1.txt',
-                         cfg.ROOT / 'requirements-p1-lock.txt']:
+                         cfg.REPORTS / 'franjas.csv', cfg.ROOT / 'requirements.txt',
+                         cfg.ROOT / 'python_env.yaml']:
                 mlflow.log_artifact(str(path), artifact_path='reports')
             # Snapshot del código ejecutado: también identifica cambios aún sin commit.
             source = [cfg.ROOT / 'src/p1_config.py', cfg.ROOT / 'src/data/p1_dataset.py',
