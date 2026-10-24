@@ -176,6 +176,37 @@ La [guía de P1](docs/p1-inventario-inicial.md) detalla el entorno Python 3.12, 
 
 ---
 
+## P3: segmentación de estaciones por patrón de uso
+
+La implementación de P3 agrupa las 352 estaciones comunes a los 21 meses según su perfil horario de salidas/llegadas (clustering no supervisado), para identificar qué estaciones se comportan de forma similar y dónde se ubican esos grupos en el AMG. Compara K-Means y Gaussian Mixture en un barrido de k=2 a 10 sobre dos conjuntos de features (perfil horario completo y perfil agrupado por franjas), y selecciona el candidato con mayor coeficiente de silueta frente a un baseline sencillo (K-Means, k=4 fijo).
+
+```bash
+# 1. Ingesta + features compartidos (también usados por P1/P2 para el catálogo de estaciones)
+python -m src.data.dataset
+python -m src.features.features
+
+# 2. Entrenamiento: corre el barrido completo y registra baseline + candidato en MLflow
+python -m src.models.p3_train
+
+# 3. Inferencia: asigna cluster a cada estación usando el modelo candidato guardado
+python -m src.models.p3_predict
+```
+O con los atajos del `Makefile`:
+```bash
+make data_p3
+make train_p3
+```
+
+Para entrenar un solo modelo puntual (un algoritmo/k específico) en vez del barrido completo, usa los flags que acepta el mismo CLI:
+```bash
+python -m src.models.p3_train --algoritmo kmeans --k 4 --conjunto-caracteristicas hourly
+```
+Esto es exactamente lo que invoca el entry point `train` del `MLproject` para P3 (ver sección 6.3): `mlflow run . -e train -P question=p3 -P model=kmeans -P k=4`.
+
+*Salidas:* `data/interim/viajes_limpios.parquet`/`estaciones.parquet`, `data/processed/estaciones_caracteristicas_{hourly,bucketed}.parquet`, `models/p3_cluster_model.pkl`, `data/processed/p3_estaciones_clusters.parquet`, figuras en `reports/figures/p3_*.png` y reporte en `reports/p3_clustering_report.txt`. Los runs (`p3_baseline_kmeans_clustering_estaciones` y `p3_candidato_<conjunto_features>_<algoritmo>_k<k>`, o `p3_run_<conjunto_features>_<algoritmo>_k<k>` en modo de run individual) se registran en el experimento compartido `mibici-equipo30`. El [notebook de EDA](notebooks/1.0-db-clustering-estaciones.ipynb) presenta el análisis exploratorio previo al modelado.
+
+---
+
 ## 🧪 6. Reproducibilidad con MLflow Projects (`MLproject`)
 
 Todas las corridas de este entregable se lanzan desde el `MLproject` de la raíz del repositorio (no desde notebooks), usando `mlflow run`. El entorno (`python_env.yaml`) y los valores por defecto de rutas/fechas/semilla viven en `requirements.txt` y en el `config.py` de cada pregunta respectivamente; el `MLproject` **no los repite**, solo expone los hiperparámetros que tiene sentido variar por corrida.
