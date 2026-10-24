@@ -115,7 +115,12 @@ def log_experiments(scores, bundle, manifest):
                       cfg.ROOT / 'src/features/p1_features.py', *Path(__file__).parent.glob('p1_*.py'),
                       cfg.ROOT / 'src/visualization/p1_plots.py']
             for path in source:
-                mlflow.log_artifact(str(path), artifact_path='source/' + str(path.relative_to(cfg.ROOT).parent))
+                # `.as_posix()` evita separadores "\" de Windows en el artifact_path: el
+                # tracking server HTTP los rechaza con "Invalid path" (a diferencia del
+                # acceso directo al archivo SQLite, donde pasaban inadvertidos).
+                mlflow.log_artifact(
+                    str(path), artifact_path='source/' + path.relative_to(cfg.ROOT).parent.as_posix()
+                )
             if method == 'seleccionado':
                 mlflow.log_artifact(str(cfg.MODEL), artifact_path='models')
                 mlflow.log_artifacts(str(cfg.FIGURES), artifact_path='figures')
