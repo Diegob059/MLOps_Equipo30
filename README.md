@@ -31,55 +31,59 @@ El proyecto aborda tres preguntas estratégicas:
 
 ```
 TC5061-Proyecto-Equipo30/
+├── MLproject                 <- Define los entry points `ingest`/`train` para `mlflow run` (ver sección 6).
+├── python_env.yaml           <- Entorno declarado para el MLproject (Python 3.12, referencia a requirements.txt).
+├── Makefile                  <- Comandos estándar de conveniencia y automatización (make mlflow, data_p1/p2/p3, train_p1/p2/p3...).
+├── requirements.txt          <- Dependencias con versiones fijadas para reproducibilidad.
+├── setup.py                  <- Setup clásico de empaquetado pip editable (CCDS v1).
+├── scripts/
+│   ├── ingest.py             <- Entry point `ingest` del MLproject (despacha a p1/p2/p3/all).
+│   ├── train.py              <- Entry point `train` del MLproject (pregunta + modelo + hiperparámetros).
+│   └── ejecutar_notebook_p1.py <- Helper para re-ejecutar el notebook de P1 y dejar sus gráficas actualizadas.
 ├── data/
-│   ├── external/            <- Datos externos complementarios (metadatos de clima o API).
-│   ├── raw/                 <- Datos crudos inmutables (CSVs de Viajes y Nomenclatura 2025-2026).
-│   ├── interim/             <- Datos limpios en Parquet (p2_estaciones.parquet, p2_viajes_agregados_hora.parquet).
-│   └── processed/           <- Datasets finales para modelado (p2_mibici_features_target.parquet).
-├── docs/                    <- Documentación del proyecto, Getting Started y ML Canvas oficial.
-│   ├── getting-started.md   <- Guía de configuración y reproducción paso a paso.
+│   ├── external/             <- Datos externos complementarios (metadatos de clima o API).
+│   ├── raw/                  <- Datos crudos inmutables (CSVs de Viajes y Nomenclatura 2025-2026).
+│   ├── interim/               <- Datos limpios en Parquet (viajes_limpios.parquet, estaciones.parquet, flujos horarios P1).
+│   └── processed/            <- Datasets finales para modelado: features y predicciones de P1, P2 y P3.
+├── docs/                     <- Documentación del proyecto, Getting Started, ML Canvas y guías por pregunta.
+│   ├── getting-started.md    <- Guía de configuración y reproducción paso a paso.
+│   ├── p1-inventario-inicial.md <- Guía detallada de P1 (entorno, particiones temporales, corridas de MLflow).
 │   └── Machine Learning Canvas (v1.2).docx <- Canvas oficial del equipo.
-├── notebooks/
-│   └── 1.0-rb-p2-riesgo-estaciones.ipynb <- Exploración interactiva y blueprint analítico P2 (convención 1.0-iniciales-descripcion).
-├── src/                     <- Código fuente canónico del paquete Python (CCDS v1).
-│   ├── __init__.py
-│   ├── config.py            <- Configuración global del proyecto.
-│   ├── p2_config.py         <- Centralización de rutas, fechas (2025-2026), hiperparámetros y MLflow P2.
+├── notebooks/                <- Convención `1.x-iniciales-descripcion.ipynb`.
+│   ├── 1.0-rb-p2-riesgo-estaciones.ipynb       <- Exploración y blueprint analítico de P2.
+│   ├── 1.0-db-clustering-estaciones.ipynb      <- EDA de clustering de estaciones de P3.
+│   └── 1.3-ge-p1-balance-salidas-llegadas.ipynb <- Resultados y gráficas de P1.
+├── src/                      <- Código fuente canónico del paquete Python (CCDS v1).
+│   ├── config.py             <- Configuración global compartida (rutas, fechas 2025-2026, semilla, MLflow).
+│   ├── p1_config.py          <- Configuración específica de P1.
+│   ├── p2_config.py          <- Configuración específica de P2 (rutas, hiperparámetros, MLflow).
 │   ├── data/
-│   │   ├── __init__.py
-│   │   ├── dataset.py       <- Ingesta y normalización base.
-│   │   ├── p2_dataset.py    <- Ingesta desatendida, normalización Parquet y versionado SHA-256 P2.
+│   │   ├── dataset.py        <- Ingesta y limpieza compartida (usada por P3; catálogo de estaciones común a P1/P2).
+│   │   ├── p1_dataset.py     <- Ingesta y preparación de datos de P1.
+│   │   ├── p2_dataset.py     <- Ingesta desatendida, normalización Parquet y versionado SHA-256 de P2.
 │   │   └── p2_download_raw_data.py <- Descargador automatizado de datos abiertos 2025-2026.
 │   ├── features/
-│   │   ├── __init__.py
-│   │   ├── features.py      <- Ingeniería de características base.
-│   │   └── p2_features.py   <- Feature store: rejilla continua (7.19M filas), zero-filling, lags y target P2.
+│   │   ├── features.py       <- Ingeniería de características compartida (perfiles de estación de P3).
+│   │   ├── p1_features.py    <- Features horarias de demanda/inventario de P1.
+│   │   └── p2_features.py    <- Feature store: rejilla continua (7.19M filas), zero-filling, lags y target de P2.
 │   ├── models/
-│   │   ├── __init__.py
-│   │   ├── train.py         <- Entrenamiento base.
-│   │   ├── p2_train.py      <- Entrenamiento (Baseline vs LightGBM), evaluación y registro en MLflow P2.
-│   │   ├── predict.py       <- Inferencia base.
-│   │   ├── p2_predict.py    <- Inferencia en batch y diagnóstico cualitativo de 5 ejemplos de test P2.
-│   │   └── run_all_experiments.py <- Runner integral de experimentos P1, P2 y P3 en MLflow.
+│   │   ├── p1_train.py / p1_predict.py / p1_balance.py   <- Entrenamiento, inferencia y balance de inventario de P1.
+│   │   ├── p2_train.py / p2_predict.py                   <- Entrenamiento (Baseline vs LightGBM) e inferencia de P2.
+│   │   ├── p3_train.py / p3_predict.py / p3_register.py  <- Búsqueda de clustering con *nested runs*, inferencia y registro en el Model Registry de P3.
+│   │   └── run_all_experiments.py <- Orquestador compartido: ejecuta y registra P1, P2 y P3 en MLflow.
 │   └── visualization/
-│       ├── __init__.py
-│       ├── plots.py         <- Visualizaciones base.
-│       └── p2_plots.py      <- Generación de diagnósticos visuales P2 (matriz de confusión e importancias).
-├── models/                  <- Modelos serializados entrenados (p2_lgbm_risk_classifier.joblib).
+│       └── p1_plots.py / p2_plots.py / p3_plots.py <- Diagnósticos visuales por pregunta.
+├── models/                   <- Modelos serializados entrenados (`*.joblib`, `*.pkl`); no se versionan en Git.
 ├── reports/
-│   └── figures/             <- Figuras diagnósticas generadas (p2_confusion_matrix.png, p2_feature_importance.png).
-├── references/              <- Documentación de arquitectura, ML Canvas y manifiesto de datos.
-│   ├── p2_data_manifest.json <- Manifiesto criptográfico (SHA-256) de versionado de datos P2 en Git.
-│   ├── p2_ml_canvas.md      <- Machine Learning Canvas detallado para la Pregunta 2.
-│   └── p2_architecture_diagram.md <- Diagramas de arquitectura del flujo end-to-end P2.
+│   ├── figures/               <- Figuras diagnósticas generadas por pregunta (p1_*, p2_*, p3_*).
+│   └── p1/                   <- Métricas, reportes y recomendaciones de ejemplo de P1.
+├── references/                <- Documentación de arquitectura, ML Canvas y manifiestos de datos.
+│   ├── data_manifest.json / p1_data_manifest.json / p2_data_manifest.json <- Manifiestos criptográficos (SHA-256) de versionado de datos.
+│   └── *_ml_canvas.md / architecture_diagram.md <- Machine Learning Canvas y diagramas de arquitectura.
 ├── tests/
-│   ├── __init__.py
-│   ├── test_data.py         <- Pruebas unitarias generales.
-│   ├── test_p2_data.py      <- Pruebas unitarias de configuración y manifiesto P2.
-│   └── test_p2_features.py  <- Pruebas unitarias de ingeniería de características P2.
-├── setup.py                 <- Setup clásico de empaquetado pip editable (CCDS v1).
-├── requirements.txt         <- Dependencias con versiones fijadas para reproducibilidad.
-├── Makefile                 <- Comandos estándar de conveniencia y automatización.
+│   ├── test_data.py / test_dataset.py / test_features.py <- Pruebas unitarias compartidas y de P3.
+│   ├── test_p2_data.py / test_p2_features.py              <- Pruebas unitarias de P2.
+│   └── test_p3_train.py                                   <- Pruebas unitarias de P3 (clustering, selección de candidatos).
 └── README.md                <- Documentación principal del proyecto.
 ```
 
