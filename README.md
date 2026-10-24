@@ -178,17 +178,17 @@ La [guía de P1](docs/p1-inventario-inicial.md) detalla el entorno Python 3.12, 
 
 ## P3: segmentación de estaciones por patrón de uso
 
-La implementación de P3 agrupa las 352 estaciones comunes a los 21 meses según su perfil horario de salidas/llegadas (clustering no supervisado), para identificar qué estaciones se comportan de forma similar y dónde se ubican esos grupos en el AMG. Compara K-Means y Gaussian Mixture en un barrido de k=2 a 10 sobre dos conjuntos de features (perfil horario completo y perfil agrupado por franjas), y selecciona el candidato con mayor coeficiente de silueta frente a un baseline sencillo (K-Means, k=4 fijo).
+La implementación de P3 agrupa las 352 estaciones comunes a los 21 meses según su perfil horario de salidas/llegadas (clustering no supervisado), para identificar qué estaciones se comportan de forma similar y dónde se ubican esos grupos en el AMG.
 
 ```bash
 # 1. Ingesta + features compartidos (también usados por P1/P2 para el catálogo de estaciones)
 python -m src.data.dataset
 python -m src.features.features
 
-# 2. Entrenamiento: corre el barrido completo y registra baseline + candidato en MLflow
+# 2. Entrenamiento: búsqueda de hiperparámetros + baseline + candidatos, todo registrado en MLflow
 python -m src.models.p3_train
 
-# 3. Inferencia: asigna cluster a cada estación usando el modelo candidato guardado
+# 3. Inferencia: asigna cluster a cada estación usando el mejor candidato guardado localmente
 python -m src.models.p3_predict
 ```
 O con los atajos del `Makefile`:
@@ -197,13 +197,28 @@ make data_p3
 make train_p3
 ```
 
-Para entrenar un solo modelo puntual (un algoritmo/k específico) en vez del barrido completo, usa los flags que acepta el mismo CLI:
+El paso 2 compara K-Means y Gaussian Mixture en un barrido de k=2 a 10 sobre dos conjuntos de features (perfil horario completo y perfil agrupado por franjas; 36 combinaciones en total), organizado como una **búsqueda con *nested runs*** de MLflow: un run padre (`p3_busqueda_hiperparametros_clustering`) con las 36 combinaciones como runs hijos anidados. De ahí se promueven **al menos 3 candidatos diversos** (el mejor k de cada combinación algoritmo/conjunto de features), además de un baseline sencillo (K-Means, k=4 fijo). Cada candidato registra en MLflow, en subcarpetas separadas:
+- `model/`: el modelo (escalador + clustering, como un `Pipeline` de sklearn) vía `mlflow.sklearn.log_model`, con firma e input de ejemplo.
+- `data/`: el manifiesto de versión de datos.
+- `plots/`: mapa de clusters y perfil por cluster.
+- `config/`: un JSON con los hiperparámetros exactos de la corrida.
+
+Todas las corridas llevan etiquetas `question`, `model_family` y `stage_of_work` (`baseline`/`search`/`candidate`) para filtrar y comparar en la UI, además de `equipo`/`git_commit`.
+
+Para entrenar un solo modelo puntual (un algoritmo/k específico) en vez del barrido completo:
 ```bash
 python -m src.models.p3_train --algoritmo kmeans --k 4 --conjunto-caracteristicas hourly
 ```
 Esto es exactamente lo que invoca el entry point `train` del `MLproject` para P3 (ver sección 6.3): `mlflow run . -e train -P question=p3 -P model=kmeans -P k=4`.
 
-*Salidas:* `data/interim/viajes_limpios.parquet`/`estaciones.parquet`, `data/processed/estaciones_caracteristicas_{hourly,bucketed}.parquet`, `models/p3_cluster_model.pkl`, `data/processed/p3_estaciones_clusters.parquet`, figuras en `reports/figures/p3_*.png` y reporte en `reports/p3_clustering_report.txt`. Los runs (`p3_baseline_kmeans_clustering_estaciones` y `p3_candidato_<conjunto_features>_<algoritmo>_k<k>`, o `p3_run_<conjunto_features>_<algoritmo>_k<k>` en modo de run individual) se registran en el experimento compartido `mibici-equipo30`. El [notebook de EDA](notebooks/1.0-db-clustering-estaciones.ipynb) presenta el análisis exploratorio previo al modelado.
+*Salidas:* `data/interim/viajes_limpios.parquet`/`estaciones.parquet`, `data/processed/estaciones_caracteristicas_{hourly,bucketed}.parquet`, `models/p3_cluster_model.pkl`, `data/processed/p3_estaciones_clusters.parquet`, figuras en `reports/figures/p3_*.png` y reporte en `reports/p3_clustering_report.txt`. Los runs se registran en el experimento compartido `mibici-equipo30`. El [notebook de EDA](notebooks/1.0-db-clustering-estaciones.ipynb) presenta el análisis exploratorio previo al modelado.
+
+### Registrar el modelo elegido en el Model Registry
+Una vez que el equipo compara los candidatos en la UI de MLflow y decide cuál pasa a producción, se registra explícitamente dando el `run_id` de esa corrida (esto **no** ocurre automáticamente en cada entrenamiento):
+```bash
+python -m src.models.p3_register --run-id <run_id_de_la_corrida_candidata_elegida>
+```
+Esto crea una nueva versión de `mibici-equipo30-p3-grupos` en el Model Registry, con una descripción automática (algoritmo, k, conjunto de features y métricas; o usa `--descripcion "..."` para una propia) y, como etiquetas de esa versión, el linaje completo: experimento, commit de git y versión de datos de la corrida de origen.
 
 ---
 
