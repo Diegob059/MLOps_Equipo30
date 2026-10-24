@@ -8,9 +8,12 @@ Cumple rigurosamente con la rúbrica y especificación oficial de MLOps TC5061:
    - P2 Baseline: `p2_baseline_dummy_stratified`
    - P2 Candidato: `p2_lgbm_risk_classifier_2025_2026`
    - P3 Baseline: `p3_baseline_kmeans_clustering_estaciones`
-   - P3 Candidato: `p3_candidato_<conjunto_features>_<algoritmo>_k<k>` (mejor
-     combinación de un barrido k=2..10 sobre K-Means/Gaussian Mixture, ver
-     `src/models/p3_train.py`)
+   - P3 Búsqueda: `p3_busqueda_hiperparametros_clustering` (run padre con 36
+     runs hijos anidados, uno por combinación de K-Means/Gaussian Mixture
+     sobre k=2..10 y 2 conjuntos de features)
+   - P3 Candidatos (>= 3): `p3_candidato_<conjunto_features>_<algoritmo>_k<k>`
+     (el mejor k de cada combinación algoritmo/conjunto de features del
+     barrido anterior, ver `src/models/p3_train.py`)
 3. Parámetros completos de reproducibilidad (rango de fechas, versión de datos,
    semilla, cortes temporales, hiperparámetros).
 4. Métricas con prefijo de conjunto (`test_`, `train_`).
@@ -285,30 +288,32 @@ def run_p2_experiments(data_version: str, git_commit: str):
 # 3. PREGUNTA 3: CLUSTERING DE ESTACIONES (K-MEANS / GAUSSIAN MIXTURE)
 # ==============================================================================
 def run_p3_clustering(data_version: str, git_commit: str):
+    """Ejecuta P3 y registra sus runs en MLflow.
+
+    Delega por completo en `src.models.p3_train.entrenar_y_registrar()`, que ya
+    implementa el registro de la búsqueda (nested runs), el baseline y los >= 3
+    candidatos diversos -incluidos los artefactos "completos" de cada candidato
+    (modelo con firma, manifiesto de datos, `log_input` y archivo de
+    configuración; ver `p3_train.py`-. `data_version`/`git_commit` se
+    conservan como parámetros por compatibilidad con la firma del orquestador,
+    pero P3 calcula los suyos propios internamente (igual que ya hace P1).
+    """
     logger.info("=" * 70)
     logger.info("EJECUTANDO PREGUNTA 3: CLUSTERING Y PERFILAMIENTO DE ESTACIONES")
     logger.info("=" * 70)
 
-    from src.models.p3_train import guardar_asignaciones_cluster, guardar_mejor_modelo, preparar_runs
+    from src.models.p3_train import entrenar_y_registrar
 
-    runs = preparar_runs()
-    for clave in ("baseline", "candidato"):
-        run = runs[clave]
+    runs = entrenar_y_registrar()
+    logger.info(
+        f"P3 baseline -> silhouette: {runs['baseline']['metrics']['test_silhouette_score']:.4f}, "
+        f"davies-bouldin: {runs['baseline']['metrics']['test_davies_bouldin_index']:.4f}"
+    )
+    for candidato in runs["candidatos"]:
         logger.info(
-            f"P3 {clave} -> silhouette: {run['metrics']['test_silhouette_score']:.4f}, "
-            f"davies-bouldin: {run['metrics']['test_davies_bouldin_index']:.4f}"
+            f"P3 candidato ({candidato['run_name']}) -> silhouette: {candidato['metrics']['test_silhouette_score']:.4f}, "
+            f"davies-bouldin: {candidato['metrics']['test_davies_bouldin_index']:.4f}"
         )
-        log_run_dual(
-            experiment_name=MLFLOW_EXPERIMENT_NAME,
-            run_name=run["run_name"],
-            params=run["params"],
-            metrics=run["metrics"],
-            tags=run["tags"],
-            artifacts=runs["artefactos"],
-        )
-
-    guardar_mejor_modelo(runs["candidato"]["resultado"])
-    guardar_asignaciones_cluster(runs["candidato"]["resultado"])
 
 
 # ==============================================================================

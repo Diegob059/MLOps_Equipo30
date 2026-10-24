@@ -4,37 +4,45 @@ Módulo de Modelado, Entrenamiento y Registro en MLflow (Pregunta 3: Clustering)
 Lee los dos conjuntos de features de estación producidos por
 ``src/features/features.py`` (perfil horario completo y perfil por franjas),
 escala cada uno de forma independiente, y recorre modelos K-Means y Gaussian
-Mixture para k = 2..10 en cada conjunto. Se seleccionan exactamente dos
-corridas para registrar en MLflow, siguiendo la misma convención
-*baseline + candidato* usada en P1 y P2:
+Mixture para k = 2..10 en cada conjunto (36 combinaciones). Esa búsqueda se
+registra como *nested runs* de MLflow (un run padre por búsqueda, un run hijo
+por combinación), y se registran además en MLflow:
 
 - *Baseline* sencillo: K-Means con k=4 fijo sobre el perfil horario completo,
   sin comparar hiperparámetros (análogo al primer acercamiento ingenuo).
-- *Candidato*: la combinación (conjunto de features, algoritmo, k) con mayor
-  coeficiente de silueta encontrada en el barrido completo.
+- *Candidatos*: las 3 combinaciones (conjunto de features, algoritmo, k) más
+  diversas y con mayor coeficiente de silueta del barrido (una por cada
+  combinación de algoritmo/conjunto de features, ver `seleccionar_candidatos`),
+  cada una registrada como un run completo e independiente.
 
 Ejecución desde terminal:
     python -m src.models.p3_train
     python -m src.models.p3_train --algoritmo kmeans --k 4   # un solo run, sin el barrido completo
 """
 
+import json
 import subprocess
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
 import joblib
 import mlflow
+import mlflow.data
 import mlflow.sklearn
 import numpy as np
 import pandas as pd
 import typer
 from loguru import logger
+from mlflow.models import infer_signature
 from sklearn.cluster import KMeans
 from sklearn.metrics import davies_bouldin_score, silhouette_score
 from sklearn.mixture import GaussianMixture
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from src.config import (
+    DATA_MANIFEST_PATH,
     END_TIMESTAMP,
     FIGURES_DIR,
     MLFLOW_EXPERIMENT_NAME,
@@ -130,38 +138,107 @@ def ejecutar_barrido(
     algoritmos: tuple = ALGORITMOS,
     rango_k: range = range(K_MINIMO, K_MAXIMO + 1),
     processed_dir: Path = PROCESSED_DATA_DIR,
-) -> tuple[pd.DataFrame, dict[tuple[str, str, int], ResultadoModelo]]:
-    """Recorre (conjunto_caracteristicas x algoritmo x k) localmente, sin registrar cada combinación en MLflow.
+    data_version: str = "",
+    git_commit: str = "",
+    tracking_uri: str = MLFLOW_TRACKING_URI,
+    experiment_name: str = MLFLOW_EXPERIMENT_NAME,
+    parent_run_name: str = "p3_busqueda_hiperparametros_clustering",
+) -> tuple[pd.DataFrame, dict[tuple[str, str, int], ResultadoModelo], str]:
+    """Recorre (conjunto_caracteristicas x algoritmo x k) y registra cada combinación como
+    un *run anidado* de MLflow dentro de un run padre que representa la búsqueda completa
+    (ver rúbrica: "al menos una búsqueda de hiperparámetros organizada como nested runs").
 
-    Solo el baseline y la mejor combinación encontrada aquí se registran como
-    *runs* de MLflow (ver `ejecutar_y_registrar_runs`); este barrido completo
-    es el respaldo metodológico de esa selección.
+    Los runs hijos solo registran parámetros/métricas/etiquetas (sin artefactos pesados);
+    los candidatos que se promueven a partir de este barrido (ver `seleccionar_candidatos`)
+    son los que reciben el registro completo con modelo y gráficas.
+
+    Regresa `(resultados, ajustados, parent_run_id)`: `resultados`/`ajustados` se usan para
+    elegir el baseline y los candidatos finales; `parent_run_id` permite enlazar cada
+    candidato promovido con la búsqueda de la que salió.
     """
     filas = []
     ajustados: dict[tuple[str, str, int], ResultadoModelo] = {}
 
-    for conjunto_caracteristicas in conjuntos_caracteristicas:
-        df, columnas_caracteristicas = load_feature_set(conjunto_caracteristicas, processed_dir)
-        escalador = StandardScaler()
-        X = escalador.fit_transform(df[columnas_caracteristicas])
+    mlflow.set_tracking_uri(tracking_uri)
+    mlflow.set_experiment(experiment_name)
 
-        for algoritmo in algoritmos:
-            for k in rango_k:
-                modelo, etiquetas, metricas = fit_and_evaluate(X, algoritmo, k)
-                filas.append({"conjunto_caracteristicas": conjunto_caracteristicas, "algoritmo": algoritmo, "k": k, **metricas})
-                ajustados[(conjunto_caracteristicas, algoritmo, k)] = ResultadoModelo(
-                    modelo=modelo,
-                    escalador=escalador,
-                    conjunto_caracteristicas=conjunto_caracteristicas,
-                    algoritmo=algoritmo,
-                    k=k,
-                    columnas_caracteristicas=columnas_caracteristicas,
-                    etiquetas=etiquetas,
-                    df=df,
-                )
+    with mlflow.start_run(run_name=parent_run_name) as parent_run:
+        mlflow.set_tags(
+            {
+                "equipo": "Equipo 30",
+                "pregunta": "P3",
+                "question": "p3",
+                "git_commit": git_commit,
+                "stage_of_work": "search",
+                "problem_type": "unsupervised_clustering",
+                "system": "MiBici Guadalajara",
+            }
+        )
+        mlflow.log_params(
+            {
+                "conjuntos_caracteristicas": ",".join(conjuntos_caracteristicas),
+                "algoritmos": ",".join(algoritmos),
+                "k_min": rango_k.start,
+                "k_max": rango_k.stop - 1,
+                "data_version": data_version,
+                "random_seed": RANDOM_SEED,
+            }
+        )
 
-    resultados = pd.DataFrame(filas).rename(columns={"test_silhouette_score": "silueta"})
-    return resultados, ajustados
+        for conjunto_caracteristicas in conjuntos_caracteristicas:
+            df, columnas_caracteristicas = load_feature_set(conjunto_caracteristicas, processed_dir)
+            escalador = StandardScaler()
+            X = escalador.fit_transform(df[columnas_caracteristicas])
+
+            for algoritmo in algoritmos:
+                for k in rango_k:
+                    modelo, etiquetas, metricas = fit_and_evaluate(X, algoritmo, k)
+                    filas.append({"conjunto_caracteristicas": conjunto_caracteristicas, "algoritmo": algoritmo, "k": k, **metricas})
+                    ajustados[(conjunto_caracteristicas, algoritmo, k)] = ResultadoModelo(
+                        modelo=modelo,
+                        escalador=escalador,
+                        conjunto_caracteristicas=conjunto_caracteristicas,
+                        algoritmo=algoritmo,
+                        k=k,
+                        columnas_caracteristicas=columnas_caracteristicas,
+                        etiquetas=etiquetas,
+                        df=df,
+                    )
+                    with mlflow.start_run(run_name=f"trial_{conjunto_caracteristicas}_{algoritmo}_k{k}", nested=True):
+                        mlflow.log_params(
+                            {
+                                "algorithm": algoritmo,
+                                "k": k,
+                                "feature_set": conjunto_caracteristicas,
+                                "scaling": "StandardScaler",
+                                "data_version": data_version,
+                            }
+                        )
+                        mlflow.log_metrics(metricas)
+                        mlflow.set_tags(
+                            {
+                                "equipo": "Equipo 30",
+                                "pregunta": "P3",
+                                "question": "p3",
+                                "git_commit": git_commit,
+                                "model_family": algoritmo,
+                                "stage_of_work": "search",
+                                "problem_type": "unsupervised_clustering",
+                            }
+                        )
+
+        resultados = pd.DataFrame(filas).rename(columns={"test_silhouette_score": "silueta"})
+
+        # Figura resumen de toda la búsqueda: se registra en el run padre (no en cada hijo ni
+        # en cada candidato, ya que compara las 36 combinaciones, no una sola).
+        FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+        fig_k = graficar_seleccion_k(resultados)
+        fig_k.savefig(P3_K_SELECTION_FIGURE, dpi=150)
+        mlflow.log_artifact(str(P3_K_SELECTION_FIGURE), artifact_path="plots")
+
+        parent_run_id = parent_run.info.run_id
+
+    return resultados, ajustados, parent_run_id
 
 
 def construir_baseline(processed_dir: Path = PROCESSED_DATA_DIR, k: int = K_BASELINE) -> ResultadoModelo:
@@ -194,7 +271,45 @@ def seleccionar_mejor(resultados: pd.DataFrame, ajustados: dict[tuple[str, str, 
     return resultado, metricas
 
 
-def _build_params_tags(resultado: ResultadoModelo, data_version: str, git_commit: str, es_baseline: bool) -> tuple[dict, dict]:
+def seleccionar_candidatos(
+    resultados: pd.DataFrame, ajustados: dict[tuple[str, str, int], ResultadoModelo], n: int = 3
+) -> list[tuple[ResultadoModelo, dict]]:
+    """Elige hasta `n` candidatos diversos del barrido para promover a runs completos de MLflow.
+
+    A diferencia de `seleccionar_mejor` (un solo ganador global), primero toma el mejor `k`
+    dentro de cada combinación (conjunto_caracteristicas, algoritmo) -por defecto, 4 grupos:
+    hourly/kmeans, hourly/gmm, bucketed/kmeans, bucketed/gmm- y luego ordena esos "mejores
+    por grupo" por silueta descendente, quedándose con los `n` más altos. Esto garantiza que
+    los candidatos promovidos varíen de verdad en algoritmo y conjunto de features (no solo
+    en k dentro de la misma combinación), tal como pide la rúbrica.
+    """
+    mejores_por_grupo = (
+        resultados.sort_values("silueta", ascending=False)
+        .groupby(["conjunto_caracteristicas", "algoritmo"], as_index=False)
+        .first()
+    )
+    top_n = mejores_por_grupo.sort_values("silueta", ascending=False).head(n)
+
+    candidatos = []
+    for _, fila in top_n.iterrows():
+        clave = (fila["conjunto_caracteristicas"], fila["algoritmo"], int(fila["k"]))
+        resultado = ajustados[clave]
+        metricas = {
+            "test_silhouette_score": float(fila["silueta"]),
+            "test_davies_bouldin_index": float(fila["test_davies_bouldin_index"]),
+        }
+        candidatos.append((resultado, metricas))
+    return candidatos
+
+
+def _build_params_tags(resultado: ResultadoModelo, data_version: str, git_commit: str, stage_of_work: str) -> tuple[dict, dict]:
+    """Arma los parámetros y etiquetas estándar de un run de P3 para MLflow.
+
+    `stage_of_work` identifica el rol del run dentro del flujo de experimentación
+    ("baseline", "search" para los hijos anidados del barrido, o "candidate" para
+    los modelos promovidos), y junto con `question`/`model_family` permite filtrar
+    y comparar runs en la interfaz de MLflow.
+    """
     params = {
         "pregunta": "P3",
         "algorithm": resultado.algoritmo,
@@ -210,16 +325,24 @@ def _build_params_tags(resultado: ResultadoModelo, data_version: str, git_commit
     tags = {
         "equipo": "Equipo 30",
         "pregunta": "P3",
+        "question": "p3",
         "git_commit": git_commit,
         "problem_type": "unsupervised_clustering",
-        "model_role": "baseline" if es_baseline else "candidate",
+        "model_family": resultado.algoritmo,
+        "stage_of_work": stage_of_work,
+        "model_role": stage_of_work,
         "system": "MiBici Guadalajara",
     }
     return params, tags
 
 
-def generar_artefactos(resultado_candidato: ResultadoModelo, resultados_barrido: pd.DataFrame, metricas_candidato: dict) -> list:
-    """Genera las figuras y el reporte de texto del modelo candidato; regresa la lista de artefactos (ruta, subcarpeta)."""
+def generar_artefactos(resultado_candidato: ResultadoModelo, metricas_candidato: dict) -> list:
+    """Genera las figuras y el reporte de texto de un candidato; regresa la lista de artefactos (ruta, subcarpeta).
+
+    La figura comparativa de selección de k (que resume las 36 combinaciones del
+    barrido) ya no se genera aquí: se registra una sola vez en el run padre de la
+    búsqueda (ver `ejecutar_barrido`), no repetida en cada candidato.
+    """
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -230,9 +353,6 @@ def generar_artefactos(resultado_candidato: ResultadoModelo, resultados_barrido:
         resultado_candidato.df, resultado_candidato.columnas_caracteristicas, resultado_candidato.etiquetas
     )
     fig_perfil.savefig(P3_PROFILE_FIGURE, dpi=150)
-
-    fig_k = graficar_seleccion_k(resultados_barrido)
-    fig_k.savefig(P3_K_SELECTION_FIGURE, dpi=150)
 
     tamanios = pd.Series(resultado_candidato.etiquetas).value_counts().sort_index()
     P3_REPORT_PATH.write_text(
@@ -247,7 +367,7 @@ def generar_artefactos(resultado_candidato: ResultadoModelo, resultados_barrido:
         f"Distribución Estaciones : {tamanios.to_dict()}\n",
         encoding="utf-8",
     )
-    return [(P3_MAP_FIGURE, "figures"), (P3_PROFILE_FIGURE, "figures"), (P3_K_SELECTION_FIGURE, "figures"), (P3_REPORT_PATH, "reports")]
+    return [(P3_MAP_FIGURE, "plots"), (P3_PROFILE_FIGURE, "plots"), (P3_REPORT_PATH, "reports")]
 
 
 def guardar_mejor_modelo(resultado_candidato: ResultadoModelo, output_path: Path = P3_MODEL_PATH) -> Path:
@@ -278,31 +398,113 @@ def guardar_asignaciones_cluster(resultado_candidato: ResultadoModelo, output_pa
     return output_path
 
 
-def preparar_runs(processed_dir: Path = PROCESSED_DATA_DIR) -> dict:
-    """Ejecuta el barrido completo + baseline y arma todo lo necesario para registrar 2 runs en MLflow.
+def _logear_modelo_y_datos_candidato(
+    resultado: ResultadoModelo,
+    metricas: dict,
+    data_version: str,
+    processed_dir: Path = PROCESSED_DATA_DIR,
+) -> None:
+    """Registra, en el run de MLflow actualmente activo, los artefactos "completos" que la
+    rúbrica exige para una corrida candidata (no para baseline ni para los hijos del barrido):
 
-    Regresa un dict con las llaves "baseline" y "candidato", cada una con
-    (resultado, params, metrics, tags), más "resultados_barrido" (tabla
-    completa del sweep, usada solo para la gráfica de selección de k) y
-    "artefactos" (figuras + reporte, compartidos por ambos runs).
+    - El modelo con `mlflow.sklearn.log_model`, incluyendo firma (`signature`) y un ejemplo
+      de entrada (`input_example`). Se envuelve el escalador ya ajustado junto con el modelo
+      de clustering en un `Pipeline` de sklearn, para que el modelo registrado reciba
+      directamente las features sin escalar (igual que recibiría datos nuevos en producción).
+    - El manifiesto de versión de datos (`references/data_manifest.json`) como artefacto,
+      bajo la subcarpeta `data/`.
+    - El propio conjunto de entrenamiento (features de estación, ya agregadas -sin columnas
+      personales de usuarios de MiBici-) vía `mlflow.log_input`.
+    - Un archivo de configuración con los hiperparámetros exactos de la corrida, bajo `config/`.
+
+    No se llama para el baseline ni para los runs hijos de la búsqueda (`ejecutar_barrido`),
+    que solo registran parámetros/métricas/etiquetas.
+    """
+    X_df = resultado.df[resultado.columnas_caracteristicas]
+    pipeline = Pipeline([("scaler", resultado.escalador), ("cluster", resultado.modelo)])
+    firma = infer_signature(X_df, resultado.etiquetas)
+    mlflow.sklearn.log_model(pipeline, name="model", signature=firma, input_example=X_df.head(5))
+
+    if DATA_MANIFEST_PATH.exists():
+        mlflow.log_artifact(str(DATA_MANIFEST_PATH), artifact_path="data")
+
+    feature_set_path = processed_dir / f"estaciones_caracteristicas_{resultado.conjunto_caracteristicas}.parquet"
+    dataset = mlflow.data.from_pandas(
+        X_df, source=str(feature_set_path), name=f"estaciones_{resultado.conjunto_caracteristicas}"
+    )
+    mlflow.log_input(dataset, context="training")
+
+    config = {
+        "algoritmo": resultado.algoritmo,
+        "k": resultado.k,
+        "conjunto_caracteristicas": resultado.conjunto_caracteristicas,
+        "scaling": "StandardScaler",
+        "random_seed": RANDOM_SEED,
+        "date_range": f"{START_TIMESTAMP[:10]} to {END_TIMESTAMP[:10]}",
+        "data_version": data_version,
+        "n_stations": len(resultado.df),
+        "n_features": len(resultado.columnas_caracteristicas),
+        "metrics": metricas,
+    }
+    # Se escribe en un directorio temporal (no en `reports/`): a diferencia de las figuras y
+    # el reporte de texto (nombre fijo, siempre sobreescrito), el nombre de este archivo varía
+    # por candidato (algoritmo/k/conjunto de features), así que dejarlo en `reports/` iría
+    # acumulando un archivo nuevo por cada combinación distinta que se haya probado alguna vez.
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        config_path = Path(tmp_dir) / f"p3_config_{resultado.conjunto_caracteristicas}_{resultado.algoritmo}_k{resultado.k}.json"
+        config_path.write_text(json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8")
+        mlflow.log_artifact(str(config_path), artifact_path="config")
+
+
+def preparar_runs(processed_dir: Path = PROCESSED_DATA_DIR) -> dict:
+    """Ejecuta la búsqueda (con nested runs) + el baseline y arma todo lo necesario para
+    registrar en MLflow: 1 baseline + 1 run padre de búsqueda (con sus hijos anidados) +
+    >= 3 candidatos diversos (distintos algoritmo/conjunto de features).
+
+    Regresa un dict con las llaves "baseline" (resultado/params/metrics/tags), "candidatos"
+    (lista de esos mismos 4 campos, uno por candidato promovido), "artefactos" (figuras +
+    reporte del mejor candidato, usado para los demás también) y "search_run_id" (el run
+    padre de la búsqueda, para enlazar el linaje de cada candidato).
     """
     data_version = get_current_data_version()
     git_commit = get_git_commit()
 
-    resultados_barrido, ajustados = ejecutar_barrido(processed_dir=processed_dir)
-    resultado_candidato, metricas_candidato = seleccionar_mejor(resultados_barrido, ajustados)
+    resultados_barrido, ajustados, parent_run_id = ejecutar_barrido(
+        processed_dir=processed_dir, data_version=data_version, git_commit=git_commit
+    )
+    candidatos_crudos = seleccionar_candidatos(resultados_barrido, ajustados, n=3)
     resultado_baseline, metricas_baseline = construir_baseline(processed_dir=processed_dir)
 
     logger.success(
-        f"Candidato seleccionado: {resultado_candidato.conjunto_caracteristicas} / "
-        f"{resultado_candidato.algoritmo} / k={resultado_candidato.k} "
-        f"(silhouette={metricas_candidato['test_silhouette_score']:.3f})"
+        f"{len(candidatos_crudos)} candidatos seleccionados de la búsqueda (run padre {parent_run_id}): "
+        + "; ".join(
+            f"{r.conjunto_caracteristicas}/{r.algoritmo}/k={r.k} (silhouette={m['test_silhouette_score']:.3f})"
+            for r, m in candidatos_crudos
+        )
     )
 
-    artefactos = generar_artefactos(resultado_candidato, resultados_barrido, metricas_candidato)
+    params_baseline, tags_baseline = _build_params_tags(resultado_baseline, data_version, git_commit, stage_of_work="baseline")
 
-    params_baseline, tags_baseline = _build_params_tags(resultado_baseline, data_version, git_commit, es_baseline=True)
-    params_candidato, tags_candidato = _build_params_tags(resultado_candidato, data_version, git_commit, es_baseline=False)
+    runs_candidatos = []
+    for resultado, metricas in candidatos_crudos:
+        params, tags = _build_params_tags(resultado, data_version, git_commit, stage_of_work="candidate")
+        tags["search_run_id"] = parent_run_id
+        runs_candidatos.append(
+            {
+                "run_name": f"p3_candidato_{resultado.conjunto_caracteristicas}_{resultado.algoritmo}_k{resultado.k}",
+                "resultado": resultado,
+                "params": params,
+                "metrics": metricas,
+                "tags": tags,
+            }
+        )
+
+    # Artefactos ligeros compartidos por todas las corridas (mapa + perfil + reporte del
+    # mejor candidato); los artefactos "completos" específicos de cada candidato (modelo con
+    # firma, manifiesto de datos, log_input, config) se registran en `registrar_run_mlflow`
+    # vía `_logear_modelo_y_datos_candidato`, ver `entrenar_y_registrar`.
+    mejor_resultado, mejor_metricas = candidatos_crudos[0]
+    artefactos = generar_artefactos(mejor_resultado, mejor_metricas)
 
     return {
         "baseline": {
@@ -312,14 +514,10 @@ def preparar_runs(processed_dir: Path = PROCESSED_DATA_DIR) -> dict:
             "metrics": metricas_baseline,
             "tags": tags_baseline,
         },
-        "candidato": {
-            "run_name": f"p3_candidato_{resultado_candidato.conjunto_caracteristicas}_{resultado_candidato.algoritmo}_k{resultado_candidato.k}",
-            "resultado": resultado_candidato,
-            "params": params_candidato,
-            "metrics": metricas_candidato,
-            "tags": tags_candidato,
-        },
+        "candidatos": runs_candidatos,
         "artefactos": artefactos,
+        "search_run_id": parent_run_id,
+        "data_version": data_version,
     }
 
 
@@ -331,8 +529,16 @@ def registrar_run_mlflow(
     artifacts: list,
     tracking_uri: str = MLFLOW_TRACKING_URI,
     experiment_name: str = MLFLOW_EXPERIMENT_NAME,
+    candidato: tuple = None,
 ) -> None:
-    """Registra un run en MLflow (un solo backend; usado por el CLI independiente de este módulo)."""
+    """Registra un run en MLflow (un solo backend; usado por el CLI independiente de este módulo).
+
+    Si `candidato` se da como `(resultado, metricas, data_version)`, además de los
+    parámetros/métricas/etiquetas/artefactos "ligeros" habituales, registra los artefactos
+    "completos" que pide la rúbrica para una corrida candidata (modelo con firma y ejemplo
+    de entrada, manifiesto de datos, `log_input` y archivo de configuración; ver
+    `_logear_modelo_y_datos_candidato`). No se pasa para baseline ni para runs hijos.
+    """
     mlflow.set_tracking_uri(tracking_uri)
     mlflow.set_experiment(experiment_name)
     with mlflow.start_run(run_name=run_name):
@@ -342,18 +548,29 @@ def registrar_run_mlflow(
         for file_path, artifact_subpath in artifacts:
             if Path(file_path).exists():
                 mlflow.log_artifact(str(file_path), artifact_path=artifact_subpath)
+        if candidato is not None:
+            resultado_candidato, metricas_candidato, data_version = candidato
+            _logear_modelo_y_datos_candidato(resultado_candidato, metricas_candidato, data_version)
     logger.info(f"Run '{run_name}' registrado en {tracking_uri} (experimento '{experiment_name}')")
 
 
 def entrenar_y_registrar() -> dict:
-    """Ejecuta el pipeline completo de P3 y registra 2 runs (baseline + candidato) en MLflow."""
+    """Ejecuta el pipeline completo de P3 (búsqueda con nested runs + baseline + >= 3
+    candidatos diversos) y los registra en MLflow."""
     runs = preparar_runs()
-    for clave in ("baseline", "candidato"):
-        run = runs[clave]
-        registrar_run_mlflow(run["run_name"], run["params"], run["metrics"], run["tags"], runs["artefactos"])
+    registrar_run_mlflow(
+        runs["baseline"]["run_name"], runs["baseline"]["params"], runs["baseline"]["metrics"],
+        runs["baseline"]["tags"], runs["artefactos"],
+    )
+    for candidato in runs["candidatos"]:
+        registrar_run_mlflow(
+            candidato["run_name"], candidato["params"], candidato["metrics"], candidato["tags"], runs["artefactos"],
+            candidato=(candidato["resultado"], candidato["metrics"], runs["data_version"]),
+        )
 
-    guardar_mejor_modelo(runs["candidato"]["resultado"])
-    guardar_asignaciones_cluster(runs["candidato"]["resultado"])
+    mejor_resultado = runs["candidatos"][0]["resultado"]
+    guardar_mejor_modelo(mejor_resultado)
+    guardar_asignaciones_cluster(mejor_resultado)
     return runs
 
 
@@ -387,7 +604,7 @@ def entrenar_run_individual(
         etiquetas=etiquetas,
         df=df,
     )
-    params, tags = _build_params_tags(resultado, data_version, git_commit, es_baseline=False)
+    params, tags = _build_params_tags(resultado, data_version, git_commit, stage_of_work="candidate")
     tags["model_role"] = "single_run_override"
     run_name = f"p3_run_{conjunto_caracteristicas}_{algoritmo}_k{k}"
 
@@ -398,9 +615,11 @@ def entrenar_run_individual(
         resultado.df, resultado.columnas_caracteristicas, resultado.etiquetas
     )
     fig_perfil.savefig(P3_PROFILE_FIGURE, dpi=150)
-    artefactos = [(P3_MAP_FIGURE, "figures"), (P3_PROFILE_FIGURE, "figures")]
+    artefactos = [(P3_MAP_FIGURE, "plots"), (P3_PROFILE_FIGURE, "plots")]
 
-    registrar_run_mlflow(run_name, params, metricas, tags, artefactos)
+    registrar_run_mlflow(
+        run_name, params, metricas, tags, artefactos, candidato=(resultado, metricas, data_version)
+    )
     return {"resultado": resultado, "params": params, "metrics": metricas, "tags": tags, "run_name": run_name}
 
 

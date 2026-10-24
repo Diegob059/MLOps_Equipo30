@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.models.p3_train import fit_and_evaluate, seleccionar_mejor
+from src.models.p3_train import fit_and_evaluate, seleccionar_candidatos, seleccionar_mejor
 
 
 def _generar_grupos_sinteticos():
@@ -68,3 +68,35 @@ def test_seleccionar_mejor_elige_mayor_silueta():
     resultado, metricas = seleccionar_mejor(resultados, ajustados)
     assert resultado == "modelo_b"
     assert metricas["test_silhouette_score"] == pytest.approx(0.55)
+
+
+def test_seleccionar_candidatos_elige_el_mejor_k_por_combinacion_y_los_mas_diversos():
+    filas = [
+        {"conjunto_caracteristicas": "hourly", "algoritmo": "kmeans", "k": 3, "silueta": 0.40, "test_davies_bouldin_index": 1.0},
+        {"conjunto_caracteristicas": "hourly", "algoritmo": "kmeans", "k": 4, "silueta": 0.55, "test_davies_bouldin_index": 0.9},
+        {"conjunto_caracteristicas": "hourly", "algoritmo": "gmm", "k": 3, "silueta": 0.30, "test_davies_bouldin_index": 1.1},
+        {"conjunto_caracteristicas": "hourly", "algoritmo": "gmm", "k": 5, "silueta": 0.45, "test_davies_bouldin_index": 1.0},
+        {"conjunto_caracteristicas": "bucketed", "algoritmo": "kmeans", "k": 4, "silueta": 0.60, "test_davies_bouldin_index": 0.8},
+        {"conjunto_caracteristicas": "bucketed", "algoritmo": "kmeans", "k": 6, "silueta": 0.35, "test_davies_bouldin_index": 1.2},
+        {"conjunto_caracteristicas": "bucketed", "algoritmo": "gmm", "k": 5, "silueta": 0.20, "test_davies_bouldin_index": 1.5},
+        {"conjunto_caracteristicas": "bucketed", "algoritmo": "gmm", "k": 7, "silueta": 0.25, "test_davies_bouldin_index": 1.4},
+    ]
+    resultados = pd.DataFrame(filas)
+    ajustados = {
+        (fila["conjunto_caracteristicas"], fila["algoritmo"], fila["k"]): f"{fila['conjunto_caracteristicas']}_{fila['algoritmo']}_k{fila['k']}"
+        for fila in filas
+    }
+
+    candidatos = seleccionar_candidatos(resultados, ajustados, n=3)
+
+    assert len(candidatos) == 3
+    modelos = [resultado for resultado, _ in candidatos]
+    # El mejor k de cada combinación: hourly/kmeans -> k=4, hourly/gmm -> k=5, bucketed/kmeans -> k=4.
+    assert "hourly_kmeans_k4" in modelos
+    assert "hourly_gmm_k5" in modelos
+    assert "bucketed_kmeans_k4" in modelos
+    # bucketed/gmm (mejor silueta 0.25) queda fuera: es el peor de los 4 "mejores por grupo".
+    assert "bucketed_gmm_k7" not in modelos
+    # Debe venir ordenado por silueta descendente.
+    siluetas = [metricas["test_silhouette_score"] for _, metricas in candidatos]
+    assert siluetas == sorted(siluetas, reverse=True)

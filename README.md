@@ -31,55 +31,59 @@ El proyecto aborda tres preguntas estratégicas:
 
 ```
 TC5061-Proyecto-Equipo30/
+├── MLproject                 <- Define los entry points `ingest`/`train` para `mlflow run` (ver sección 6).
+├── python_env.yaml           <- Entorno declarado para el MLproject (Python 3.12, referencia a requirements.txt).
+├── Makefile                  <- Comandos estándar de conveniencia y automatización (make mlflow, data_p1/p2/p3, train_p1/p2/p3...).
+├── requirements.txt          <- Dependencias con versiones fijadas para reproducibilidad.
+├── setup.py                  <- Setup clásico de empaquetado pip editable (CCDS v1).
+├── scripts/
+│   ├── ingest.py             <- Entry point `ingest` del MLproject (despacha a p1/p2/p3/all).
+│   ├── train.py              <- Entry point `train` del MLproject (pregunta + modelo + hiperparámetros).
+│   └── ejecutar_notebook_p1.py <- Helper para re-ejecutar el notebook de P1 y dejar sus gráficas actualizadas.
 ├── data/
-│   ├── external/            <- Datos externos complementarios (metadatos de clima o API).
-│   ├── raw/                 <- Datos crudos inmutables (CSVs de Viajes y Nomenclatura 2025-2026).
-│   ├── interim/             <- Datos limpios en Parquet (p2_estaciones.parquet, p2_viajes_agregados_hora.parquet).
-│   └── processed/           <- Datasets finales para modelado (p2_mibici_features_target.parquet).
-├── docs/                    <- Documentación del proyecto, Getting Started y ML Canvas oficial.
-│   ├── getting-started.md   <- Guía de configuración y reproducción paso a paso.
+│   ├── external/             <- Datos externos complementarios (metadatos de clima o API).
+│   ├── raw/                  <- Datos crudos inmutables (CSVs de Viajes y Nomenclatura 2025-2026).
+│   ├── interim/               <- Datos limpios en Parquet (viajes_limpios.parquet, estaciones.parquet, flujos horarios P1).
+│   └── processed/            <- Datasets finales para modelado: features y predicciones de P1, P2 y P3.
+├── docs/                     <- Documentación del proyecto, Getting Started, ML Canvas y guías por pregunta.
+│   ├── getting-started.md    <- Guía de configuración y reproducción paso a paso.
+│   ├── p1-inventario-inicial.md <- Guía detallada de P1 (entorno, particiones temporales, corridas de MLflow).
 │   └── Machine Learning Canvas (v1.2).docx <- Canvas oficial del equipo.
-├── notebooks/
-│   └── 1.0-rb-p2-riesgo-estaciones.ipynb <- Exploración interactiva y blueprint analítico P2 (convención 1.0-iniciales-descripcion).
-├── src/                     <- Código fuente canónico del paquete Python (CCDS v1).
-│   ├── __init__.py
-│   ├── config.py            <- Configuración global del proyecto.
-│   ├── p2_config.py         <- Centralización de rutas, fechas (2025-2026), hiperparámetros y MLflow P2.
+├── notebooks/                <- Convención `1.x-iniciales-descripcion.ipynb`.
+│   ├── 1.0-rb-p2-riesgo-estaciones.ipynb       <- Exploración y blueprint analítico de P2.
+│   ├── 1.0-db-clustering-estaciones.ipynb      <- EDA de clustering de estaciones de P3.
+│   └── 1.3-ge-p1-balance-salidas-llegadas.ipynb <- Resultados y gráficas de P1.
+├── src/                      <- Código fuente canónico del paquete Python (CCDS v1).
+│   ├── config.py             <- Configuración global compartida (rutas, fechas 2025-2026, semilla, MLflow).
+│   ├── p1_config.py          <- Configuración específica de P1.
+│   ├── p2_config.py          <- Configuración específica de P2 (rutas, hiperparámetros, MLflow).
 │   ├── data/
-│   │   ├── __init__.py
-│   │   ├── dataset.py       <- Ingesta y normalización base.
-│   │   ├── p2_dataset.py    <- Ingesta desatendida, normalización Parquet y versionado SHA-256 P2.
+│   │   ├── dataset.py        <- Ingesta y limpieza compartida (usada por P3; catálogo de estaciones común a P1/P2).
+│   │   ├── p1_dataset.py     <- Ingesta y preparación de datos de P1.
+│   │   ├── p2_dataset.py     <- Ingesta desatendida, normalización Parquet y versionado SHA-256 de P2.
 │   │   └── p2_download_raw_data.py <- Descargador automatizado de datos abiertos 2025-2026.
 │   ├── features/
-│   │   ├── __init__.py
-│   │   ├── features.py      <- Ingeniería de características base.
-│   │   └── p2_features.py   <- Feature store: rejilla continua (7.19M filas), zero-filling, lags y target P2.
+│   │   ├── features.py       <- Ingeniería de características compartida (perfiles de estación de P3).
+│   │   ├── p1_features.py    <- Features horarias de demanda/inventario de P1.
+│   │   └── p2_features.py    <- Feature store: rejilla continua (7.19M filas), zero-filling, lags y target de P2.
 │   ├── models/
-│   │   ├── __init__.py
-│   │   ├── train.py         <- Entrenamiento base.
-│   │   ├── p2_train.py      <- Entrenamiento (Baseline vs LightGBM), evaluación y registro en MLflow P2.
-│   │   ├── predict.py       <- Inferencia base.
-│   │   ├── p2_predict.py    <- Inferencia en batch y diagnóstico cualitativo de 5 ejemplos de test P2.
-│   │   └── run_all_experiments.py <- Runner integral de experimentos P1, P2 y P3 en MLflow.
+│   │   ├── p1_train.py / p1_predict.py / p1_balance.py   <- Entrenamiento, inferencia y balance de inventario de P1.
+│   │   ├── p2_train.py / p2_predict.py                   <- Entrenamiento (Baseline vs LightGBM) e inferencia de P2.
+│   │   ├── p3_train.py / p3_predict.py / p3_register.py  <- Búsqueda de clustering con *nested runs*, inferencia y registro en el Model Registry de P3.
+│   │   └── run_all_experiments.py <- Orquestador compartido: ejecuta y registra P1, P2 y P3 en MLflow.
 │   └── visualization/
-│       ├── __init__.py
-│       ├── plots.py         <- Visualizaciones base.
-│       └── p2_plots.py      <- Generación de diagnósticos visuales P2 (matriz de confusión e importancias).
-├── models/                  <- Modelos serializados entrenados (p2_lgbm_risk_classifier.joblib).
+│       └── p1_plots.py / p2_plots.py / p3_plots.py <- Diagnósticos visuales por pregunta.
+├── models/                   <- Modelos serializados entrenados (`*.joblib`, `*.pkl`); no se versionan en Git.
 ├── reports/
-│   └── figures/             <- Figuras diagnósticas generadas (p2_confusion_matrix.png, p2_feature_importance.png).
-├── references/              <- Documentación de arquitectura, ML Canvas y manifiesto de datos.
-│   ├── p2_data_manifest.json <- Manifiesto criptográfico (SHA-256) de versionado de datos P2 en Git.
-│   ├── p2_ml_canvas.md      <- Machine Learning Canvas detallado para la Pregunta 2.
-│   └── p2_architecture_diagram.md <- Diagramas de arquitectura del flujo end-to-end P2.
+│   ├── figures/               <- Figuras diagnósticas generadas por pregunta (p1_*, p2_*, p3_*).
+│   └── p1/                   <- Métricas, reportes y recomendaciones de ejemplo de P1.
+├── references/                <- Documentación de arquitectura, ML Canvas y manifiestos de datos.
+│   ├── data_manifest.json / p1_data_manifest.json / p2_data_manifest.json <- Manifiestos criptográficos (SHA-256) de versionado de datos.
+│   └── *_ml_canvas.md / architecture_diagram.md <- Machine Learning Canvas y diagramas de arquitectura.
 ├── tests/
-│   ├── __init__.py
-│   ├── test_data.py         <- Pruebas unitarias generales.
-│   ├── test_p2_data.py      <- Pruebas unitarias de configuración y manifiesto P2.
-│   └── test_p2_features.py  <- Pruebas unitarias de ingeniería de características P2.
-├── setup.py                 <- Setup clásico de empaquetado pip editable (CCDS v1).
-├── requirements.txt         <- Dependencias con versiones fijadas para reproducibilidad.
-├── Makefile                 <- Comandos estándar de conveniencia y automatización.
+│   ├── test_data.py / test_dataset.py / test_features.py <- Pruebas unitarias compartidas y de P3.
+│   ├── test_p2_data.py / test_p2_features.py              <- Pruebas unitarias de P2.
+│   └── test_p3_train.py                                   <- Pruebas unitarias de P3 (clustering, selección de candidatos).
 └── README.md                <- Documentación principal del proyecto.
 ```
 
@@ -178,17 +182,17 @@ La [guía de P1](docs/p1-inventario-inicial.md) detalla el entorno Python 3.12, 
 
 ## P3: segmentación de estaciones por patrón de uso
 
-La implementación de P3 agrupa las 352 estaciones comunes a los 21 meses según su perfil horario de salidas/llegadas (clustering no supervisado), para identificar qué estaciones se comportan de forma similar y dónde se ubican esos grupos en el AMG. Compara K-Means y Gaussian Mixture en un barrido de k=2 a 10 sobre dos conjuntos de features (perfil horario completo y perfil agrupado por franjas), y selecciona el candidato con mayor coeficiente de silueta frente a un baseline sencillo (K-Means, k=4 fijo).
+La implementación de P3 agrupa las 352 estaciones comunes a los 21 meses según su perfil horario de salidas/llegadas (clustering no supervisado), para identificar qué estaciones se comportan de forma similar y dónde se ubican esos grupos en el AMG.
 
 ```bash
 # 1. Ingesta + features compartidos (también usados por P1/P2 para el catálogo de estaciones)
 python -m src.data.dataset
 python -m src.features.features
 
-# 2. Entrenamiento: corre el barrido completo y registra baseline + candidato en MLflow
+# 2. Entrenamiento: búsqueda de hiperparámetros + baseline + candidatos, todo registrado en MLflow
 python -m src.models.p3_train
 
-# 3. Inferencia: asigna cluster a cada estación usando el modelo candidato guardado
+# 3. Inferencia: asigna cluster a cada estación usando el mejor candidato guardado localmente
 python -m src.models.p3_predict
 ```
 O con los atajos del `Makefile`:
@@ -197,13 +201,28 @@ make data_p3
 make train_p3
 ```
 
-Para entrenar un solo modelo puntual (un algoritmo/k específico) en vez del barrido completo, usa los flags que acepta el mismo CLI:
+El paso 2 compara K-Means y Gaussian Mixture en un barrido de k=2 a 10 sobre dos conjuntos de features (perfil horario completo y perfil agrupado por franjas; 36 combinaciones en total), organizado como una **búsqueda con *nested runs*** de MLflow: un run padre (`p3_busqueda_hiperparametros_clustering`) con las 36 combinaciones como runs hijos anidados. De ahí se promueven **al menos 3 candidatos diversos** (el mejor k de cada combinación algoritmo/conjunto de features), además de un baseline sencillo (K-Means, k=4 fijo). Cada candidato registra en MLflow, en subcarpetas separadas:
+- `model/`: el modelo (escalador + clustering, como un `Pipeline` de sklearn) vía `mlflow.sklearn.log_model`, con firma e input de ejemplo.
+- `data/`: el manifiesto de versión de datos.
+- `plots/`: mapa de clusters y perfil por cluster.
+- `config/`: un JSON con los hiperparámetros exactos de la corrida.
+
+Todas las corridas llevan etiquetas `question`, `model_family` y `stage_of_work` (`baseline`/`search`/`candidate`) para filtrar y comparar en la UI, además de `equipo`/`git_commit`.
+
+Para entrenar un solo modelo puntual (un algoritmo/k específico) en vez del barrido completo:
 ```bash
 python -m src.models.p3_train --algoritmo kmeans --k 4 --conjunto-caracteristicas hourly
 ```
 Esto es exactamente lo que invoca el entry point `train` del `MLproject` para P3 (ver sección 6.3): `mlflow run . -e train -P question=p3 -P model=kmeans -P k=4`.
 
-*Salidas:* `data/interim/viajes_limpios.parquet`/`estaciones.parquet`, `data/processed/estaciones_caracteristicas_{hourly,bucketed}.parquet`, `models/p3_cluster_model.pkl`, `data/processed/p3_estaciones_clusters.parquet`, figuras en `reports/figures/p3_*.png` y reporte en `reports/p3_clustering_report.txt`. Los runs (`p3_baseline_kmeans_clustering_estaciones` y `p3_candidato_<conjunto_features>_<algoritmo>_k<k>`, o `p3_run_<conjunto_features>_<algoritmo>_k<k>` en modo de run individual) se registran en el experimento compartido `mibici-equipo30`. El [notebook de EDA](notebooks/1.0-db-clustering-estaciones.ipynb) presenta el análisis exploratorio previo al modelado.
+*Salidas:* `data/interim/viajes_limpios.parquet`/`estaciones.parquet`, `data/processed/estaciones_caracteristicas_{hourly,bucketed}.parquet`, `models/p3_cluster_model.pkl`, `data/processed/p3_estaciones_clusters.parquet`, figuras en `reports/figures/p3_*.png` y reporte en `reports/p3_clustering_report.txt`. Los runs se registran en el experimento compartido `mibici-equipo30`. El [notebook de EDA](notebooks/1.0-db-clustering-estaciones.ipynb) presenta el análisis exploratorio previo al modelado.
+
+### Registrar el modelo elegido en el Model Registry
+Una vez que el equipo compara los candidatos en la UI de MLflow y decide cuál pasa a producción, se registra explícitamente dando el `run_id` de esa corrida (esto **no** ocurre automáticamente en cada entrenamiento):
+```bash
+python -m src.models.p3_register --run-id <run_id_de_la_corrida_candidata_elegida>
+```
+Esto crea una nueva versión de `mibici-equipo30-p3-grupos` en el Model Registry, con una descripción automática (algoritmo, k, conjunto de features y métricas; o usa `--descripcion "..."` para una propia) y, como etiquetas de esa versión, el linaje completo: experimento, commit de git y versión de datos de la corrida de origen.
 
 ---
 
