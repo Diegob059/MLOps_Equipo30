@@ -288,42 +288,32 @@ def run_p2_experiments(data_version: str, git_commit: str):
 # 3. PREGUNTA 3: CLUSTERING DE ESTACIONES (K-MEANS / GAUSSIAN MIXTURE)
 # ==============================================================================
 def run_p3_clustering(data_version: str, git_commit: str):
+    """Ejecuta P3 y registra sus runs en MLflow.
+
+    Delega por completo en `src.models.p3_train.entrenar_y_registrar()`, que ya
+    implementa el registro de la búsqueda (nested runs), el baseline y los >= 3
+    candidatos diversos -incluidos los artefactos "completos" de cada candidato
+    (modelo con firma, manifiesto de datos, `log_input` y archivo de
+    configuración; ver `p3_train.py`-. `data_version`/`git_commit` se
+    conservan como parámetros por compatibilidad con la firma del orquestador,
+    pero P3 calcula los suyos propios internamente (igual que ya hace P1).
+    """
     logger.info("=" * 70)
     logger.info("EJECUTANDO PREGUNTA 3: CLUSTERING Y PERFILAMIENTO DE ESTACIONES")
     logger.info("=" * 70)
 
-    from src.models.p3_train import guardar_asignaciones_cluster, guardar_mejor_modelo, preparar_runs
+    from src.models.p3_train import entrenar_y_registrar
 
-    runs = preparar_runs()
+    runs = entrenar_y_registrar()
     logger.info(
         f"P3 baseline -> silhouette: {runs['baseline']['metrics']['test_silhouette_score']:.4f}, "
         f"davies-bouldin: {runs['baseline']['metrics']['test_davies_bouldin_index']:.4f}"
-    )
-    log_run_dual(
-        experiment_name=MLFLOW_EXPERIMENT_NAME,
-        run_name=runs["baseline"]["run_name"],
-        params=runs["baseline"]["params"],
-        metrics=runs["baseline"]["metrics"],
-        tags=runs["baseline"]["tags"],
-        artifacts=runs["artefactos"],
     )
     for candidato in runs["candidatos"]:
         logger.info(
             f"P3 candidato ({candidato['run_name']}) -> silhouette: {candidato['metrics']['test_silhouette_score']:.4f}, "
             f"davies-bouldin: {candidato['metrics']['test_davies_bouldin_index']:.4f}"
         )
-        log_run_dual(
-            experiment_name=MLFLOW_EXPERIMENT_NAME,
-            run_name=candidato["run_name"],
-            params=candidato["params"],
-            metrics=candidato["metrics"],
-            tags=candidato["tags"],
-            artifacts=runs["artefactos"],
-        )
-
-    mejor_resultado = runs["candidatos"][0]["resultado"]
-    guardar_mejor_modelo(mejor_resultado)
-    guardar_asignaciones_cluster(mejor_resultado)
 
 
 # ==============================================================================
