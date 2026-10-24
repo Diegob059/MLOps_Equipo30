@@ -77,10 +77,10 @@ train_p2:
 train_p3:
 	$(PYTHON_INTERPRETER) -m src.models.p3_train
 
-## Launch local MLflow Tracking server on port 5005
+## Launch local MLflow Tracking server (DB-backed, required for the Model Registry) on port 5000
 .PHONY: mlflow
 mlflow:
-	mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5005
+	mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
 
 #################################################################################
 # Self Documenting Commands                                                     #

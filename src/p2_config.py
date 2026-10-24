@@ -7,10 +7,19 @@ colisiones con otras preguntas o módulos del proyecto.
 """
 
 import os
+import sys
 from pathlib import Path
 from typing import Dict, List
 
 from dotenv import load_dotenv
+
+if sys.platform == "win32":
+    # Evita UnicodeEncodeError en consolas Windows (cp1252) cuando MLflow
+    # imprime el emoji del enlace de la corrida al registrar contra un
+    # tracking server HTTP. Sin esto, una corrida puede quedar marcada
+    # "RUNNING" en vez de "FINISHED".
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 try:
     from loguru import logger
@@ -123,9 +132,11 @@ LGBM_PARAMS: Dict = {
 # ==============================================================================
 os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
 os.environ["MLFLOW_DISABLE_AGENT_HINT"] = "1"
-MLFLOW_TRACKING_URI: str = os.getenv(
-    "MLFLOW_TRACKING_URI", f"sqlite:///{PROJ_ROOT / 'mlflow.db'}"
-)
+# Apunta al servidor local de MLflow (ver `make mlflow`:
+# `mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000`),
+# requerido para que el Model Registry funcione. El servidor debe estar
+# corriendo antes de ejecutar cualquier entrenamiento.
+MLFLOW_TRACKING_URI: str = os.getenv("MLFLOW_TRACKING_URI", "http://127.0.0.1:5000")
 MLFLOW_EXPERIMENT_NAME: str = "mibici-equipo30"
 
 # Configuración de loguru con tqdm si está disponible

@@ -14,7 +14,7 @@ El proyecto aborda tres preguntas estratégicas:
 2. **Pregunta 2 (Riesgo Operativo en Estaciones — Foco Principal de este Módulo):**  
    *¿Una estación estará en riesgo de quedarse sin bicicletas (Desabasto) o sin anclajes libres (Saturación) en un horizonte futuro de 2 horas?*  
    Permite a los despachadores del CCO planificar rutas proactivas de rebalanceo antes de que el usuario experimente la falta de servicio.
-3. **Pregunta 3 (Optimización Logística):** ¿Cuáles son las rutas y secuencias de rebalanceo más eficientes para las furgonetas operativas de MiBici?
+3. **Pregunta 3 (Segmentación de Estaciones):** ¿Qué estaciones comparten patrones de uso similares (perfiles horarios de salidas/llegadas) y cómo se distribuyen geográficamente estos grupos en el AMG? Clustering no supervisado (K-Means y Gaussian Mixture) sobre perfiles de actividad por estación, útil para diseñar estrategias de rebalanceo y mantenimiento diferenciadas por segmento.
 
 ---
 
@@ -105,6 +105,15 @@ pip install -e .
 
 Cada fase del pipeline de la Pregunta 2 cuenta con el prefijo `p2_` para mantenerse 100% desacoplado de las implementaciones de los demás compañeros del equipo:
 
+### Paso 0: Levantar el servidor local de MLflow Tracking (requisito para todo lo demás)
+Todas las preguntas (P1, P2 y P3) registran sus corridas contra un servidor de *tracking* respaldado por base de datos (requisito para que el Model Registry funcione). **Debe estar corriendo antes de ejecutar cualquier comando de ingesta o entrenamiento:**
+```bash
+make mlflow
+# O directamente:
+mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
+```
+Esto expone la UI y la API en `http://127.0.0.1:5000` y crea/actualiza `mlflow.db` en la raíz del repo (archivo ignorado por Git, ver `.gitignore`). Déjalo corriendo en una terminal aparte mientras ejecutas los pasos siguientes. Por defecto, `MLFLOW_TRACKING_URI` apunta a `http://127.0.0.1:5000`; puedes sobreescribirlo con una variable de entorno si usas otro host/puerto.
+
 ### Paso 1: Ingesta, Normalización y Versionado de Datos (2025 y 2026)
 Descarga automáticamente los 21 meses de viajes y nomenclatura más reciente, normaliza tipos y genera el manifiesto SHA-256 en Parquet:
 ```bash
@@ -124,7 +133,7 @@ Ajusta el Baseline Estratificado y el modelo candidato LightGBM (`class_weight='
 ```bash
 python -m src.models.p2_train
 ```
-*Salidas:* `models/p2_lgbm_risk_classifier.joblib`, `reports/figures/p2_confusion_matrix.png`, `reports/figures/p2_feature_importance.png`, base de datos MLflow `mlflow.db`.
+*Salidas:* `models/p2_lgbm_risk_classifier.joblib`, `reports/figures/p2_confusion_matrix.png`, `reports/figures/p2_feature_importance.png`, registro de la corrida en el servidor de MLflow (`mlflow.db`, ver Paso 0).
 
 ### Paso 4: Inferencia en Batch e Inspección de Casos de Test
 Carga el modelo serializado, ejecuta inferencia sobre las 3,078,500 observaciones de prueba de 2026 y presenta una tabla de 5 ejemplos cualitativos (valor predicho vs esperado con probabilidades):
@@ -140,14 +149,15 @@ make test
 pytest tests
 ```
 
-### Paso 6: Explorador de Experimentos en MLflow UI
-Para inspeccionar gráficamente las métricas, parámetros y artefactos registrados:
+### Paso 6: Explorador de Experimentos en MLflow (UI del servidor de Tracking)
+Si el servidor del Paso 0 ya está corriendo, simplemente abre tu navegador en: **`http://127.0.0.1:5000`** (seleccionar la pestaña **"Model training"** para ver las corridas registradas). No se requiere ningún comando adicional: la misma instancia de `mlflow server` sirve tanto la API de *tracking* como la UI.
+
+Si necesitas levantarlo de nuevo:
 ```bash
 make mlflow
 # O directamente:
-mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5005
+mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
 ```
-Acceder en el navegador a: **`http://127.0.0.1:5005`** (seleccionar la pestaña **"Model training"** para ver las corridas registradas).
 
 ---
 
@@ -202,7 +212,7 @@ Se adopta el estándar de [Conventional Commits](https://www.conventionalcommits
 | Integrante | Rol en el Proyecto | Responsabilidades Principales |
 |---|---|---|
 | **Ricardo Bahamón** | **MLOps & Pipeline Engineer** | Arquitectura del pipeline reproducible, orquestación de ingesta Parquet, configuración de MLflow, tracking de artefactos y control de versiones de datos. |
-| **Diego Botero** | **Lead Data Scientist & Modeling** | Formulación matemática del target de riesgo, ingeniería de variables de series de tiempo (lags/rollings), entrenamiento y calibración de modelos LightGBM. |
+| **Diego Becerril** | **Lead Data Scientist & Modeling** | Formulación matemática del target de riesgo, ingeniería de variables de series de tiempo (lags/rollings), entrenamiento y calibración de modelos LightGBM. |
 | **Gregorio Escobedo** | **Data Engineer & Quality QA** | Scraping dinámico resiliente, saneamiento de catálogos geoespaciales, validación de integridad criptográfica (SHA-256) y pruebas unitarias. |
 | **Freddin Alcantara** | **Product & Deployment Lead** | Elaboración del ML Canvas, especificación de requisitos operativos del CCO, diseño de diagnósticos visuales y documentación técnica. |
 
