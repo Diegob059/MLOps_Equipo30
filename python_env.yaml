@@ -1,0 +1,11 @@
+# Entorno de Python para MLflow Projects (ver `MLproject`).
+# Declara la misma versión y los mismos paquetes fijados en `requirements.txt`,
+# sin duplicar las versiones: este archivo únicamente referencia esa fuente
+# única de verdad mediante `-r requirements.txt`.
+python: "3.12"
+build_dependencies:
+  - pip
+  - setuptools
+  - wheel
+dependencies:
+  - -r requirements.txt

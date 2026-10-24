@@ -18,10 +18,10 @@ El entorno de P1 usa Python 3.12 y dependencias compatibles con las restriccione
 ```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements-p1.txt
+python -m pip install -r requirements.txt
 ```
 
-`requirements-p1-lock.txt` fija también las dependencias transitivas del entorno de esta ejecución. Puede usarse en lugar de `requirements-p1.txt` con Python 3.12.
+Las dependencias del proyecto (incluidas las de P1) están consolidadas en el `requirements.txt` de la raíz, con versiones fijadas para Python 3.12 (ver también `python_env.yaml` para el entorno declarado del `MLflow Project`).
 
 Los archivos se ubican en `data/raw/Viajes/` y el catálogo en `data/raw/Nomenclatura/nomenclatura_2026_09.csv`. El descargador existente del proyecto puede obtenerlos:
 
