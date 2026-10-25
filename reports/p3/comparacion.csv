@@ -1,0 +1,5 @@
+candidato,run_id,stage,algorithm,k,feature_set,n_features,n_stations,silhouette_score,davies_bouldin_index,inercia
+hourly_gmm_k2,f732c016be2d4e80b05415d005826f4e,candidate,gmm,2,hourly,52,352,0.2917596891649504,1.9791763367544342,
+bucketed_kmeans_k2,5ad7a5ae98274afb8b022c33bb1b0301,candidate,kmeans,2,bucketed,14,352,0.15731438928327857,2.1234506348077766,
+bucketed_gmm_k2,3d51e921ec7e4e988897c24b4607075c,candidate,gmm,2,bucketed,14,352,0.15355384392029153,2.422536591042377,
+baseline_hourly_kmeans_k4,3f45a08b84d3401bb1309eadfcfea683,baseline,kmeans,4,hourly,52,352,0.09113816548426774,2.321711191524791,14019.468484400993

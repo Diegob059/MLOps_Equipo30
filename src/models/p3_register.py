@@ -1,111 +1,201 @@
 """
-Módulo de Registro en el Model Registry de MLflow (Pregunta 3: Clustering).
-============================================================================
-Registra, en el Model Registry de MLflow, el modelo candidato de P3 que el
-equipo eligió manualmente tras comparar las corridas en la interfaz (ver el
-requisito "Seleccionar el mejor modelo": desempeño frente al baseline,
-métrica de negocio, estabilidad y costo de entrenamiento/inferencia).
+Módulo de Registro en el Model Registry de MLflow y Promoción a Producción (Pregunta 3: Clustering).
+=====================================================================================================
+Registra en el Model Registry (`mibici-equipo30-p3-grupos`) el modelo candidato de P3
+seleccionado por el equipo tras la evaluación multicriterio (coeficiente de silueta,
+índice de Davies-Bouldin, interpretabilidad operativa de perfiles de estación y estabilidad).
 
-A propósito, este módulo NO se ejecuta automáticamente en cada entrenamiento
-de `src/models/p3_train.py`: registrar un modelo es una decisión deliberada
-del equipo, no algo que el código deba decidir solo (por ejemplo, eligiendo
-siempre el candidato con mayor silueta). Se invoca explícitamente dando el
-`run_id` de la corrida candidata elegida (visible en la UI de MLflow).
+Asigna el alias de producción `champion`, verifica la trazabilidad completa del linaje
+(código Git, versión de datos y corrida de búsqueda anidada) y ejecuta una prueba de inferencia
+real cargando el modelo desde el Model Registry por su alias antes de certificar la promoción.
 
-Ejecución desde terminal:
-    python -m src.models.p3_register --run-id <run_id_de_la_corrida_candidata>
-    python -m src.models.p3_register --run-id <run_id> --descripcion "..."
+Uso desde terminal:
+    python -m src.models.p3_register --run-id <run_id_candidato> --reason "<justificación>"
+Vía MLflow Project:
+    mlflow run . -e register_p3 -P run_id=<run_id> -P reason="<justificación>"
 """
 
-import typer
+import argparse
+import json
+import os
+from pathlib import Path
+from typing import Dict, Optional
+
 import mlflow
-from loguru import logger
-from mlflow.entities.model_registry import ModelVersion
 from mlflow.tracking import MlflowClient
+import numpy as np
+import pandas as pd
 
-from src.config import MLFLOW_TRACKING_URI
-
-app = typer.Typer(help="CLI para registrar el modelo candidato elegido de P3 en el Model Registry de MLflow.")
-
-MODEL_REGISTRY_NAME = "mibici-equipo30-p3-grupos"
-
-REGISTERED_MODEL_DESCRIPTION = (
-    "Modelo de clustering no supervisado de estaciones MiBici (Pregunta 3): agrupa "
-    "estaciones por patrón horario de uso (salidas/llegadas) para apoyar decisiones de "
-    "rebalanceo y mantenimiento diferenciadas por segmento. Cada versión corresponde a un "
-    "candidato distinto (algoritmo, k y conjunto de features) seleccionado manualmente por "
-    "el equipo tras comparar las corridas en la UI de MLflow. Ver `src/models/p3_train.py` "
-    "para el detalle del barrido de hiperparámetros (K-Means/Gaussian Mixture, k=2..10, 2 "
-    "conjuntos de features) del que salen los candidatos."
+from src.p3_config import (
+    MLFLOW_TRACKING_URI,
+    P3_PRODUCTION_ALIAS,
+    P3_REGISTERED_MODEL_DESCRIPTION,
+    P3_REGISTRY_NAME,
+    P3_REPORTS_DIR,
+    logger,
 )
 
 
-def registrar_modelo(
+def register_candidate(
     run_id: str,
-    descripcion_version: str = None,
+    reason: str,
     tracking_uri: str = MLFLOW_TRACKING_URI,
-    model_name: str = MODEL_REGISTRY_NAME,
-) -> ModelVersion:
-    """Registra el modelo de la corrida `run_id` como una nueva versión de `model_name`.
+    model_name: str = P3_REGISTRY_NAME,
+    alias: str = P3_PRODUCTION_ALIAS,
+) -> Dict:
+    """Registra, versiona y promueve con alias `champion` un candidato de P3 en el Model Registry."""
+    if not reason or not reason.strip():
+        raise ValueError("Es obligatorio documentar la justificación de selección (--reason) antes de promover.")
 
-    El modelo debe haber sido registrado previamente en esa corrida con
-    `mlflow.sklearn.log_model(..., name="model", ...)` (ver
-    `p3_train._logear_modelo_y_datos_candidato`), lo cual solo ocurre en corridas
-    candidatas, nunca en el baseline ni en los runs hijos de la búsqueda.
+    _proj_run_id = os.environ.pop("MLFLOW_RUN_ID", None)
+    if _proj_run_id:
+        os.environ["MIBICI_PROJECT_RUN_ID"] = _proj_run_id
 
-    Preserva el linaje de cada versión copiando, como etiquetas propias de la versión
-    registrada, el experimento, la corrida de origen, el commit de git y la versión de
-    datos -además del enlace nativo `run_id`/`source` que MLflow ya mantiene
-    automáticamente entre una versión registrada y su corrida de origen-.
-    """
+    # Si MLflow CLI inyectó una URI sqlite directa en vez del servidor HTTP del Model Registry
+    if not tracking_uri.startswith("http"):
+        env_uri = os.getenv("MLFLOW_TRACKING_URI", "")
+        if env_uri.startswith("http"):
+            tracking_uri = env_uri
+        else:
+            tracking_uri = "http://127.0.0.1:5001"
+
+    logger.info("=" * 70)
+    logger.info("REGISTRO DE MODELO EN MODEL REGISTRY (PREGUNTA 3 - CLUSTERING)")
+    logger.info("=" * 70)
+    logger.info(f"Conectando al servidor MLflow Tracking: {tracking_uri}")
     mlflow.set_tracking_uri(tracking_uri)
-    client = MlflowClient()
+    client = MlflowClient(tracking_uri=tracking_uri)
+
+    # 1. Validación de la corrida de origen
     run = client.get_run(run_id)
+    experiment = client.get_experiment(run.info.experiment_id)
+    stage = run.data.tags.get("stage_of_work", "")
+    question = run.data.tags.get("question", run.data.tags.get("pregunta", ""))
 
-    version = mlflow.register_model(model_uri=f"runs:/{run_id}/model", name=model_name)
+    if run.info.status != "FINISHED":
+        raise ValueError(f"La corrida {run_id} no está en estado FINISHED (estado: {run.info.status}).")
+    if str(question).lower() != "p3":
+        raise ValueError(f"La corrida {run_id} no pertenece a la Pregunta 3 (pregunta: {question}).")
+    if stage != "candidate":
+        raise ValueError(
+            f"Solo se pueden promover corridas de tipo 'candidate' (la corrida {run_id} es de tipo '{stage}')."
+        )
 
-    # Linaje: experimento, corrida de origen, commit y versión de datos.
-    client.set_model_version_tag(model_name, version.version, "experiment_id", run.info.experiment_id)
-    client.set_model_version_tag(model_name, version.version, "source_run_id", run_id)
-    client.set_model_version_tag(model_name, version.version, "git_commit", run.data.tags.get("git_commit", ""))
-    client.set_model_version_tag(model_name, version.version, "data_version", run.data.params.get("data_version", ""))
+    git_commit = run.data.tags.get("git_commit", "")
+    data_version = run.data.params.get("data_version", "")
+    search_run_id = run.data.tags.get("search_run_id", "")
 
-    # Descripción del modelo registrado (a nivel de familia de versiones; idempotente).
+    lineage = {
+        "experiment_id": str(run.info.experiment_id),
+        "experiment": experiment.name,
+        "source_run_id": run_id,
+        "git_commit": git_commit,
+        "data_version": data_version,
+        "search_run_id": search_run_id,
+        "candidate_id": run.data.tags.get("candidate_id", run.info.run_name),
+        "algorithm": run.data.params.get("algorithm", ""),
+        "k": run.data.params.get("k", ""),
+        "feature_set": run.data.params.get("feature_set", ""),
+    }
+
+    # 2. Prueba de inferencia previa con el modelo de la corrida
+    uri = f"runs:/{run_id}/model"
+    logger.info(f"Validando artefacto de modelo en: {uri}")
+    source_model = mlflow.pyfunc.load_model(uri)
+
+    # Obtener ejemplo de entrada
+    example = source_model.input_example
+    if example is None:
+        try:
+            path = mlflow.artifacts.download_artifacts(f"{uri}/input_example.json")
+            payload = json.loads(Path(path).read_text(encoding="utf-8"))
+            example = pd.DataFrame(payload["data"], columns=payload["columns"])
+        except Exception as exc:
+            logger.warning(f"No fue posible descargar input_example.json: {exc}")
+            raise ValueError("El modelo de la corrida no contiene input_example válido.")
+
+    expected_preds = source_model.predict(example)
+    if hasattr(expected_preds, "values"):
+        expected_preds = expected_preds.values
+    expected_preds = np.asarray(expected_preds).ravel()
+
+    if len(expected_preds) != len(example):
+        raise ValueError("La dimensión de las predicciones del modelo fuente no coincide con el número de ejemplos.")
+    if not (expected_preds >= 0).all():
+        raise ValueError("El modelo fuente generó identificadores de cluster negativos.")
+
+    logger.success(f"✓ Prueba de inferencia local exitosa ({len(example)} filas evaluadas).")
+
+    # 3. Registro formal en el Model Registry
+    logger.info(f"Registrando nueva versión para el modelo: '{model_name}'...")
+    version = mlflow.register_model(uri, model_name)
+    logger.success(f"✓ Modelo registrado como '{model_name}' Versión {version.version}")
+
+    # Descripción a nivel de familia registrada (idempotente)
     try:
-        client.update_registered_model(model_name, description=REGISTERED_MODEL_DESCRIPTION)
+        client.update_registered_model(model_name, description=P3_REGISTERED_MODEL_DESCRIPTION)
     except Exception as exc:
         logger.warning(f"No se pudo actualizar la descripción del modelo registrado '{model_name}': {exc}")
 
-    # Descripción específica de esta versión.
-    if descripcion_version is None:
-        silueta = run.data.metrics.get("test_silhouette_score")
-        davies_bouldin = run.data.metrics.get("test_davies_bouldin_index")
-        descripcion_version = (
-            f"Candidato {run.data.params.get('algorithm')} (k={run.data.params.get('k')}) sobre el "
-            f"conjunto de features '{run.data.params.get('feature_set')}'. "
-            f"Silhouette={silueta:.4f}, Davies-Bouldin={davies_bouldin:.4f}. "
-            f"Corrida de origen: {run_id} (experimento {run.info.experiment_id})."
-        )
-    client.update_model_version(model_name, version.version, description=descripcion_version)
+    # Descripción específica de esta versión con métricas clave y justificación
+    client.update_model_version(model_name, str(version.version), description=reason)
 
-    logger.success(f"Modelo registrado: '{model_name}' versión {version.version} (corrida de origen: {run_id})")
-    return version
+    # Etiquetas de linaje en la versión
+    for key, value in lineage.items():
+        client.set_model_version_tag(model_name, str(version.version), key, str(value))
+    client.set_model_version_tag(model_name, str(version.version), "selection_reason", reason)
+
+    # 4. Verificación de carga por número de versión
+    logger.info(f"Verificando carga por versión: models:/{model_name}/{version.version}")
+    restored_version_model = mlflow.pyfunc.load_model(f"models:/{model_name}/{version.version}")
+    restored_preds = np.asarray(restored_version_model.predict(example)).ravel()
+    np.testing.assert_array_equal(expected_preds, restored_preds)
+    logger.success("✓ Predicciones idénticas al cargar por número de versión.")
+
+    # 5. Asignación del alias de producción (`champion`)
+    logger.info(f"Asignando alias '{alias}' a la versión {version.version}...")
+    client.set_registered_model_alias(model_name, alias, str(version.version))
+    logger.success(f"✓ Alias '{alias}' asignado exitosamente a la versión {version.version}.")
+
+    # 6. Certificación final cargando por alias de producción
+    alias_uri = f"models:/{model_name}@{alias}"
+    logger.info(f"Certificando inferencia desde URI de producción: {alias_uri}")
+    champion_model = mlflow.pyfunc.load_model(alias_uri)
+    champion_preds = np.asarray(champion_model.predict(example)).ravel()
+    np.testing.assert_array_equal(expected_preds, champion_preds)
+    logger.success(f"✓ Modelo en producción certificado: predicciones consistentes en {alias_uri}.")
+
+    # 7. Persistencia del reporte de auditoría
+    evidence = {
+        "model_name": model_name,
+        "version": str(version.version),
+        "alias": alias,
+        "model_uri": alias_uri,
+        **lineage,
+        "reason": reason,
+        "load_and_predict_verified": True,
+        "example_rows": len(example),
+        "clusters_detected": sorted(list(set(int(x) for x in expected_preds))),
+    }
+
+    P3_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    registry_report_path = P3_REPORTS_DIR / "registry.json"
+    registry_report_path.write_text(json.dumps(evidence, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    logger.success(f"✓ Evidencia de auditoría guardada en: {registry_report_path}")
+
+    return evidence
 
 
-@app.command()
-def main(
-    run_id: str = typer.Option(
-        ..., "--run-id", help="run_id de la corrida candidata elegida por el equipo (ver la UI de MLflow)."
-    ),
-    descripcion: str = typer.Option(
-        None,
-        "--descripcion",
-        help="Descripción de esta versión (opcional; si se omite, se genera una automática con algoritmo/k/métricas).",
-    ),
-):
-    """Registra en el Model Registry el modelo de la corrida `--run-id` elegida manualmente."""
-    registrar_modelo(run_id=run_id, descripcion_version=descripcion)
+def main():
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--run-id", required=True, help="run_id de la corrida candidata de P3 elegida.")
+    parser.add_argument("--reason", required=True, help="Justificación técnica y operativa de la selección.")
+    parser.add_argument("--alias", default=P3_PRODUCTION_ALIAS, help=f"Alias a asignar (por defecto '{P3_PRODUCTION_ALIAS}').")
+    args = parser.parse_args()
+
+    evidence = register_candidate(run_id=args.run_id, reason=args.reason, alias=args.alias)
+    print("\n" + json.dumps(evidence, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":
-    app()
+    main()

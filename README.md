@@ -81,9 +81,10 @@ TC5061-Proyecto-Equipo30/
 │   ├── data_manifest.json / p1_data_manifest.json / p2_data_manifest.json <- Manifiestos criptográficos (SHA-256) de versionado de datos.
 │   └── *_ml_canvas.md / architecture_diagram.md <- Machine Learning Canvas y diagramas de arquitectura.
 ├── tests/
-│   ├── test_data.py / test_dataset.py / test_features.py <- Pruebas unitarias compartidas y de P3.
-│   ├── test_p2_data.py / test_p2_features.py              <- Pruebas unitarias de P2.
-│   └── test_p3_train.py                                   <- Pruebas unitarias de P3 (clustering, selección de candidatos).
+│   ├── test_data.py / test_dataset.py / test_features.py <- Pruebas unitarias compartidas.
+│   ├── test_p1_experiments.py                            <- Pruebas unitarias de P1.
+│   ├── test_p2_data.py / test_p2_features.py / test_p2_train.py <- Pruebas unitarias de P2.
+│   └── test_p3_train.py / test_p3_register.py            <- Pruebas unitarias de P3 (clustering, registro y auditoría).
 └── README.md                <- Documentación principal del proyecto.
 ```
 
@@ -226,12 +227,25 @@ Esto es exactamente lo que invoca el entry point `train` del `MLproject` para P3
 
 *Salidas:* `data/interim/viajes_limpios.parquet`/`estaciones.parquet`, `data/processed/estaciones_caracteristicas_{hourly,bucketed}.parquet`, `models/p3_cluster_model.pkl`, `data/processed/p3_estaciones_clusters.parquet`, figuras en `reports/figures/p3_*.png` y reporte en `reports/p3_clustering_report.txt`. Los runs se registran en el experimento compartido `mibici-equipo30`. El [notebook de EDA](notebooks/1.0-db-clustering-estaciones.ipynb) presenta el análisis exploratorio previo al modelado.
 
-### Registrar el modelo elegido en el Model Registry
+### Registrar el modelo elegido en el Model Registry y promoverlo a producción
 Una vez que el equipo compara los candidatos en la UI de MLflow y decide cuál pasa a producción, se registra explícitamente dando el `run_id` de esa corrida (esto **no** ocurre automáticamente en cada entrenamiento):
 ```bash
-python -m src.models.p3_register --run-id <run_id_de_la_corrida_candidata_elegida>
+python -m src.models.p3_register --run-id <run_id_de_la_corrida_candidata_elegida> --reason "<justificación>"
 ```
-Esto crea una nueva versión de `mibici-equipo30-p3-grupos` en el Model Registry, con una descripción automática (algoritmo, k, conjunto de features y métricas; o usa `--descripcion "..."` para una propia) y, como etiquetas de esa versión, el linaje completo: experimento, commit de git y versión de datos de la corrida de origen.
+O vía MLflow Project:
+```bash
+mlflow run . -e register_p3 -P run_id=<run_id_elegido> -P reason="Champion P3: clustering horario GMM k=2" --experiment-name mibici-equipo30 --env-manager local
+```
+Esto registra la versión en `mibici-equipo30-p3-grupos`, copia el linaje completo (experimento, commit de Git, versión de datos y `search_run_id`), asigna el alias de producción `champion` y certifica la inferencia en producción cargando desde `models:/mibici-equipo30-p3-grupos@champion`. Las evidencias auditables se guardan en `reports/p3/comparacion.csv`, `reports/p3/seleccion.json` y `reports/p3/registry.json`.
+
+### Inferencia en Batch desde el Model Registry (Producción)
+Asigna el cluster operacional a las estaciones directamente desde el modelo registrado en producción:
+```bash
+python -m src.models.p3_predict --model-uri models:/mibici-equipo30-p3-grupos@champion
+```
+*Salidas:* `data/processed/p3_estaciones_clusters.parquet` y resumen de distribución de clusters en consola.
+
+Para más detalles sobre la metodología, partición, comparativas y justificación del Champion de P3, consultar la [Guía de MLflow Avanzado de P3](docs/p3-mlflow-avanzado.md).
 
 ---
 
