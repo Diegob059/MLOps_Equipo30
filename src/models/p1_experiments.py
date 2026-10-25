@@ -150,14 +150,20 @@ def _log_candidate(name, method, params, train, validation, test, peaks, manifes
                      'src/features/p1_features.py', 'src/data/p1_dataset.py', 'scripts/train.py'):
             mlflow.log_artifact(str(cfg.ROOT / path), artifact_path='source/' +
                                 (cfg.ROOT / path).relative_to(cfg.ROOT).parent.as_posix())
-        example = model_input(validation.head(5))
+        # Se especifica serialization_format='cloudpickle' explícitamente: en MLflow 3, si la librería
+        # 'skops' está instalada en el entorno, MLflow intenta usar skops por defecto. Sin embargo,
+        # la clase personalizada FlowRegressor (src.models.p1_estimator) y los nodos internos de
+        # árboles de decisión (sklearn.tree._tree.Tree) no pertenecen a la lista blanca de skops,
+        # arrojando UntrustedTypesFoundException. Cloudpickle permite serializar y deserializar
+        # de forma íntegra clases custom y closures de Python sin restricciones artificiales.
         info = mlflow.sklearn.log_model(
             sk_model=model, name='model', input_example=example,
             signature=infer_signature(example, model.predict(example)),
             code_paths=[str(cfg.ROOT / 'src')],
             pip_requirements=[f'mlflow=={mlflow.__version__}',
                            f'numpy=={np.__version__}', f'pandas=={pd.__version__}',
-                           f'scikit-learn=={__import__("sklearn").__version__}'])
+                           f'scikit-learn=={__import__("sklearn").__version__}'],
+            serialization_format="cloudpickle")
         _plots(test, test_prediction, inventory, monthly, run.info.run_id)
         return {'candidate': name, 'stage_of_work': stage, 'model_family': method,
                 **model.effective_params_, **metrics, 'run_id': run.info.run_id,
@@ -221,3 +227,9 @@ def run_experiments(model=None, tree_params=None):
                       'test_mejora_inventario_pct', 'run_id']].to_string(index=False))
     print(json.dumps(summary, indent=2, ensure_ascii=False))
     return comparison
+
+
+# Permite ejecutar directamente el barrido completo de experimentos de P1 desde la terminal
+# (ej. python -m src.models.p1_experiments) además de ser invocado por scripts/train.py.
+if __name__ == '__main__':
+    run_experiments()

@@ -3,6 +3,14 @@ from pathlib import Path
 import os
 import sys
 
+from dotenv import load_dotenv
+
+# Carga variables de entorno desde .env si existe (homologado con src/config.py y src/p2_config.py).
+# Garantiza que sobreescrituras locales como MLFLOW_TRACKING_URI (ej. puerto 5001 en macOS
+# para evitar colisión con AirPlay en 5000) sean leídas en cualquier invocación independiente
+# de scripts, CLI o pruebas unitarias de P1 sin requerir export manual en terminal.
+load_dotenv()
+
 if sys.platform == "win32":
     # Evita UnicodeEncodeError en consolas Windows (cp1252) cuando MLflow
     # imprime el emoji del enlace de la corrida al registrar contra un
