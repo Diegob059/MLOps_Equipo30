@@ -46,8 +46,11 @@ def test_model_roundtrip_has_signature_and_requires_no_targets(tmp_path, method)
     model = FlowRegressor(method=method, max_depth=2, min_samples_leaf=1).fit(inputs, data[cfg.FLOWS])
     predicted = model.predict(inputs)
     assert not set(cfg.FLOWS).intersection(inputs.columns)
+    # serialization_format='cloudpickle' previene fallos por UntrustedTypesFoundException de skops
+    # al persistir el custom estimator FlowRegressor y las instancias internas de DecisionTree.
     mlflow.sklearn.save_model(model, str(tmp_path / method), input_example=inputs.head(2),
-        signature=infer_signature(inputs, predicted), pip_requirements=[])
+        signature=infer_signature(inputs, predicted), pip_requirements=[],
+        serialization_format="cloudpickle")
     restored = mlflow.pyfunc.load_model(str(tmp_path / method))
     pd.testing.assert_frame_equal(restored.predict(inputs), predicted)
     assert (predicted >= 0).all().all()
