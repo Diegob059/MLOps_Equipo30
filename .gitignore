@@ -70,3 +70,5 @@ mlflow.db
 *.swp
 *.swo
 *~
+*.pages
+*.pages/
