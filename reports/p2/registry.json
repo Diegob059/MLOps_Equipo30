@@ -1,0 +1,21 @@
+{
+  "model_name": "mibici-equipo30-p2-riesgo",
+  "version": "3",
+  "alias": "champion",
+  "model_uri": "models:/mibici-equipo30-p2-riesgo@champion",
+  "experiment_id": "1",
+  "experiment": "mibici-equipo30",
+  "source_run_id": "8350c8c6b05d49f9a2f1b7746bd0463c",
+  "git_commit": "5bae625746700ae29c8ab53230b816f4d56a5c09",
+  "data_version": "p2-mibici-v2025_2026-ddfa3aa49c",
+  "train_cutoff_date": "2025-12-31 22:00:00",
+  "candidate_id": "lgbm_profundo",
+  "reason": "Candidato lgbm_profundo: mayor Macro F1 (0.3708) y Balanced Accuracy (0.8800) en test limpio sin fuga temporal, con 88.41% de recall en desabasto y 90.92% en saturación.",
+  "load_and_predict_verified": true,
+  "example_rows": 5,
+  "classes_verified": [
+    0,
+    1,
+    2
+  ]
+}

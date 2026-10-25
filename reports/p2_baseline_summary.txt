@@ -1,9 +1,9 @@
 BASELINE HEURÍSTICO ESTRATIFICADO (PREGUNTA 2)
 ================================================
-Macro F1-Score      : 0.3333
-Balanced Accuracy   : 0.3336
-Recall Normal (0)   : 98.66%
-Recall Desabasto (1): 0.78%
+Macro F1-Score       : 0.3333
+Balanced Accuracy    : 0.3336
+Recall Normal (0)    : 98.66%
+Recall Desabasto (1) : 0.78%
 Recall Saturación (2): 0.62%
-Fecha Corte Train   : < 2025-12-31 22:00:00 (Anti-Leakage)
-Fecha Evaluación    : >= 2026-01-01 00:00:00
+Fecha Corte Train    : < 2025-12-31 22:00:00 (Anti-Leakage)
+Fecha Evaluación     : >= 2026-01-01 00:00:00
