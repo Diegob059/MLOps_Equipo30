@@ -38,6 +38,7 @@ from src.p2_config import (
     P2_MODEL_PATH,
     RANDOM_SEED,
     REPORTS_DIR,
+    TRAIN_CUTOFF_DATE,
     TRAIN_END_DATE,
     logger,
 )
@@ -168,6 +169,7 @@ def train_and_evaluate(
                     "train_samples": len(X_train),
                     "test_samples": len(X_test),
                     "train_end_date": TRAIN_END_DATE,
+                    "train_cutoff_date": TRAIN_CUTOFF_DATE,
                     "date_range": "2025-01-01 to 2026-09-30",
                     "data_version": data_version,
                 }
@@ -190,6 +192,7 @@ def train_and_evaluate(
                 f"Recall Normal (0)   : {recalls_dummy[0]:.2%}\n"
                 f"Recall Desabasto (1): {recalls_dummy[1]:.2%}\n"
                 f"Recall Saturación (2): {recalls_dummy[2]:.2%}\n"
+                f"Fecha Corte Train   : < {TRAIN_CUTOFF_DATE} (Anti-Leakage)\n"
                 f"Fecha Evaluación    : >= {TRAIN_END_DATE}\n",
                 encoding="utf-8",
             )
@@ -220,6 +223,7 @@ def train_and_evaluate(
                     "test_samples": len(X_test),
                     "num_features": len(feature_cols),
                     "train_end_date": TRAIN_END_DATE,
+                    "train_cutoff_date": TRAIN_CUTOFF_DATE,
                     "date_range": "2025-01-01 to 2026-09-30",
                     "data_version": data_version,
                 }
