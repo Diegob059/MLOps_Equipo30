@@ -134,36 +134,41 @@ python -m src.features.p2_features
 ```
 *Salidas:* `data/processed/p2_mibici_features_target.parquet`.
 
-### Paso 3: Entrenamiento del Modelo y Registro en MLflow
-Ajusta el Baseline Estratificado y el modelo candidato LightGBM (`class_weight='balanced'`), evalúa sobre Test (enero - septiembre 2026), guarda el modelo y registra parámetros y artefactos en MLflow:
+### Paso 3: Entrenamiento, Comparación de Candidatos y Registro en MLflow
+Ajusta el Baseline Estratificado y evalúa al menos 3 candidatos diversos de LightGBM (`lgbm_balanceado`, `lgbm_profundo` y `lgbm_compacto`) con partición temporal estricta anti-leakage (< 2025-12-31 22:00:00). Registra parámetros, métricas, modelos firmados con `input_example`, datos y diagnósticos en MLflow:
 ```bash
 python -m src.models.p2_train
 ```
-*Salidas:* `models/p2_lgbm_risk_classifier.joblib`, `reports/figures/p2_confusion_matrix.png`, `reports/figures/p2_feature_importance.png`, registro de la corrida en el servidor de MLflow (`mlflow.db`, ver Paso 0).
-
-### Paso 4: Inferencia en Batch e Inspección de Casos de Test
-Carga el modelo serializado, ejecuta inferencia sobre las 3,078,500 observaciones de prueba de 2026 y presenta una tabla de 5 ejemplos cualitativos (valor predicho vs esperado con probabilidades):
+O vía MLflow Project:
 ```bash
-python -m src.models.p2_predict --sample-size 5
+mlflow run . -e train -P question=p2 --experiment-name mibici-equipo30 --env-manager local
+```
+*Salidas:* `reports/p2/comparacion.csv`, `reports/p2/seleccion.json`, `models/p2_lgbm_risk_classifier.joblib`, `reports/figures/p2_confusion_matrix.png`, `reports/figures/p2_feature_importance.png`.
+
+### Paso 4: Registro del Champion en Model Registry y Transición a Producción
+Registra el modelo seleccionado en el Model Registry bajo `mibici-equipo30-p2-riesgo`, copia el linaje completo y le asigna el alias `champion`:
+```bash
+python -m src.models.p2_register --run-id <run_id_elegido> --reason "Candidato champion con mejor balance F1 y recall"
+```
+O vía MLflow Project:
+```bash
+mlflow run . -e register_p2 -P run_id=<run_id_elegido> -P reason="Candidato champion con mejor balance F1 y recall" --experiment-name mibici-equipo30 --env-manager local
+```
+*Salidas:* `reports/p2/registry.json`.
+
+### Paso 5: Inferencia en Batch desde el Model Registry (Producción)
+Ejecuta inferencia sobre las 3,078,500 observaciones de prueba de 2026 cargando directamente el modelo Champion desde el Model Registry:
+```bash
+python -m src.models.p2_predict --model-uri models:/mibici-equipo30-p2-riesgo@champion --sample-size 5
 ```
 *Salidas:* `data/processed/p2_test_predictions.parquet` y resumen tabular en consola.
 
-### Paso 5: Ejecución de Pruebas Unitarias
+### Paso 6: Ejecución de Pruebas Unitarias
 ```bash
-make test
-# O directamente con pytest:
 pytest tests
 ```
 
-### Paso 6: Explorador de Experimentos en MLflow (UI del servidor de Tracking)
-Si el servidor del Paso 0 ya está corriendo, simplemente abre tu navegador en: **`http://127.0.0.1:5000`** (seleccionar la pestaña **"Model training"** para ver las corridas registradas). No se requiere ningún comando adicional: la misma instancia de `mlflow server` sirve tanto la API de *tracking* como la UI.
-
-Si necesitas levantarlo de nuevo:
-```bash
-make mlflow
-# O directamente:
-mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
-```
+Para más detalles sobre la metodología, partición anti-leakage y comparativas de P2, consultar la [Guía de MLflow Avanzado de P2](docs/p2-mlflow-avanzado.md).
 
 ---
 

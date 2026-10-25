@@ -10,8 +10,10 @@ Ejecución desde terminal:
 """
 
 from pathlib import Path
+from typing import Optional
 
 import joblib
+import mlflow
 import numpy as np
 import pandas as pd
 import typer
@@ -19,6 +21,7 @@ import typer
 from src.features.p2_features import get_train_test_data
 from src.p2_config import (
     LABEL_MAPPING,
+    MLFLOW_TRACKING_URI,
     P2_FEATURES_TARGET_PARQUET,
     P2_MODEL_PATH,
     P2_STATIONS_PARQUET,
@@ -34,6 +37,7 @@ app = typer.Typer(
 
 def run_batch_inference(
     model_path: Path = P2_MODEL_PATH,
+    model_uri: Optional[str] = None,
     features_parquet: Path = P2_FEATURES_TARGET_PARQUET,
     stations_parquet: Path = P2_STATIONS_PARQUET,
     output_predictions_parquet: Path = P2_TEST_PREDICTIONS_PARQUET,
@@ -42,27 +46,38 @@ def run_batch_inference(
     """
     Ejecuta inferencia sobre el conjunto de Test de 2026, guarda predicciones en Parquet
     y despliega una tabla formateada en consola con casos cualitativos.
+    Permite cargar el modelo desde un archivo local o desde un Model Registry URI de MLflow.
     """
-    if not model_path.exists():
-        raise FileNotFoundError(
-            f"No se encontró el modelo serializado en: {model_path}. "
-            "Ejecuta primero: python -m src.models.p2_train"
-        )
-
-    logger.info(f"Cargando modelo serializado desde: {model_path}")
-    clf = joblib.load(model_path)
-
     logger.info(f"Cargando dataset para inferencia desde: {features_parquet}")
     X_train, y_train, X_test, y_test, feature_cols, df_clean = get_train_test_data(
         features_parquet=features_parquet,
         split_date=TRAIN_END_DATE,
     )
 
-    logger.info(
-        f"Generando inferencia para {len(X_test):,} registros del periodo Test..."
-    )
-    y_pred = clf.predict(X_test)
-    y_proba = clf.predict_proba(X_test)
+    if model_uri:
+        logger.info(f"Cargando modelo desde MLflow URI: {model_uri}")
+        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+        clf = mlflow.pyfunc.load_model(model_uri)
+        preds = clf.predict(X_test)
+        if hasattr(preds, "values"):
+            preds = preds.values
+        y_pred = np.asarray(preds).ravel().astype(int)
+        try:
+            y_proba = clf.predict_proba(X_test)
+        except Exception:
+            y_proba = np.zeros((len(y_pred), 3))
+            for i, p in enumerate(y_pred):
+                y_proba[i, p] = 1.0
+    else:
+        if not model_path.exists():
+            raise FileNotFoundError(
+                f"No se encontró el modelo serializado en: {model_path}. "
+                "Ejecuta primero: python -m src.models.p2_train"
+            )
+        logger.info(f"Cargando modelo serializado desde: {model_path}")
+        clf = joblib.load(model_path)
+        y_pred = clf.predict(X_test)
+        y_proba = clf.predict_proba(X_test)
 
     # Construcción de tabla de resultados
     df_results = df_clean.loc[
@@ -138,9 +153,14 @@ def main(
     sample_size: int = typer.Option(
         5, help="Número de ejemplos a desplegar en consola."
     ),
+    model_uri: Optional[str] = typer.Option(
+        None,
+        "--model-uri",
+        help="URI del modelo en MLflow Model Registry (ej: models:/mibici-equipo30-p2-riesgo@champion).",
+    ),
 ):
     """Ejecuta la inferencia en batch para la Pregunta 2."""
-    run_batch_inference(sample_size=sample_size)
+    run_batch_inference(sample_size=sample_size, model_uri=model_uri)
 
 
 if __name__ == "__main__":

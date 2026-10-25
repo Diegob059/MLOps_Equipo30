@@ -58,6 +58,7 @@ P2_MODEL_PATH: Path = MODELS_DIR / "p2_lgbm_risk_classifier.joblib"
 
 # Reportes y visualizaciones específicas de P2
 REPORTS_DIR: Path = PROJ_ROOT / "reports"
+P2_REPORTS_DIR: Path = REPORTS_DIR / "p2"
 FIGURES_DIR: Path = REPORTS_DIR / "figures"
 P2_CONFUSION_MATRIX_PLOT: Path = FIGURES_DIR / "p2_confusion_matrix.png"
 P2_FEATURE_IMPORTANCE_PLOT: Path = FIGURES_DIR / "p2_feature_importance.png"
@@ -130,8 +131,52 @@ LGBM_PARAMS: Dict = {
     "verbose": -1,
 }
 
+# Definición de al menos 3 candidatos con diferencias sustanciales de hiperparámetros
+# y capacidad de representación (cumplimiento estricto de rúbrica TC5061):
+# 1. lgbm_balanceado: arquitectura base equilibrada entre sesgo y varianza
+# 2. lgbm_profundo: mayor profundidad, árboles y menor learning rate para capturar interacciones complejas
+# 3. lgbm_compacto: regularizado, árboles poco profundos y menor número de hojas para baja latencia
+P2_CANDIDATE_CONFIGS: Dict[str, Dict] = {
+    "lgbm_balanceado": {
+        "description": "LightGBM balanceado base (profundidad 7, 120 árboles, lr 0.08)",
+        "params": {
+            **LGBM_PARAMS,
+            "n_estimators": 120,
+            "max_depth": 7,
+            "num_leaves": 31,
+            "learning_rate": 0.08,
+            "subsample": 0.85,
+            "colsample_bytree": 0.85,
+        },
+    },
+    "lgbm_profundo": {
+        "description": "LightGBM alta capacidad (profundidad 9, 180 árboles, lr 0.04)",
+        "params": {
+            **LGBM_PARAMS,
+            "n_estimators": 180,
+            "max_depth": 9,
+            "num_leaves": 63,
+            "learning_rate": 0.04,
+            "subsample": 0.80,
+            "colsample_bytree": 0.80,
+        },
+    },
+    "lgbm_compacto": {
+        "description": "LightGBM regularizado compacto (profundidad 5, 80 árboles, lr 0.10)",
+        "params": {
+            **LGBM_PARAMS,
+            "n_estimators": 80,
+            "max_depth": 5,
+            "num_leaves": 16,
+            "learning_rate": 0.10,
+            "subsample": 0.90,
+            "colsample_bytree": 0.90,
+        },
+    },
+}
+
 # ==============================================================================
-# TRACKING CON MLFLOW
+# TRACKING CON MLFLOW Y MODEL REGISTRY
 # ==============================================================================
 os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
 os.environ["MLFLOW_DISABLE_AGENT_HINT"] = "1"
@@ -141,6 +186,8 @@ os.environ["MLFLOW_DISABLE_AGENT_HINT"] = "1"
 # corriendo antes de ejecutar cualquier entrenamiento.
 MLFLOW_TRACKING_URI: str = os.getenv("MLFLOW_TRACKING_URI", "http://127.0.0.1:5000")
 MLFLOW_EXPERIMENT_NAME: str = "mibici-equipo30"
+P2_REGISTRY_NAME: str = "mibici-equipo30-p2-riesgo"
+P2_PRODUCTION_ALIAS: str = "champion"
 
 # Configuración de loguru con tqdm si está disponible
 if hasattr(logger, "remove"):

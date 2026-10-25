@@ -74,16 +74,24 @@ def train_p2(model: str, overrides: dict) -> None:
     from src.models.p2_train import train_and_evaluate
     from src.p2_config import LGBM_PARAMS
 
-    lgbm_params = dict(LGBM_PARAMS)
-    if overrides.get("n_estimators") is not None:
-        lgbm_params["n_estimators"] = int(overrides["n_estimators"])
-    if overrides.get("max_depth") is not None:
-        lgbm_params["max_depth"] = int(overrides["max_depth"])
-    if overrides.get("learning_rate") is not None:
-        lgbm_params["learning_rate"] = float(overrides["learning_rate"])
-    if overrides.get("num_leaves") is not None:
-        lgbm_params["num_leaves"] = int(overrides["num_leaves"])
-    train_and_evaluate(lgbm_params=lgbm_params)
+    has_overrides = any(
+        overrides.get(k) is not None
+        for k in ("n_estimators", "max_depth", "learning_rate", "num_leaves")
+    )
+    if has_overrides:
+        lgbm_params = dict(LGBM_PARAMS)
+        if overrides.get("n_estimators") is not None:
+            lgbm_params["n_estimators"] = int(overrides["n_estimators"])
+        if overrides.get("max_depth") is not None:
+            lgbm_params["max_depth"] = int(overrides["max_depth"])
+        if overrides.get("learning_rate") is not None:
+            lgbm_params["learning_rate"] = float(overrides["learning_rate"])
+        if overrides.get("num_leaves") is not None:
+            lgbm_params["num_leaves"] = int(overrides["num_leaves"])
+        train_and_evaluate(lgbm_params=lgbm_params)
+    else:
+        train_and_evaluate(lgbm_params=None)
+
 
 
 def train_p3(model: str, overrides: dict) -> None:

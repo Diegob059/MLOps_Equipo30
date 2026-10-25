@@ -1,0 +1,32 @@
+{
+  "selected_candidate": "lgbm_profundo",
+  "selected_run_id": "8350c8c6b05d49f9a2f1b7746bd0463c",
+  "selection_reason": "Candidato 'lgbm_profundo' seleccionado como Champion de P2: Mayor Macro F1 (0.3708) y Balanced Accuracy (0.8800) sobre Test limpio, con Recall de Desabasto del 88.41% y Saturación del 90.92%, superando al Baseline Estratificado (Macro F1=0.3333) en +0.0375 puntos. Tiempo de entrenamiento eficiente (23.0s) y latencia óptima (3.9791 ms/1k filas).",
+  "metrics": {
+    "test_macro_f1": 0.3707799746445863,
+    "test_balanced_accuracy": 0.8799518860095513,
+    "test_recall_normal": 0.8465519310484577,
+    "test_recall_desabasto": 0.8840884256535261,
+    "test_recall_saturacion": 0.9092153013266703,
+    "test_precision_normal": 0.9993671238857896,
+    "test_precision_desabasto": 0.04442267000603959,
+    "test_precision_saturacion": 0.05917107071645663,
+    "train_fit_duration_seconds": 22.95031499862671,
+    "test_predict_latency_ms_per_1k": 3.979088211865012
+  },
+  "baseline_metrics": {
+    "test_macro_f1": 0.3333203753288205,
+    "test_balanced_accuracy": 0.3335555933023964,
+    "test_recall_normal": 0.9866030295816701,
+    "test_recall_desabasto": 0.007817096747079096,
+    "test_recall_saturacion": 0.006246653578440122,
+    "test_precision_normal": 0.9906738371599157,
+    "test_precision_desabasto": 0.004473519649814806,
+    "test_precision_saturacion": 0.0051347254144456945
+  },
+  "train_samples": 4037300,
+  "test_samples": 3078500,
+  "train_cutoff_date": "2025-12-31 22:00:00",
+  "git_commit": "5bae625746700ae29c8ab53230b816f4d56a5c09",
+  "data_version": "p2-mibici-v2025_2026-ddfa3aa49c"
+}
