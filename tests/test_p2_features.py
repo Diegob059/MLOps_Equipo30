@@ -11,6 +11,7 @@ from src.features.p2_features import (
     add_demand_lags,
     add_rolling_balance_features,
     compute_target_variable,
+    get_train_test_data,
 )
 
 
@@ -74,3 +75,59 @@ def test_p2_add_cyclical_calendar_features(sample_station_grid):
         # Las funciones trigonométricas deben estar acotadas entre -1 y 1
         assert df_res[col].min() >= -1.0
         assert df_res[col].max() <= 1.0
+
+
+def test_p2_get_train_test_data_anti_leakage(tmp_path):
+    """
+    Verifica que la partición temporal excluya de Train las filas cuya ventana
+    futura cruce hacia el periodo de Test (evitando fuga de datos de enero 2026).
+    """
+    # Rango horario que cruza fin de año 2025 e inicio de 2026
+    timestamps = pd.date_range("2025-12-31 18:00:00", "2026-01-01 06:00:00", freq="h")
+    n = len(timestamps)
+    df = pd.DataFrame(
+        {
+            "station_id": [1] * n,
+            "timestamp": timestamps,
+            "capacity": [20] * n,
+            "salidas": [1] * n,
+            "llegadas": [1] * n,
+            "balance_neto": [0] * n,
+            "delta_net": [0] * n,
+            "ratio": [0.0] * n,
+            "target": [0] * n,
+            "salidas_lag_168": [1.0] * n,
+            "feature_demo": np.arange(n),
+        }
+    )
+
+    parquet_file = tmp_path / "test_features.parquet"
+    df.to_parquet(parquet_file, index=False)
+
+    X_train, y_train, X_test, y_test, feature_cols, df_clean = get_train_test_data(
+        features_parquet=parquet_file,
+        split_date="2026-01-01 00:00:00",
+        horizon_hours=2,
+        warmup_lag_col="salidas_lag_168",
+    )
+
+    # El corte de train debe ser < 2025-12-31 22:00:00 (horizon_hours=2)
+    train_timestamps = df_clean.loc[X_train.index, "timestamp"]
+    test_timestamps = df_clean.loc[X_test.index, "timestamp"]
+
+    # 1. No debe existir ninguna fila en Train a partir de las 22:00 del 31 de diciembre
+    assert (train_timestamps < pd.Timestamp("2025-12-31 22:00:00")).all()
+    assert train_timestamps.max() == pd.Timestamp("2025-12-31 21:00:00")
+
+    # 2. Las filas de las 22:00 y 23:00 del 31 de dic no deben estar ni en Train ni en Test
+    excluded_mask = df_clean["timestamp"].isin(
+        [pd.Timestamp("2025-12-31 22:00:00"), pd.Timestamp("2025-12-31 23:00:00")]
+    )
+    excluded_indices = df_clean[excluded_mask].index
+    assert not any(idx in X_train.index for idx in excluded_indices)
+    assert not any(idx in X_test.index for idx in excluded_indices)
+
+    # 3. Test debe comenzar estrictamente en 2026-01-01 00:00:00
+    assert (test_timestamps >= pd.Timestamp("2026-01-01 00:00:00")).all()
+    assert test_timestamps.min() == pd.Timestamp("2026-01-01 00:00:00")
+

@@ -246,12 +246,15 @@ def build_full_feature_pipeline(
 def get_train_test_data(
     features_parquet: Path = P2_FEATURES_TARGET_PARQUET,
     split_date: str = TRAIN_END_DATE,
+    horizon_hours: int = TARGET_HORIZON_HOURS,
     warmup_lag_col: str = "salidas_lag_168",
 ) -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series, List[str], pd.DataFrame]:
     """
-    Carga el dataset de características y realiza la partición temporal estricta:
+    Carga el dataset de características y realiza la partición temporal estricta anti-leakage:
     - Descarta periodo de calentamiento y filas terminales sin target.
-    - Train: timestamp < split_date
+    - Train: timestamp < (split_date - horizon_hours) -> Excluye las filas cuyas ventanas futuras
+      de 2 horas (t+1, t+2) cruzan el corte hacia el periodo de prueba de 2026 (las que empiezan
+      a partir de las 22:00 del 31 de diciembre de 2025).
     - Test : timestamp >= split_date
     """
     if not features_parquet.exists():
@@ -281,7 +284,11 @@ def get_train_test_data(
         ]
     ]
 
-    train_mask = df_clean["timestamp"] < split_date
+    # Prevención estricta de fuga temporal (Data Leakage):
+    # Las filas cuya ventana futura cruza el corte (a partir de las 22:00 del 31 de diciembre)
+    # se excluyen de entrenamiento para que ninguna etiqueta use viajes de enero de 2026.
+    train_cutoff = pd.Timestamp(split_date) - pd.Timedelta(hours=horizon_hours)
+    train_mask = df_clean["timestamp"] < train_cutoff
     test_mask = df_clean["timestamp"] >= split_date
 
     X_train = df_clean.loc[train_mask, feature_cols]

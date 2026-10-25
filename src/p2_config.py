@@ -84,6 +84,9 @@ TARGET_YEARS: List[int] = [2025, 2026]
 START_TIMESTAMP: str = "2025-01-01 00:00:00"
 END_TIMESTAMP: str = "2026-09-30 23:00:00"
 TRAIN_END_DATE: str = "2026-01-01 00:00:00"
+# Corte anti-leakage: inicio de las dos últimas horas de 2025 (>= 22:00 del 31 de diciembre).
+# Las observaciones cuyas ventanas futuras cruzan el corte hacia 2026 (t+1, t+2) se excluyen de Train.
+TRAIN_CUTOFF_DATE: str = "2025-12-31 22:00:00"
 
 # ==============================================================================
 # DEFINICIÓN DEL TARGET OPERATIVO (PREGUNTA 2)
