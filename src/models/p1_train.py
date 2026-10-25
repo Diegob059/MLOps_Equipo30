@@ -94,7 +94,7 @@ def log_experiments(scores, bundle, manifest):
                 'test_start': cfg.TEST_START, 'data_end': cfg.END,
                 'forecast_origin': '00:00 local; siguiente manana', 'interval_hours': 1,
                 'cohort': 'origenes_enero_2025', 'stations': len(bundle['stations']),
-                'features': json.dumps(cfg.VARIABLES), 'tree_params': json.dumps(cfg.TREE_PARAMS),
+                'features': json.dumps(cfg.VARIABLES), 'tree_params': json.dumps(bundle['tree_params']),
                 'margin_quantile': cfg.MARGIN_QUANTILE, 'margin': bundle['margins'][method],
                 'selected_methods': json.dumps(bundle['selected']),
                 'peak_weekday': str(bundle['peaks'].loc['Laborable'].to_dict()),
@@ -161,6 +161,7 @@ def run_pipeline(log_mlflow=True, catalog=cfg.CATALOG, tree_params=None):
             rows.append({'metodo': method, 'particion': partition, **metrics})
     scores = pd.DataFrame(rows)
     bundle = {'models': models, 'selected': selected, 'stations': january_stations(hourly),
+              'tree_params': tree_params or dict(cfg.TREE_PARAMS),
               'peaks': peaks, 'margin': margins['seleccionado'], 'margins': margins,
               'data_version': manifest['data_version'], 'variables': cfg.VARIABLES,
               'training_end': '2025-12-31', 'calibration_end': '2026-06-30',

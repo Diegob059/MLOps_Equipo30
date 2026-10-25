@@ -11,6 +11,10 @@ P1 estima los viajes que se iniciarán en cada estación hasta terminar el prime
 - Entrenamiento: febrero–diciembre de 2025. Validación: enero–junio de 2026. Prueba: julio–septiembre de 2026.
 - Las llegadas se asignan al destino y a la fecha y hora de fin del viaje, incluso cuando cruzan medianoche.
 
+## Entrega de tracking avanzado
+
+Para la segunda entrega se usa [P1: MLflow Project, búsqueda y Registry](p1-mlflow-avanzado.md). Los comandos directos que siguen documentan la entrega anterior; las nuevas corridas se lanzan con `mlflow run`. La inferencia admite `--model-uri models:/mibici-equipo30-p1-demanda@champion`.
+
 ## Reproducción
 
 El entorno de P1 usa Python 3.12 y dependencias compatibles con las restricciones generales del repositorio:
@@ -45,7 +49,7 @@ python -m src.features.p1_features
 python -m src.models.p1_train --catalog /ruta/nomenclatura_2026_09.csv
 ```
 
-El entrenamiento registra cuatro corridas en `mibici-equipo30`, utilizando `MLFLOW_TRACKING_URI` o `sqlite:///mlflow.db` del repositorio:
+El entrenamiento registra cuatro corridas en `mibici-equipo30`, utilizando `MLFLOW_TRACKING_URI` (por defecto `http://127.0.0.1:5000`, servidor con SQLite):
 
 1. `p1_baseline_semanal_balance`: misma estación y hora de hace siete días.
 2. `p1_baseline_historico_balance`: promedio de entrenamiento por estación, día de semana y hora.

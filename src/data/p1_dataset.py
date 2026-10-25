@@ -88,9 +88,44 @@ def load_prepared():
     return pd.read_parquet(cfg.HOURLY), manifest
 
 
+def ensure_raw_data(raw_dir=cfg.RAW_DIR, catalog=cfg.CATALOG):
+    """Descarga solo los meses fijados en config y verifica el manifiesto previo.
+
+    Se reutiliza el descargador del equipo. El catálogo de septiembre no se
+    sustituye por el más reciente, pues cambiaría la versión de datos.
+    """
+    from src.data.p2_download_raw_data import (
+        DownloadItem, FALLBACK_TRIPS, FALLBACK_NOMENCLATURA_URL,
+        create_resilient_session, download_item,
+    )
+    raw_dir, catalog = Path(raw_dir), Path(catalog)
+    expected = json.loads(cfg.MANIFEST.read_text()) if cfg.MANIFEST.exists() else {}
+    hashes = {item['file']: item['sha256'] for item in expected.get('files', [])}
+    if expected.get('catalog_sha256'):
+        hashes[catalog.name] = expected['catalog_sha256']
+    sources = [(raw_dir / f'datos_abiertos_{month.year}_{month.month:02d}.csv',
+                FALLBACK_TRIPS.get((month.year, month.month)))
+               for month in pd.period_range(cfg.START, cfg.END, freq='M')]
+    sources.append((catalog, FALLBACK_NOMENCLATURA_URL
+                    if catalog.name == Path(FALLBACK_NOMENCLATURA_URL).name else None))
+    with create_resilient_session() as session:
+        for path, url in sources:
+            if not path.exists():
+                if not url:
+                    raise ValueError(f'No hay fuente oficial configurada para {path.name}')
+                item = DownloadItem(filename=path.name, url=url, file_type='trip')
+                if not download_item(item, path.parent, session, organize_subdirs=False):
+                    raise RuntimeError(f'No se pudo descargar {path.name}; no se inicia entrenamiento.')
+            if path.name in hashes and sha256(path) != hashes[path.name]:
+                raise ValueError(f'{path.name} difiere del manifiesto versionado; revisa la fuente.')
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--raw-dir', type=Path, default=cfg.RAW_DIR)
     parser.add_argument('--catalog', type=Path, default=cfg.CATALOG)
+    parser.add_argument('--download-missing', action='store_true')
     args = parser.parse_args()
+    if args.download_missing:
+        ensure_raw_data(args.raw_dir, args.catalog)
     prepare_dataset(args.raw_dir, args.catalog)

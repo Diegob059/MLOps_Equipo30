@@ -26,9 +26,9 @@ PIPELINES = {
 }
 
 
-def run_module(module: str) -> None:
+def run_module(module: str, *args: str) -> None:
     print(f"\n==> python -m {module}")
-    subprocess.run([sys.executable, "-m", module], cwd=ROOT, check=True)
+    subprocess.run([sys.executable, "-m", module, *args], cwd=ROOT, check=True)
 
 
 def run_ingest(question: str) -> None:
@@ -36,7 +36,8 @@ def run_ingest(question: str) -> None:
     for nombre, modulos in preguntas.items():
         print(f"\n{'=' * 70}\nIngesta de {nombre.upper()}\n{'=' * 70}")
         for modulo in modulos:
-            run_module(modulo)
+            args = ('--download-missing',) if modulo == 'src.data.p1_dataset' else ()
+            run_module(modulo, *args)
 
 
 def main() -> None:
