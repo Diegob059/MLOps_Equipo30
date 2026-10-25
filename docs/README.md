@@ -4,6 +4,8 @@
 
 - [Propuesta en PDF](TC5061_Propuesta_Proyecto_Equipo30.pdf).
 - [Versión editable en Word](TC5061_Propuesta_Proyecto_Equipo30.docx).
+- [Canvas completo de P1, P2 y P3](../references/ml_canvas_equipo30.docx).
+- [Arquitectura general](../references/architecture_diagram.md).
 
 La propuesta incluye los Canvas de P1, P2 y P3, el diagrama general de arquitectura,
 las gráficas y las evidencias de MLflow. La revisión del 18 de octubre de 2026
