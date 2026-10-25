@@ -1,0 +1,24 @@
+{
+  "selected_candidate": "hourly_gmm_k2",
+  "selected_run_id": "f732c016be2d4e80b05415d005826f4e",
+  "selection_reason": "Candidato hourly_gmm_k2 seleccionado como Champion de P3: Mayor coeficiente de silueta (0.2918 frente a 0.0911 del baseline, mejora relativa de +220%) y menor indice de Davies-Bouldin (1.9792 frente a 2.3217, menor dispersion inter-cluster). La separacion en k=2 clusters sobre el perfil de 24 horas aisla nitidamente el cluster 0 (origen residencial con pico matutino de salidas 7-9h) del cluster 1 (destino laboral con pico matutino de llegadas 8-10h), optimizando las rutas de rebalanceo matutino y vespertino de camiones.",
+  "metrics": {
+    "test_silhouette_score": 0.2917596891649504,
+    "test_davies_bouldin_index": 1.9791763367544342
+  },
+  "baseline_metrics": {
+    "test_silhouette_score": 0.09113816548426774,
+    "test_davies_bouldin_index": 2.321711191524791,
+    "inercia": 14019.468484400993
+  },
+  "algorithm": "gmm",
+  "k": 2,
+  "feature_set": "hourly",
+  "n_features": 52,
+  "n_stations": 352,
+  "git_commit": "f967a70a5b094e5deee55eb7dbff7c26c72c6a14",
+  "data_version": "mibici-v2025_2026-f1db9c0782",
+  "search_run_id": "c01b31f37ab74208b7f7d6e0ba10ee7c",
+  "model_registry_name": "mibici-equipo30-p3-grupos",
+  "alias": "champion"
+}

@@ -1,0 +1,22 @@
+{
+  "model_name": "mibici-equipo30-p3-grupos",
+  "version": "3",
+  "alias": "champion",
+  "model_uri": "models:/mibici-equipo30-p3-grupos@champion",
+  "experiment_id": "1",
+  "experiment": "mibici-equipo30",
+  "source_run_id": "f732c016be2d4e80b05415d005826f4e",
+  "git_commit": "f967a70a5b094e5deee55eb7dbff7c26c72c6a14",
+  "data_version": "mibici-v2025_2026-f1db9c0782",
+  "search_run_id": "c01b31f37ab74208b7f7d6e0ba10ee7c",
+  "candidate_id": "p3_candidato_hourly_gmm_k2",
+  "algorithm": "gmm",
+  "k": "2",
+  "feature_set": "hourly",
+  "reason": "Champion P3: clustering horario GMM k=2",
+  "load_and_predict_verified": true,
+  "example_rows": 5,
+  "clusters_detected": [
+    0
+  ]
+}
