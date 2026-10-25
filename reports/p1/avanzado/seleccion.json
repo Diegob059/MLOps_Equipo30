@@ -1,0 +1,12 @@
+{
+  "selected_run_id": "e17f484bf7b349d19a63edc19802cb07",
+  "candidate": "arbol_d10_l50",
+  "model_uri": "models:/m-dce659ad661046a49d86c7125801eb4f",
+  "git_commit": "667444a010847d64067a9596986de52115a8b112",
+  "git_dirty": "False",
+  "data_version": "p1-b82961c841c7089205efb9ef8de938995258201f2ccf81344756af16bdb1241c",
+  "search_run_id": "3bdc120bb70947509702da8f42ab3f5e",
+  "selection_metric": "validation_inventario_mae",
+  "selection_uses_test": false,
+  "baseline_run_id": "d5dfc6922bb14ddeb359db7f9e20fb7a"
+}

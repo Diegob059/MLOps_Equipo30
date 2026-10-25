@@ -20,6 +20,7 @@
 /.venv/
 /reports/p1/evaluacion_inventario_prueba.csv
 /reports/p1/avanzado/plots/
+/reports/p1/avanzado/sugerencia_registry.csv
 .env
 .env.*
 !.env.example

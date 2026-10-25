@@ -1,0 +1,15 @@
+{
+  "name": "mibici-equipo30-p1-demanda",
+  "version": "1",
+  "alias": "champion",
+  "model_uri": "models:/mibici-equipo30-p1-demanda@champion",
+  "experiment_id": "1",
+  "experiment": "mibici-equipo30",
+  "source_run_id": "e17f484bf7b349d19a63edc19802cb07",
+  "git_commit": "667444a010847d64067a9596986de52115a8b112",
+  "data_version": "p1-b82961c841c7089205efb9ef8de938995258201f2ccf81344756af16bdb1241c",
+  "git_dirty": "False",
+  "reason": "Arbol profundidad 10 y hoja minima 50: menor MAE de inventario en validacion (1.9263 frente a 2.1726 del baseline), mejora de 11.34 por ciento en validacion y 9.27 por ciento en prueba. La seleccion no usa prueba. Se comparan peor mes, dispersion mensual y costo de ajuste/inferencia en comparacion.csv; el arbol requiere dos predicciones por fila y evita almacenar tablas historicas completas. El margen se calibra solo con validacion y no garantiza disponibilidad fisica.",
+  "load_and_predict_verified": true,
+  "example_rows": 5
+}

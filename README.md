@@ -272,6 +272,10 @@ mlflow run . -e train -P question=p3 -P model=kmeans -P k=4 --experiment-name mi
 
 **Nota:** `--env-manager local` requiere que el virtualenv esté **activado** en la misma terminal (no basta con invocar `python.exe` por ruta completa), de lo contrario el subproceso que lanza `mlflow run` no encontrará el paquete `src` instalado en modo editable.
 
+### Resultados ejecutados de P1
+
+P1 ya tiene baseline + cinco candidatas, cuatro combinaciones en nested runs y `mibici-equipo30-p1-demanda@champion` verificado en el tracking local. El elegido (árbol profundidad 10/hoja mínima 50) mejora el MAE de inventario 11.34% en validación y 9.27% en prueba. Consulta el [anexo PDF de avance de P1](output/pdf/TC5061_Reporte_MLFlow_Equipo30_P1_Avance.pdf) y la [evidencia completa](docs/p1-mlflow-avanzado.md#resultados-ejecutados-de-p1-25-de-octubre-de-2026). El reporte final del equipo aún debe integrar P2, P3 y las revisiones individuales.
+
 ### 6.4 Qué no se entrega
 Por diseño, el repositorio **no incluye** (ver `.gitignore`): los archivos de datos crudos de MiBici, `mlflow.db`, las carpetas `mlruns/`/`mlartifacts/`, ni modelos serializados (`models/*.joblib`, `*.pkl`). Todo eso se reconstruye con los comandos de `ingest`/`train` anteriores desde un clon limpio.
 

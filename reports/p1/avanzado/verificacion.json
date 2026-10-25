@@ -1,0 +1,117 @@
+{
+  "source_commit": "667444a010847d64067a9596986de52115a8b112",
+  "tests_passed": 29,
+  "dependency_check": "pip check: No broken requirements found",
+  "tracking_uri": "http://127.0.0.1:5001",
+  "experiment": "mibici-equipo30",
+  "baseline_and_candidates": [
+    {
+      "candidate": "baseline_semanal_avanzado",
+      "run_id": "d5dfc6922bb14ddeb359db7f9e20fb7a",
+      "status": "FINISHED",
+      "signature": true,
+      "input_example": true,
+      "dataset_input": true,
+      "artifact_groups": [
+        "config",
+        "data",
+        "plots",
+        "source"
+      ]
+    },
+    {
+      "candidate": "historico_avanzado",
+      "run_id": "e4d8d8ab525042a5adce8f5264764973",
+      "status": "FINISHED",
+      "signature": true,
+      "input_example": true,
+      "dataset_input": true,
+      "artifact_groups": [
+        "config",
+        "data",
+        "plots",
+        "source"
+      ]
+    },
+    {
+      "candidate": "arbol_d6_l50",
+      "run_id": "0d54ac9b83cc485b80a55a726f9fa76b",
+      "status": "FINISHED",
+      "signature": true,
+      "input_example": true,
+      "dataset_input": true,
+      "artifact_groups": [
+        "config",
+        "data",
+        "plots",
+        "source"
+      ]
+    },
+    {
+      "candidate": "arbol_d6_l100",
+      "run_id": "8477a1e162174ad9bc38e8130e1b7d2b",
+      "status": "FINISHED",
+      "signature": true,
+      "input_example": true,
+      "dataset_input": true,
+      "artifact_groups": [
+        "config",
+        "data",
+        "plots",
+        "source"
+      ]
+    },
+    {
+      "candidate": "arbol_d10_l50",
+      "run_id": "e17f484bf7b349d19a63edc19802cb07",
+      "status": "FINISHED",
+      "signature": true,
+      "input_example": true,
+      "dataset_input": true,
+      "artifact_groups": [
+        "config",
+        "data",
+        "plots",
+        "source"
+      ]
+    },
+    {
+      "candidate": "arbol_d10_l100",
+      "run_id": "432d983bd3c34665a59297068a877472",
+      "status": "FINISHED",
+      "signature": true,
+      "input_example": true,
+      "dataset_input": true,
+      "artifact_groups": [
+        "config",
+        "data",
+        "plots",
+        "source"
+      ]
+    }
+  ],
+  "clean_clone": {
+    "source": "local Git clone of committed branch",
+    "new_venv_created": false,
+    "environment": "Reused exact pinned dependencies; PYTHONPATH points to clone",
+    "raw_inputs": "20 months and catalog reused; January 2025 downloaded from official MiBici source",
+    "ingest_project_run_id": "68ae4c6d09374ac6bbb58c4c7a58d261",
+    "train_project_run_id": "8d5cd085657244bd9cf46d71515562a1",
+    "candidate_run_id": "b81b2baa757c4ca2b85aac8d20bfb881",
+    "matching_features_sha256": true,
+    "metrics_compared": 18,
+    "maximum_absolute_difference": 0.0
+  },
+  "registry_alias_load_and_predict_verified": true,
+  "daily_inference": {
+    "date": "2026-10-01",
+    "stations": 368,
+    "states": {
+      "Sugerencia revisable": 313,
+      "Falta espacio previsto para devoluciones": 32,
+      "Inventario inicial supera capacidad": 21,
+      "Confirmar operación": 2
+    },
+    "invalid_capacity_recommendations_suppressed": true
+  }
+}

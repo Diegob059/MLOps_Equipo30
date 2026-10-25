@@ -73,10 +73,10 @@ Se usa **alias `champion`** para producción académica: permite cambiar la vers
 Reproducir un árbol elegido sin repetir la búsqueda:
 
 ```bash
-mlflow run . -e train -P question=p1 -P model=arbol -P max_depth=6 -P min_samples_leaf=100 --experiment-name mibici-equipo30 --env-manager local
+mlflow run . -e train -P question=p1 -P model=arbol -P max_depth=10 -P min_samples_leaf=50 --experiment-name mibici-equipo30 --env-manager local
 ```
 
-El comando es un ejemplo de combinación; usar los valores del candidato efectivamente elegido. Si gana el promedio histórico: `-P model=historico`. Inferencia desde el Registry:
+El comando anterior reproduce la combinación elegida en la ejecución documentada. Si gana el promedio histórico: `-P model=historico`. Inferencia desde el Registry:
 
 ```bash
 python -m src.models.p1_predict --date 2026-10-01 --model-uri models:/mibici-equipo30-p1-demanda@champion --output reports/p1/avanzado/sugerencia_registry.csv
@@ -91,6 +91,39 @@ python -m pytest tests -q
 ```
 
 Las pruebas nuevas verifican separación temporal, selección independiente de prueba, equivalencia de métricas con la entrega anterior, orden conservador de salidas/llegadas, fallback de estaciones y serialización/carga con firma de los tres métodos. La ejecución real y las capturas de MLflow se documentan junto con los resultados.
+
+## Resultados ejecutados de P1 (25 de octubre de 2026)
+
+Las seis corridas terminaron correctamente desde el MLflow Project. Código de entrenamiento: `667444a010847d64067a9596986de52115a8b112`, con `git_dirty=False`.
+
+| Modelo | MAE inventario validación | MAE inventario prueba | RMSE inventario prueba | Mejora MAE prueba | Cobertura prueba |
+|---|---:|---:|---:|---:|---:|
+| baseline_semanal_avanzado | 2.1726 | 2.1892 | 3.3306 | - | 89.90% |
+| historico_avanzado | 1.9430 | 2.0481 | 3.0851 | 6.44% | 91.33% |
+| arbol_d6_l50 | 1.9722 | 2.0441 | 3.1599 | 6.63% | 92.54% |
+| arbol_d6_l100 | 1.9714 | 2.0426 | 3.1554 | 6.69% | 92.57% |
+| arbol_d10_l50 | 1.9263 | 1.9861 | 3.0548 | 9.27% | 92.77% |
+| arbol_d10_l100 | 1.9293 | 1.9879 | 3.0724 | 9.19% | 92.78% |
+
+Se eligió `arbol_d10_l50`: reduce el MAE de inventario **11.34% en validación** y **9.27% en prueba** frente al baseline semanal. Tiene el menor error de su peor mes de validación (2.0093) y menor dispersión mensual que el baseline (0.0642 frente a 0.0792). Los árboles de profundidad 6 tienen algo menos de dispersión, pero mayor error; el promedio histórico es más barato, pero también tiene mayor MAE (1.9430 en validación). El d10/l100 es cercano: la diferencia entre hojas 50/100 no demuestra significación estadística.
+
+En este equipo el ajuste del elegido tomó 1.93 s y la predicción de los dos flujos 0.0675 ms por mil filas. La latencia se midió en un solo batch de validación, excluye balance/red y no equivale a un benchmark del servicio. El margen calibrado es 3.7625 bicicletas; la cobertura de prueba es 92.77% con redondeo hacia arriba.
+
+- Corrida elegida: `e17f484bf7b349d19a63edc19802cb07`.
+- Búsqueda padre: `3bdc120bb70947509702da8f42ab3f5e`.
+- Registry local: `mibici-equipo30-p1-demanda`, versión `1`, alias `champion`; carga y predicciones verificadas.
+- Inferencia del 1 de octubre: 368 estaciones; 313 sugerencias revisables y 55 alertas sin sugerencia numérica.
+- 29 pruebas aprobadas; `pip check` sin conflictos.
+- Clon separado sin procesados: se descargó enero de 2025 desde MiBici y se reutilizaron los otros 20 meses, catálogo y entorno fijado. Se reconstruyeron las características y se ejecutó el modelo elegido. Las 18 métricas de validación/prueba coincidieron exactamente (diferencia máxima 0). No se creó un virtualenv nuevo ni se redescargaron los 22 archivos en esta comprobación.
+
+Evidencia auditable:
+
+- [Comparación completa (CSV)](../reports/p1/avanzado/comparacion.csv).
+- [Selección y origen (JSON)](../reports/p1/avanzado/seleccion.json).
+- [Registry y prueba de carga (JSON)](../reports/p1/avanzado/registry.json).
+- [Comprobaciones de artefactos y reproducción (JSON)](../reports/p1/avanzado/verificacion.json).
+- [Anexo de avance de P1 en PDF](../output/pdf/TC5061_Reporte_MLFlow_Equipo30_P1_Avance.pdf).
+- [Capturas y diagnósticos](../reports/figures/p1/avanzado/).
 
 ## Pendientes de integración del equipo
 
