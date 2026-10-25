@@ -29,7 +29,9 @@ TRACKING_URI = os.getenv('MLFLOW_TRACKING_URI', 'http://127.0.0.1:5000')
 START = '2025-01-01'
 END = '2026-09-30'
 TRAIN_START = '2025-02-01'
+TRAIN_END = '2025-12-31'
 VALIDATION_START = '2026-01-01'
+VALIDATION_END = '2026-06-30'
 TEST_START = '2026-07-01'
 HOURS = 12
 PEAK_DURATION = 3
@@ -39,3 +41,7 @@ VARIABLES = ['hora', 'dia_semana', 'mes', 'salidas_ayer', 'salidas_semana',
              'llegadas_ayer', 'llegadas_semana']
 FLOWS = ['salidas', 'llegadas']
 METHODS = ['semanal', 'historico', 'arbol']
+TREE_GRID = {'max_depth': [6, 10], 'min_samples_leaf': [50, 100]}
+ADVANCED_REPORTS = REPORTS / 'avanzado'
+REGISTRY_NAME = 'mibici-equipo30-p1-demanda'
+PRODUCTION_ALIAS = 'champion'

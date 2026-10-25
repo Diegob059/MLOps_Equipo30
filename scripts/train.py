@@ -26,7 +26,9 @@ import os
 # ejecución (baseline + candidato, según la convención de la rúbrica), lo
 # cual choca con ese run único. Se limpia la variable para que cada módulo
 # siga creando sus propios runs con nombre, como lo hace fuera de `mlflow run`.
-os.environ.pop("MLFLOW_RUN_ID", None)
+_project_run_id = os.environ.pop("MLFLOW_RUN_ID", None)
+if _project_run_id:
+    os.environ["MIBICI_PROJECT_RUN_ID"] = _project_run_id
 
 
 def _clean(value):
@@ -52,20 +54,18 @@ def _none_if_empty(value):
 
 
 def train_p1(model: str, overrides: dict) -> None:
-    if model:
-        raise ValueError(
-            f"P1 no acepta --model (compara internamente los métodos semanal/histórico/árbol); "
-            f"recibido: {model!r}. Usa --max-depth/--min-samples-leaf para ajustar el árbol."
-        )
+    if model not in ("", "semanal", "historico", "arbol"):
+        raise ValueError("P1 soporta semanal, historico o arbol; vacío ejecuta la búsqueda completa.")
     from src import p1_config as cfg
-    from src.models.p1_train import run_pipeline
+    from src.models.p1_experiments import run_experiments
 
     tree_params = dict(cfg.TREE_PARAMS)
     if overrides.get("max_depth") is not None:
         tree_params["max_depth"] = int(overrides["max_depth"])
     if overrides.get("min_samples_leaf") is not None:
         tree_params["min_samples_leaf"] = int(overrides["min_samples_leaf"])
-    run_pipeline(tree_params=tree_params)
+    explicit = any(overrides.get(key) is not None for key in ("max_depth", "min_samples_leaf"))
+    run_experiments(model=model or None, tree_params=tree_params if explicit else None)
 
 
 def train_p2(model: str, overrides: dict) -> None:

@@ -116,6 +116,8 @@ make mlflow
 # O directamente:
 mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
 ```
+En macOS, si AirPlay ocupa el puerto 5000, usa `--port 5001` y exporta `MLFLOW_TRACKING_URI=http://127.0.0.1:5001` en las terminales de ejecución.
+
 Esto expone la UI y la API en `http://127.0.0.1:5000` y crea/actualiza `mlflow.db` en la raíz del repo (archivo ignorado por Git, ver `.gitignore`). Déjalo corriendo en una terminal aparte mientras ejecutas los pasos siguientes. Por defecto, `MLFLOW_TRACKING_URI` apunta a `http://127.0.0.1:5000`; puedes sobreescribirlo con una variable de entorno si usas otro host/puerto.
 
 ### Paso 1: Ingesta, Normalización y Versionado de Datos (2025 y 2026)
@@ -169,14 +171,16 @@ mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
 
 La implementación de P1 combina regresión horaria de salidas y llegadas con un balance de inventario hasta el final del primer pico matutino. Compara baseline semanal, promedio histórico y árboles sobre las mismas estaciones, fechas y horas, incluidas las horas sin actividad.
 
+Para esta entrega, con el entorno activado y el servidor de tracking en ejecución:
+
 ```bash
-python -m src.data.p1_dataset
-python -m src.features.p1_features
-python -m src.models.p1_train
-python -m src.models.p1_predict --date 2026-10-01
+mlflow run . -e ingest -P question=p1 --experiment-name mibici-equipo30 --env-manager local
+mlflow run . -e train -P question=p1 --experiment-name mibici-equipo30 --env-manager local
 ```
 
-La [guía de P1](docs/p1-inventario-inicial.md) detalla el entorno Python 3.12, las particiones temporales, las cuatro corridas de MLflow, los comandos y los supuestos. El [notebook explicativo](notebooks/1.3-ge-p1-balance-salidas-llegadas.ipynb) presenta las gráficas y los resultados. El experimento compartido es `mibici-equipo30`.
+La ingesta descarga automáticamente los archivos faltantes del periodo fijado y verifica sus hashes contra el manifiesto versionado. El entrenamiento compara el baseline semanal, el promedio histórico y cuatro árboles (profundidades 6/10 × hojas mínimas 50/100). La búsqueda usa un padre y cuatro corridas hijas; cada modelo conserva firma, ejemplo, manifiesto, configuración, metadatos del dataset y diagnósticos. Se mantienen exactamente la cohorte, las fechas y las métricas de P1 de la propuesta. La selección utiliza **MAE de inventario en validación**; prueba se reserva para reportar desempeño.
+
+La [guía de tracking avanzado de P1](docs/p1-mlflow-avanzado.md) contiene los comandos para registrar y cargar `models:/mibici-equipo30-p1-demanda@champion`, la inferencia diaria, las tablas y los pendientes de integración del equipo. La [guía original](docs/p1-inventario-inicial.md) documenta los supuestos del balance y el flujo anterior. El experimento compartido es `mibici-equipo30`.
 
 ---
 
@@ -255,8 +259,8 @@ mlflow run . -e ingest --env-manager local              # question=all (P1+P2+P3
 ### 6.3 Entry point `train`
 Recibe la pregunta, el modelo/algoritmo (opcional) y sus hiperparámetros (opcionales; si se omiten, cada módulo corre su pipeline por defecto tal como en la sección 5):
 ```bash
-# P1: compara semanal/histórico/árbol (sin --model); solo el árbol acepta overrides
-mlflow run . -e train -P question=p1 -P max_depth=8 --experiment-name mibici-equipo30 --env-manager local
+# P1: baseline + histórico + búsqueda anidada de cuatro árboles
+mlflow run . -e train -P question=p1 --experiment-name mibici-equipo30 --env-manager local
 
 # P2: baseline + candidato LightGBM
 mlflow run . -e train -P question=p2 -P model=lgbm -P n_estimators=300 --experiment-name mibici-equipo30 --env-manager local
