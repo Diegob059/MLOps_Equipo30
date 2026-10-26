@@ -1,0 +1,66 @@
+{
+  "base_main_commit": "ab88e0a54d615b2892117bba32299a7ad0ccf2ea",
+  "training_fix_commit": "5d377c11554ce012e5772468f2e7995450da31de",
+  "registry_fix_commit": "d58fa75fc845a3b1ce675412f76a258d027b77a1",
+  "branch": "codex/fix-mlflow-reproducibilidad",
+  "tests": {
+    "passed": 36,
+    "warnings": 1,
+    "scope": "complete suite, including real P1 model logging, registry and alias roundtrip"
+  },
+  "dependency_check": "pip check: No broken requirements found",
+  "environment": {
+    "python": "3.12",
+    "mlflow": "3.5.0",
+    "lightgbm": "4.7.0",
+    "native_openmp": "Homebrew libomp 23.1.4"
+  },
+  "reproduction": {
+    "environment_reused": true,
+    "processed_data_reused": true,
+    "new_ingest_executed": false,
+    "p2_or_p3_retrained": false,
+    "tracking_uri": "http://127.0.0.1:5002",
+    "train_project_run_id": "89a702f62373427697dc2a1c20837fd9",
+    "register_project_run_id": "c8e39d45a0f5492aa95250e872a4a05f",
+    "selection": {
+      "selected_run_id": "f043029ad4774639a8504ab2704dc367",
+      "candidate": "arbol_d10_l50",
+      "model_uri": "models:/m-c6b3749aa0a046b699bb2528bce0ef1e",
+      "git_commit": "5d377c11554ce012e5772468f2e7995450da31de",
+      "git_dirty": "False",
+      "data_version": "p1-b82961c841c7089205efb9ef8de938995258201f2ccf81344756af16bdb1241c",
+      "search_run_id": "131554dfbf7348848426c98014070483",
+      "selection_metric": "validation_inventario_mae",
+      "selection_uses_test": false,
+      "baseline_run_id": "57349187cf9b4fca9b071fbb4a88fcbb"
+    },
+    "registry": {
+      "name": "mibici-equipo30-p1-demanda",
+      "version": "1",
+      "alias": "champion",
+      "model_uri": "models:/mibici-equipo30-p1-demanda@champion",
+      "experiment_id": "1",
+      "experiment": "mibici-equipo30",
+      "source_run_id": "f043029ad4774639a8504ab2704dc367",
+      "git_commit": "5d377c11554ce012e5772468f2e7995450da31de",
+      "data_version": "p1-b82961c841c7089205efb9ef8de938995258201f2ccf81344756af16bdb1241c",
+      "git_dirty": "False",
+      "reason": "Reproduccion verificada del candidato por validacion tras reparar el ejemplo de entrada y la URI de MLflow 3",
+      "load_and_predict_verified": true,
+      "example_rows": 5
+    },
+    "comparison": {
+      "metrics_compared": 118,
+      "maximum_absolute_difference": 0.0
+    }
+  },
+  "remaining": [
+    "Review and merge this repair PR",
+    "Independent selection/evaluation periods for P2",
+    "Clustering stability evaluation for P3",
+    "Complete three-model production screenshots and lineage",
+    "Individual contribution and review requirements",
+    "Protect main"
+  ]
+}
