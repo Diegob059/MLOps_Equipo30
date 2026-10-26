@@ -114,7 +114,8 @@ def test_candidate_logging_restores_model_with_signature_and_target_free_example
         dataset = mlflow.data.from_pandas(model_input(train), name='fixture_train')
         result = _log_candidate(
             'regression', 'arbol', {'max_depth': 2, 'min_samples_leaf': 1},
-            train, validation, test, peaks, manifest, {}, dataset=dataset)
+            train, validation, test, peaks, manifest,
+            {'git_commit': 'fixture-commit', 'git_dirty': 'False'}, dataset=dataset)
         client = MlflowClient()
         run = client.get_run(result['run_id'])
         assert run.info.status == 'FINISHED'
@@ -131,5 +132,16 @@ def test_candidate_logging_restores_model_with_signature_and_target_free_example
         predictions = model.predict(example)
         assert list(predictions.columns) == ['salidas_previstas', 'llegadas_previstas']
         assert np.isfinite(predictions.to_numpy()).all()
+
+        from src.models.p1_register import register_candidate
+
+        monkeypatch.setattr(cfg, 'TRACKING_URI', mlflow.get_tracking_uri())
+        monkeypatch.setattr(cfg, 'EXPERIMENT', 'p1-candidate-regression')
+        monkeypatch.setattr(cfg, 'REGISTRY_NAME', 'p1-regression-demanda')
+        evidence = register_candidate(result['run_id'], 'Prueba de registro desde LoggedModel')
+        assert evidence['source_run_id'] == result['run_id']
+        assert evidence['load_and_predict_verified'] is True
+        champion = mlflow.pyfunc.load_model(evidence['model_uri'])
+        pd.testing.assert_frame_equal(champion.predict(example), predictions)
     finally:
         mlflow.set_tracking_uri(previous_uri)
