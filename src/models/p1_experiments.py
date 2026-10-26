@@ -156,6 +156,7 @@ def _log_candidate(name, method, params, train, validation, test, peaks, manifes
         # árboles de decisión (sklearn.tree._tree.Tree) no pertenecen a la lista blanca de skops,
         # arrojando UntrustedTypesFoundException. Cloudpickle permite serializar y deserializar
         # de forma íntegra clases custom y closures de Python sin restricciones artificiales.
+        example = model_input(validation.head(5))
         info = mlflow.sklearn.log_model(
             sk_model=model, name='model', input_example=example,
             signature=infer_signature(example, model.predict(example)),

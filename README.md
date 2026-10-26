@@ -92,6 +92,12 @@ TC5061-Proyecto-Equipo30/
 
 ## ⚙️ 4. Instalación y Configuración
 
+Se requiere Python 3.12. En macOS, instalar primero el runtime OpenMP que utiliza
+el paquete de LightGBM: `brew install libomp` (con Homebrew disponible). Sin él,
+la importación puede fallar con `Library not loaded: ...libomp.dylib`. Esta es una
+dependencia del sistema y no se instala mediante `requirements.txt`.
+Referencia: [instalación del paquete Python de LightGBM](https://github.com/lightgbm-org/LightGBM/blob/main/python-package/README.rst).
+
 Clonar el repositorio y configurar el entorno virtual:
 
 ```bash
@@ -99,9 +105,17 @@ Clonar el repositorio y configurar el entorno virtual:
 git clone https://github.com/Diegob059/TC5061-Proyecto-Equipo30.git
 cd TC5061-Proyecto-Equipo30
 
-# 2. Instalar las dependencias fijadas del proyecto
-pip install -r requirements.txt
-pip install -e .
+# 2. Crear y activar el entorno
+python3.12 -m venv .venv
+source .venv/bin/activate  # macOS/Linux
+# Windows PowerShell: .venv\Scripts\Activate.ps1
+
+# 3. Instalar las dependencias fijadas del proyecto
+python -m pip install -r requirements.txt
+
+# 4. Verificar la dependencia nativa y ejecutar la suite completa
+python -c "import lightgbm; print(lightgbm.__version__)"
+python -m pytest -q
 ```
 
 ---
