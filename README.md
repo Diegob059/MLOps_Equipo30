@@ -92,6 +92,12 @@ TC5061-Proyecto-Equipo30/
 
 ## ⚙️ 4. Instalación y Configuración
 
+Se requiere Python 3.12. En macOS, instalar primero el runtime OpenMP que utiliza
+el paquete de LightGBM: `brew install libomp` (con Homebrew disponible). Sin él,
+la importación puede fallar con `Library not loaded: ...libomp.dylib`. Esta es una
+dependencia del sistema y no se instala mediante `requirements.txt`.
+Referencia: [instalación del paquete Python de LightGBM](https://github.com/lightgbm-org/LightGBM/blob/main/python-package/README.rst).
+
 Clonar el repositorio y configurar el entorno virtual:
 
 ```bash
@@ -99,9 +105,17 @@ Clonar el repositorio y configurar el entorno virtual:
 git clone https://github.com/Diegob059/TC5061-Proyecto-Equipo30.git
 cd TC5061-Proyecto-Equipo30
 
-# 2. Instalar las dependencias fijadas del proyecto
-pip install -r requirements.txt
-pip install -e .
+# 2. Crear y activar el entorno
+python3.12 -m venv .venv
+source .venv/bin/activate  # macOS/Linux
+# Windows PowerShell: .venv\Scripts\Activate.ps1
+
+# 3. Instalar las dependencias fijadas del proyecto
+python -m pip install -r requirements.txt
+
+# 4. Verificar la dependencia nativa y ejecutar la suite completa
+python -c "import lightgbm; print(lightgbm.__version__)"
+python -m pytest -q
 ```
 
 ---
@@ -293,7 +307,17 @@ mlflow run . -e train -P question=p3 -P model=kmeans -P k=4 --experiment-name mi
 
 ### Resultados ejecutados de P1
 
-P1 ya tiene baseline + cinco candidatas, cuatro combinaciones en nested runs y `mibici-equipo30-p1-demanda@champion` verificado en el tracking local. El elegido (árbol profundidad 10/hoja mínima 50) mejora el MAE de inventario 11.34% en validación y 9.27% en prueba. Consulta el [anexo PDF de avance de P1](output/pdf/TC5061_Reporte_MLFlow_Equipo30_P1_Avance.pdf) y la [evidencia completa](docs/p1-mlflow-avanzado.md#resultados-ejecutados-de-p1-25-de-octubre-de-2026). El reporte final del equipo aún debe integrar P2, P3 y las revisiones individuales.
+P1 tiene baseline + cinco candidatas, cuatro combinaciones en nested runs y `mibici-equipo30-p1-demanda@champion` verificado en el tracking local. El elegido (árbol profundidad 10/hoja mínima 50) mejora el MAE de inventario 11.34% en validación y 9.27% en prueba. Consulta el [reporte corregido del equipo en PDF](docs/TC5061_Reporte_MLFlow_Equipo30.pdf), su [versión editable](docs/TC5061_Reporte_MLFlow_Equipo30.docx) y la [evidencia de P1](docs/p1-mlflow-avanzado.md#resultados-ejecutados-de-p1-25-de-octubre-de-2026).
+
+La reparación de P1 restaura el ejemplo de entrada y resuelve el `LoggedModel` de
+MLflow 3 antes de promoverlo. La suite completa aprueba 36 pruebas. En una ejecución
+nueva de `train` y `register_p1` mediante MLflow Project, 118 métricas comparables
+coinciden exactamente con las históricas y se verifica carga/predicción por alias.
+Se reutilizaron el entorno fijado y los datos procesados: no es una instalación
+nueva ni una repetición de ingesta o de P2/P3. Los identificadores están en
+[verificacion_reparacion_mlflow.json](reports/verificacion_reparacion_mlflow.json).
+El reporte conserva las métricas y el linaje históricos y documenta pendientes
+de evaluación, capturas de los tres modelos y colaboración individual.
 
 ### 6.4 Qué no se entrega
 Por diseño, el repositorio **no incluye** (ver `.gitignore`): los archivos de datos crudos de MiBici, `mlflow.db`, las carpetas `mlruns/`/`mlartifacts/`, ni modelos serializados (`models/*.joblib`, `*.pkl`). Todo eso se reconstruye con los comandos de `ingest`/`train` anteriores desde un clon limpio.

@@ -1,4 +1,6 @@
 """Regresiones: causalidad temporal, balance, selección y modelo portable de P1."""
+from pathlib import Path
+
 import mlflow.sklearn
 import numpy as np
 import pandas as pd
@@ -7,7 +9,12 @@ from mlflow.models import infer_signature
 
 from src import p1_config as cfg
 from src.models.p1_estimator import FlowRegressor, model_input
-from src.models.p1_experiments import evaluate, select_candidate, temporal_split
+from src.models.p1_experiments import (
+    _log_candidate,
+    evaluate,
+    select_candidate,
+    temporal_split,
+)
 from src.models.p1_train import evaluate_stock
 
 
@@ -81,3 +88,60 @@ def test_historical_fallback_for_station_absent_from_training():
     model = FlowRegressor(method='historico').fit(model_input(data), data[cfg.FLOWS])
     unseen = model_input(data.head(1)).assign(estacion=999)
     np.testing.assert_allclose(model.predict(unseen).iloc[0], data[cfg.FLOWS].mean())
+
+
+def test_candidate_logging_restores_model_with_signature_and_target_free_example(tmp_path, monkeypatch):
+    """Ejercita el registro real que fallaba por usar `example` sin definir."""
+    import json
+
+    import mlflow
+    from mlflow import MlflowClient
+
+    train = sample().assign(fecha=pd.Timestamp('2025-06-01'))
+    validation = sample()
+    test = sample().assign(fecha=pd.Timestamp('2026-07-01'))
+    peaks = pd.DataFrame({'inicio_pico': [0, 0], 'hora_fin': [3, 3]},
+                         index=['Laborable', 'Fin de semana'])
+    manifest = {'data_version': 'fixture-p1', 'features_sha256': 'fixture-features'}
+    manifest_path = tmp_path / 'manifest.json'
+    manifest_path.write_text(json.dumps(manifest))
+    monkeypatch.setattr(cfg, 'MANIFEST', manifest_path)
+    monkeypatch.setattr(cfg, 'ADVANCED_REPORTS', tmp_path / 'reports')
+    previous_uri = mlflow.get_tracking_uri()
+    mlflow.set_tracking_uri(f'sqlite:///{tmp_path / "tracking.db"}')
+    try:
+        mlflow.set_experiment('p1-candidate-regression')
+        dataset = mlflow.data.from_pandas(model_input(train), name='fixture_train')
+        result = _log_candidate(
+            'regression', 'arbol', {'max_depth': 2, 'min_samples_leaf': 1},
+            train, validation, test, peaks, manifest,
+            {'git_commit': 'fixture-commit', 'git_dirty': 'False'}, dataset=dataset)
+        client = MlflowClient()
+        run = client.get_run(result['run_id'])
+        assert run.info.status == 'FINISHED'
+        assert run.data.tags['stage_of_work'] == 'candidate'
+        assert np.isfinite(run.data.metrics['validation_inventario_mae'])
+
+        model = mlflow.pyfunc.load_model(result['model_uri'])
+        assert model.metadata.signature is not None
+        assert model.metadata.saved_input_example_info is not None
+        artifact = Path(mlflow.artifacts.download_artifacts(result['model_uri']))
+        example = mlflow.models.Model.load(str(artifact / 'MLmodel')).load_input_example(str(artifact))
+        assert len(example) == 5
+        assert not set(cfg.FLOWS).intersection(example.columns)
+        predictions = model.predict(example)
+        assert list(predictions.columns) == ['salidas_previstas', 'llegadas_previstas']
+        assert np.isfinite(predictions.to_numpy()).all()
+
+        from src.models.p1_register import register_candidate
+
+        monkeypatch.setattr(cfg, 'TRACKING_URI', mlflow.get_tracking_uri())
+        monkeypatch.setattr(cfg, 'EXPERIMENT', 'p1-candidate-regression')
+        monkeypatch.setattr(cfg, 'REGISTRY_NAME', 'p1-regression-demanda')
+        evidence = register_candidate(result['run_id'], 'Prueba de registro desde LoggedModel')
+        assert evidence['source_run_id'] == result['run_id']
+        assert evidence['load_and_predict_verified'] is True
+        champion = mlflow.pyfunc.load_model(evidence['model_uri'])
+        pd.testing.assert_frame_equal(champion.predict(example), predictions)
+    finally:
+        mlflow.set_tracking_uri(previous_uri)

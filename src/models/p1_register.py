@@ -1,7 +1,6 @@
 """Registro explícito del candidato P1, promoción por alias y prueba de carga."""
 import argparse
 import json
-from pathlib import Path
 
 import mlflow
 import pandas as pd
@@ -28,13 +27,19 @@ def register_candidate(run_id, reason, alias=cfg.PRODUCTION_ALIAS):
     if not all(lineage[key] for key in ('git_commit', 'data_version')):
         raise ValueError('La corrida no conserva commit y versión de datos.')
     # Validar modelo y predicciones ANTES de asignar el alias de producción.
-    uri = f'runs:/{run_id}/model'
+    # MLflow 3 almacena log_model como LoggedModel, fuera de artifacts/model.
+    # Resolver desde la corrida conserva el linaje y no depende de un JSON local.
+    outputs = run.outputs.model_outputs if run.outputs else []
+    models = [client.get_logged_model(output.model_id) for output in outputs]
+    models = [model for model in models if model.name == 'model']
+    if len(models) > 1:
+        raise ValueError('La corrida contiene varios modelos llamados model; selecciona una corrida inequívoca.')
+    uri = models[0].model_uri if models else f'runs:/{run_id}/model'
     source_model = mlflow.pyfunc.load_model(uri)
-    example = source_model.input_example
+    directory = mlflow.artifacts.download_artifacts(uri)
+    example = source_model.metadata.load_input_example(directory)
     if example is None:
-        path = mlflow.artifacts.download_artifacts(uri + '/input_example.json')
-        payload = json.loads(Path(path).read_text(encoding='utf-8'))
-        example = pd.DataFrame(payload['data'], columns=payload['columns'])
+        raise ValueError('El modelo no conserva un ejemplo de entrada para verificar la inferencia.')
     expected = source_model.predict(example)
     if expected.shape != (len(example), 2) or not pd.DataFrame(expected).ge(0).all().all():
         raise ValueError('La prueba de inferencia de flujos falló.')
