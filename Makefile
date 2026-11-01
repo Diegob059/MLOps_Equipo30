@@ -82,6 +82,11 @@ train_p3:
 mlflow:
 	mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
 
+## Run DeepChecks data integrity and train/test drift validation suites
+.PHONY: deepchecks
+deepchecks:
+	$(PYTHON_INTERPRETER) scripts/run_deepchecks.py
+
 #################################################################################
 # Self Documenting Commands                                                     #
 #################################################################################
