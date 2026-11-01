@@ -41,6 +41,16 @@ format:
 test:
 	$(PYTHON_INTERPRETER) -m pytest tests
 
+## Static code security scan with bandit
+.PHONY: security_code
+security_code:
+	$(PYTHON_INTERPRETER) -m bandit -r src scripts
+
+## Dependency vulnerability scan with pip-audit
+.PHONY: security_deps
+security_deps:
+	$(PYTHON_INTERPRETER) -m pip_audit
+
 #################################################################################
 # PROJECT PIPELINES (CCDS v1)                                                   #
 #################################################################################
