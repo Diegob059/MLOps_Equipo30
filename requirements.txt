@@ -24,6 +24,7 @@ ruff==0.17.1
 ipykernel==6.30.1
 nbclient==0.10.2
 nbformat==5.10.4
+<<<<<<< HEAD
 bandit==1.9.4
 pip-audit==2.10.1
 # pyasn1 fija por encima de lo que resuelve mlflow==3.5.0 por defecto: corrige 4 CVEs
@@ -31,4 +32,8 @@ pip-audit==2.10.1
 # cryptography/fastmcp/pyarrow, que mlflow 3.5.0 limita por debajo de sus versiones
 # corregidas; requieren actualizar mlflow primero, ver hallazgos de seguridad).
 pyasn1==0.6.5
+=======
+deepchecks==0.19.1
+anywidget==0.11.0
+>>>>>>> origin/main
 -e .

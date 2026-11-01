@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-11-01T14:44:45Z",
+  "dataset": "p2_mibici_features_target.parquet",
+  "train_samples": 7500,
+  "test_samples": 7500,
+  "features_evaluated": 22,
+  "elapsed_seconds": 7.0,
+  "suites": {
+    "data_integrity": {
+      "suite_name": "data_integrity",
+      "total_checks": 12,
+      "passed_checks_count": 8,
+      "passed_checks": [
+        "Is Single Value",
+        "Special Characters",
+        "Mixed Nulls",
+        "Mixed Data Types",
+        "String Mismatch",
+        "Data Duplicates",
+        "String Length Out Of Bounds",
+        "Conflicting Labels"
+      ],
+      "not_passed_checks": [
+        "Feature Label Correlation",
+        "Feature Feature Correlation"
+      ],
+      "all_passed": false,
+      "report_path": "reports/deepchecks_data_integrity.html"
+    },
+    "train_test_drift": {
+      "suite_name": "train_test_validation",
+      "total_checks": 12,
+      "passed_checks_count": 7,
+      "passed_checks": [
+        "Datasets Size Comparison",
+        "New Category Train Test",
+        "String Mismatch Comparison",
+        "Train Test Samples Mix",
+        "Feature Drift",
+        "Label Drift",
+        "Multivariate Drift"
+      ],
+      "not_passed_checks": [
+        "New Label Train Test",
+        "Feature Label Correlation Change"
+      ],
+      "all_passed": false,
+      "report_path": "reports/deepchecks_data_drift.html"
+    }
+  }
+}
