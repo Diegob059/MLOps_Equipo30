@@ -185,6 +185,15 @@ pytest tests
 
 Para más detalles sobre la metodología, partición anti-leakage y comparativas de P2, consultar la [Guía de MLflow Avanzado de P2](docs/p2-mlflow-avanzado.md).
 
+### Paso 7: Validación de Datos con DeepChecks
+Chequeos genéricos de integridad (valores faltantes, duplicados, tipos mixtos) y, para P1/P2, *drift* entre entrenamiento y prueba (P3 no tiene partición train/test: es clustering no supervisado). Aplica a las 3 preguntas:
+```bash
+python -m src.data.validate_data --question p1
+python -m src.data.validate_data --question p2
+python -m src.data.validate_data --question p3
+```
+O con el atajo del `Makefile`: `make validate_data QUESTION=p1` (o `p2`/`p3`). Genera reportes HTML en `reports/<pregunta>_deepchecks_*.html` (no se versionan: son pesados y fácilmente regenerables). Para datasets grandes (P2), valida sobre una muestra aleatoria de hasta 20,000 filas (`--muestra`) para que la validación no tome varios minutos.
+
 ---
 
 ## P1: bicicletas al inicio del día

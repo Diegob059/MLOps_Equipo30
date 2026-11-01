@@ -21,6 +21,8 @@
 /reports/p1/evaluacion_inventario_prueba.csv
 /reports/p1/avanzado/plots/
 /reports/p1/avanzado/sugerencia_registry.csv
+# Reportes de DeepChecks: HTML regenerable y pesado (varios MB), no se versiona.
+/reports/*_deepchecks_*.html
 .env
 .env.*
 !.env.example

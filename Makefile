@@ -82,6 +82,11 @@ train_p3:
 mlflow:
 	mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
 
+## Validate dataset quality/integrity with DeepChecks (make validate_data QUESTION=p1|p2|p3)
+.PHONY: validate_data
+validate_data:
+	$(PYTHON_INTERPRETER) -m src.data.validate_data --question $(QUESTION)
+
 #################################################################################
 # Self Documenting Commands                                                     #
 #################################################################################
